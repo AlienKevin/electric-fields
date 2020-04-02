@@ -3,6 +3,7 @@ module Main exposing (main)
 import Browser
 import Html exposing (Html)
 import Html.Attributes
+import Html.Events
 import Color exposing (Color)
 import TypedSvg as Svg
 import TypedSvg.Attributes as Attributes
@@ -11,6 +12,7 @@ import TypedSvg.Types exposing (px, Paint(..))
 import Math.Vector2 as Vector2
 import Draggable
 import Draggable.Events
+import Json.Decode as Json
 
 type alias Model =
   { fields : List Field
@@ -183,6 +185,7 @@ type Msg
   | DragMsg (Draggable.Msg Id)
   | StartDragging Id
   | ToggleSourceSign Id
+  | ScaleSourceMagnitude Int
 
 
 dragConfig : Draggable.Config Id Msg
@@ -239,6 +242,33 @@ update msg model =
       ( { model
         | activeSourceId = id
         , fields =
+          calculateFields newFields
+      }
+      , Cmd.none
+      )
+
+    ScaleSourceMagnitude delta ->
+      let
+        newFields =
+          updateActive
+            (\field ->
+              let
+                source =
+                  field.source
+              in
+              { field |
+                source =
+                  { source |
+                    magnitude =
+                      min 20 <| max 0.5 <| source.magnitude + toFloat delta * -0.01
+                  }
+              }
+            )
+            model.activeSourceId
+            model.fields
+      in
+      ( { model |
+        fields =
           calculateFields newFields
       }
       , Cmd.none
@@ -324,6 +354,7 @@ viewFieldSource activeSourceId field =
     , Attributes.r (px field.source.r)
     , Attributes.fill <| Paint fill
     , Draggable.mouseTrigger field.source.id DragMsg
+    , onWheel ScaleSourceMagnitude
     ] ++ if field.source.id == activeSourceId then
         [ Attributes.stroke <| Paint Color.lightGreen
         , Attributes.strokeWidth <| px 2.5
@@ -344,6 +375,11 @@ viewFieldLines field =
         []
       )
       field.lines
+
+
+onWheel : (Int -> msg) -> Html.Attribute msg
+onWheel message =
+  Html.Events.on "wheel" (Json.map message (Json.at ["deltaY"] Json.int ))
 
 
 signToColor : Sign -> Color
