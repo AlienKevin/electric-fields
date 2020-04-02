@@ -363,7 +363,8 @@ viewFieldSource activeSourceId field =
     , Draggable.mouseTrigger field.source.id DragMsg
     , onWheel ScaleSourceMagnitude
     , Html.Events.onDoubleClick ToggleSourceSign
-    ] ++ if field.source.id == activeSourceId then
+    ] ++ Draggable.touchTriggers field.source.id DragMsg
+    ++ if field.source.id == activeSourceId then
         [ Attributes.stroke <| Paint Color.lightGreen
         , Attributes.strokeWidth <| px 2.5
         ]
