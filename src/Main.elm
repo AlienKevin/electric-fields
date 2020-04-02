@@ -442,7 +442,8 @@ viewContextMenu model =
       , E.mouseOver
           [ Background.color <| toElmUiColor Color.grey ]
       , E.paddingXY 10 5
-      , Border.width 2
+      , E.width <| E.px 150
+      , Border.widthXY 2 1
       , Border.color <| toElmUiColor Color.darkGrey
       ]
   in
