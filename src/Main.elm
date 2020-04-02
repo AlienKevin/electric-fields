@@ -22,6 +22,7 @@ import Element.Events
 type alias Model =
   { fields : List Field
   , activeSourceId : Id
+  , nextId : Id
   , drag : Draggable.State Id
   , showContextMenu : Bool
   }
@@ -89,6 +90,7 @@ initialModel _ =
   ({ fields =
     calculateFields fields
   , activeSourceId = 0
+  , nextId = List.length fields
   , drag = Draggable.init
   , showContextMenu = False
   }
@@ -197,6 +199,7 @@ type Msg
   | ShowContextMenu
   | DeleteActiveField
   | ClickedBackground
+  | DuplicateActiveField
 
 
 dragConfig : Draggable.Config Id Msg
@@ -324,6 +327,41 @@ update msg model =
     ClickedBackground ->
       (resetState model, Cmd.none)
 
+    DuplicateActiveField ->
+      (duplicateActiveField model, Cmd.none)
+
+duplicateActiveField : Model -> Model
+duplicateActiveField model =
+  let
+    duplicatedFields =
+      List.indexedMap
+        (\index field ->
+          let
+            source =
+              field.source
+          in
+          { field |
+            source =
+              { source
+                | x =
+                  source.x + source.r * 2 + 15
+                , id =
+                  model.nextId + index
+              }
+          }
+        )
+        (getActiveFields model)
+    newFields =
+      model.fields ++ duplicatedFields
+  in
+  { model
+    | fields =
+      calculateFields newFields
+    , nextId =
+      model.nextId + List.length duplicatedFields
+  }
+
+
 resetState : Model -> Model
 resetState model =
   { model |
@@ -381,17 +419,20 @@ view model =
       )
 
 
+getActiveFields : Model -> List Field
+getActiveFields model =
+  List.filter
+    (\field ->
+      field.source.id == model.activeSourceId
+    )
+    model.fields
+
+
 viewContextMenu : Model -> E.Element Msg
 viewContextMenu model =
   let
     (x, y) =
-      case List.head <|
-        List.filter
-          (\field ->
-            field.source.id == model.activeSourceId
-          )
-          model.fields
-      of
+      case List.head <| getActiveFields model of
         Just field ->
           (field.source.x, field.source.y)
         Nothing ->
@@ -413,6 +454,11 @@ viewContextMenu model =
       buttonStyles
       { onPress = Just DeleteActiveField
       , label = E.text "delete"
+      }
+    , Input.button
+      buttonStyles
+      { onPress = Just DuplicateActiveField
+      , label = E.text "duplicate"
       }
     ]
 
