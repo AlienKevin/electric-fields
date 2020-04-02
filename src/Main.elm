@@ -301,7 +301,7 @@ viewFieldSource field =
     [ Svg.radialGradient
       [ Attributes.id <| gradientId ]
       [ Svg.stop
-        [ Attributes.offset "50%"
+        [ Attributes.offset "1%"
         , Attributes.stopColor <| Color.toCssString <| setAlpha 1 fill
         ] []
       , Svg.stop
@@ -313,8 +313,16 @@ viewFieldSource field =
   , Svg.circle
     [ Attributes.cx (px field.source.x)
     , Attributes.cy (px field.source.y)
-    , Attributes.r (px <| lerp 0 20 8 35 (min 20 field.source.r * field.source.magnitude / 10))
+    , Attributes.r (px <| lerp 0 20 10 40 (min 20 field.source.r * field.source.magnitude / 10))
     , Attributes.fill <| Reference gradientId
+    , Html.Attributes.style "pointer-events" "none"
+    ]
+    []
+  , Svg.circle
+    [ Attributes.cx (px field.source.x)
+    , Attributes.cy (px field.source.y)
+    , Attributes.r (px field.source.r)
+    , Attributes.fill <| Paint fill
     , Draggable.mouseTrigger field.source.id DragMsg
     ]
     []
