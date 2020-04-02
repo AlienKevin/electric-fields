@@ -13,11 +13,17 @@ import Math.Vector2 as Vector2
 import Draggable
 import Draggable.Events
 import Json.Decode as Json
+import Element as E
+import Element.Input as Input
+import Element.Background as Background
+import Element.Border as Border
+import Element.Events
 
 type alias Model =
   { fields : List Field
   , activeSourceId : Id
   , drag : Draggable.State Id
+  , showContextMenu : Bool
   }
 
 type alias Field =
@@ -84,6 +90,7 @@ initialModel _ =
     calculateFields fields
   , activeSourceId = 0
   , drag = Draggable.init
+  , showContextMenu = False
   }
   , Cmd.none
   )
@@ -187,6 +194,9 @@ type Msg
   | ActivateSource Id
   | ToggleSourceSign
   | ScaleSourceMagnitude Int
+  | ShowContextMenu
+  | DeleteActiveField
+  | ClickedBackground
 
 
 dragConfig : Draggable.Config Id Msg
@@ -284,6 +294,43 @@ update msg model =
     DragMsg dragMsg ->
       Draggable.update dragConfig dragMsg model
 
+    ShowContextMenu ->
+      ({ model
+        | showContextMenu = True
+      }
+      , Cmd.none
+      )
+
+    DeleteActiveField ->
+      let
+        newFields =
+          List.filter
+            (\field ->
+              field.source.id /= model.activeSourceId
+            )
+            model.fields
+      in
+      ( { model |
+        fields =
+          calculateFields newFields
+        , showContextMenu =
+          False
+        , activeSourceId =
+          -1
+      }
+      , Cmd.none
+      )
+
+    ClickedBackground ->
+      (resetState model, Cmd.none)
+
+resetState : Model -> Model
+resetState model =
+  { model |
+    showContextMenu =
+      False
+  }
+
 
 updateActive : (Field -> Field) -> Id -> List Field -> List Field
 updateActive func id fields =
@@ -314,15 +361,60 @@ dragSource (dx, dy) field =
 
 view : Model -> Html Msg
 view model =
-  Svg.svg
-    [ Attributes.width (px 1000)
-    , Attributes.height (px 780)
-    , Attributes.viewBox 0 0 1000 780
-    , Html.Attributes.style "display" "block"
-    , Html.Attributes.style "margin" "auto"
+  E.layout
+    [ E.width E.fill
+    , E.height E.fill
+    , Element.Events.onClick ClickedBackground
     ] <|
-  List.map viewFieldLines model.fields
-  ++ List.map (viewFieldSource model.activeSourceId) model.fields
+    E.el
+      [ E.inFront <| if model.showContextMenu then viewContextMenu model else E.none
+      , E.centerX
+      , E.centerY
+      ]
+      ( E.html <| Svg.svg
+        [ Attributes.width (px 1000)
+        , Attributes.height (px 780)
+        , Attributes.viewBox 0 0 1000 780
+        ] <|
+        List.map viewFieldLines model.fields
+        ++ List.map (viewFieldSource model.activeSourceId) model.fields
+      )
+
+
+viewContextMenu : Model -> E.Element Msg
+viewContextMenu model =
+  let
+    (x, y) =
+      case List.head <|
+        List.filter
+          (\field ->
+            field.source.id == model.activeSourceId
+          )
+          model.fields
+      of
+        Just field ->
+          (field.source.x, field.source.y)
+        Nothing ->
+          (0, 0) -- impossible
+    buttonStyles =
+      [ Background.color <| toElmUiColor Color.lightGrey
+      , E.mouseOver
+          [ Background.color <| toElmUiColor Color.grey ]
+      , E.paddingXY 10 5
+      , Border.width 2
+      , Border.color <| toElmUiColor Color.darkGrey
+      ]
+  in
+  E.column
+    [ E.moveRight x
+    , E.moveDown y
+    ]
+    [ Input.button
+      buttonStyles
+      { onPress = Just DeleteActiveField
+      , label = E.text "delete"
+      }
+    ]
 
 
 viewFieldSource : Id -> Field -> Svg Msg
@@ -363,6 +455,7 @@ viewFieldSource activeSourceId field =
     , Draggable.mouseTrigger field.source.id DragMsg
     , onWheel ScaleSourceMagnitude
     , Html.Events.onDoubleClick ToggleSourceSign
+    , onRightClick ShowContextMenu
     ] ++ Draggable.touchTriggers field.source.id DragMsg
     ++ if field.source.id == activeSourceId then
         [ Attributes.stroke <| Paint Color.lightGreen
@@ -389,6 +482,17 @@ viewFieldLines field =
 onWheel : (Int -> msg) -> Html.Attribute msg
 onWheel message =
   Html.Events.on "wheel" (Json.map message (Json.at ["deltaY"] Json.int ))
+
+
+onRightClick : msg -> Html.Attribute msg
+onRightClick msg =
+  Html.Events.custom "contextmenu"
+    (Json.succeed
+      { message = msg
+      , stopPropagation = True
+      , preventDefault = True
+      }
+    )
 
 
 signToColor : Sign -> Color
@@ -428,6 +532,15 @@ lerp min1 max1 min2 max2 num =
       abs <| (num - min1) / (max1 - min1)
   in
   min2 + ratio * (max2 - min2)
+
+
+toElmUiColor : Color.Color -> E.Color
+toElmUiColor color =
+    let
+        {red, green, blue, alpha } =
+            Color.toRgba color
+    in
+    E.rgba red green blue alpha
 
 
 subscriptions : Model -> Sub Msg
