@@ -9,9 +9,14 @@ import TypedSvg.Attributes as Attributes
 import TypedSvg.Core exposing (Svg)
 import TypedSvg.Types exposing (px, Paint(..))
 import Math.Vector2 as Vector2
+import Draggable
+import Draggable.Events exposing (onDragBy, onDragStart)
 
 type alias Model =
-  { fields : List Field }
+  { fields : List Field
+  , activeSourceId : Id
+  , drag : Draggable.State Id
+  }
 
 type alias Field =
   { source: Charge
@@ -20,6 +25,9 @@ type alias Field =
   , delta: Float
   , lines: List Line
   }
+
+type alias Id =
+  Int
 
 type alias Line =
   List Point
@@ -32,70 +40,80 @@ type Sign
   | Negative
 
 type alias Charge =
-  { sign: Sign
+  { id : Id
+  , sign: Sign
   , magnitude: Float
   , x: Float
   , y: Float
   , r: Float
   }
 
-initialModel : Model
-initialModel =
+initialModel : () -> (Model, Cmd Msg)
+initialModel _ =
   let
     fields =
-      [{ source = { sign = Negative, magnitude = 1.0, x = 300.0, y = 350.0, r = 10.0 }
+      [{ source = { id = 0, sign = Negative, magnitude = 1.0, x = 300.0, y = 350.0, r = 10.0 }
       , density = 30
-      , steps = 250
+      , steps = 450
       , delta = 2
       , lines = []
       }
-      , { source = { sign = Positive, magnitude = 1.0, x = 400.0, y = 350.0, r = 10.0 }
+      , { source = { id = 1, sign = Positive, magnitude = 1.0, x = 400.0, y = 350.0, r = 10.0 }
       , density = 30
-      , steps = 250
+      , steps = 450
       , delta = 2
       , lines = []
       }
-      , { source = { sign = Positive, magnitude = 10.0, x = 300.0, y = 450.0, r = 10.0 }
+      , { source = { id = 2, sign = Positive, magnitude = 10.0, x = 300.0, y = 450.0, r = 10.0 }
       , density = 30
-      , steps = 250
+      , steps = 450
       , delta = 2
       , lines = []
       }
-      , { source = { sign = Negative, magnitude = 1.0, x = 400.0, y = 450.0, r = 10.0 }
+      , { source = { id = 3, sign = Negative, magnitude = 1.0, x = 400.0, y = 450.0, r = 10.0 }
       , density = 30
-      , steps = 250
+      , steps = 450
       , delta = 2
       , lines = []
       }
       ]
   in
-  { fields =
-    List.map
-      (\field ->
-        let
-          deltaAngle =
-            2 * pi / toFloat field.density
-          lines =
-            List.map
-              (\index ->
-                let
-                  angle =
-                    deltaAngle * index
-                  x =
-                    field.source.x + field.source.r * cos angle
-                  y =
-                    field.source.y + field.source.r * sin angle
-                in
-                calculateFieldLine (List.map .source fields) field.steps field.delta field.source.sign (x, y)
-              )
-              (List.map toFloat <| List.range 0 (field.density - 1))
-        in
-        { field |
-          lines = lines
-        }
-      )
-      fields
+  ({ fields =
+    calculateFields fields
+  , activeSourceId = 0
+  , drag = Draggable.init
   }
+  , Cmd.none
+  )
+
+
+calculateFields : List Field -> List Field
+calculateFields fields =
+  List.map
+    (\field ->
+      let
+        deltaAngle =
+          2 * pi / toFloat field.density
+        lines =
+          List.map
+            (\index ->
+              let
+                angle =
+                  deltaAngle * index
+                x =
+                  field.source.x + field.source.r * cos angle
+                y =
+                  field.source.y + field.source.r * sin angle
+              in
+              calculateFieldLine (List.map .source fields) field.steps field.delta field.source.sign (x, y)
+            )
+            (List.map toFloat <| List.range 0 (field.density - 1))
+      in
+      { field |
+        lines = lines
+      }
+    )
+    fields
 
 
 calculateFieldLine : List Charge -> Int -> Float -> Sign -> Point -> Line
@@ -161,13 +179,65 @@ distance (x1, y1) (x2, y2) =
 
 
 type Msg
-  = NoOp
+  = OnDragBy Draggable.Delta
+  | DragMsg (Draggable.Msg Id)
+  | StartDragging Id
 
 
-update : Msg -> Model -> Model
+dragConfig : Draggable.Config Id Msg
+dragConfig =
+  Draggable.customConfig
+    [ onDragBy OnDragBy
+    , onDragStart StartDragging
+    ]
+
+
+update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
-    NoOp -> model
+    OnDragBy delta ->
+      let
+        draggedFields =
+          List.map
+            (\field ->
+              if field.source.id == model.activeSourceId then
+                dragSource delta field
+              else
+                field
+            )
+            model.fields
+      in
+      ( { model |
+        fields =
+          calculateFields draggedFields
+      }
+      , Cmd.none
+      )
+
+    StartDragging id ->
+      ( { model |
+        activeSourceId = id
+      }
+      , Cmd.none
+      )
+
+    DragMsg dragMsg ->
+      Draggable.update dragConfig dragMsg model
+
+
+dragSource : (Float, Float) -> Field -> Field
+dragSource (dx, dy) field =
+  let
+    source =
+      field.source
+  in
+  { field |
+    source =
+      { source
+        | x = field.source.x + dx
+        , y = field.source.y + dy
+      }
+  }
 
 
 view : Model -> Html Msg
@@ -190,6 +260,7 @@ viewFieldSource field =
     , Attributes.cy (px field.source.y)
     , Attributes.r (px field.source.r)
     , Attributes.fill <| Paint (signToColor field.source.sign)
+    , Draggable.mouseTrigger field.source.id DragMsg
     ] []
 
 
@@ -212,10 +283,17 @@ signToColor sign =
     Negative ->
       Color.blue
 
+
+subscriptions : Model -> Sub Msg
+subscriptions { drag } =
+  Draggable.subscriptions DragMsg drag
+
+
 main : Program () Model Msg
 main =
-  Browser.sandbox
+  Browser.element
     { init = initialModel
     , view = view
     , update = update
+    , subscriptions = subscriptions
     }
