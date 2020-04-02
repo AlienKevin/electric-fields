@@ -285,11 +285,11 @@ view model =
     , Html.Attributes.style "margin" "auto"
     ] <|
   List.map viewFieldLines model.fields
-  ++ List.map viewFieldSource model.fields
+  ++ List.map (viewFieldSource model.activeSourceId) model.fields
 
 
-viewFieldSource : Field -> Svg Msg
-viewFieldSource field =
+viewFieldSource : Id -> Field -> Svg Msg
+viewFieldSource activeSourceId field =
   let
     fill =
       signToColor field.source.sign
@@ -319,12 +319,18 @@ viewFieldSource field =
     ]
     []
   , Svg.circle
-    [ Attributes.cx (px field.source.x)
+    ([ Attributes.cx (px field.source.x)
     , Attributes.cy (px field.source.y)
     , Attributes.r (px field.source.r)
     , Attributes.fill <| Paint fill
     , Draggable.mouseTrigger field.source.id DragMsg
-    ]
+    ] ++ if field.source.id == activeSourceId then
+        [ Attributes.stroke <| Paint Color.lightGreen
+        , Attributes.strokeWidth <| px 2.5
+        ]
+      else
+        []
+    )
     []
   ]
 
