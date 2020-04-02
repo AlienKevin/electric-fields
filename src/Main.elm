@@ -10,7 +10,7 @@ import TypedSvg.Core exposing (Svg)
 import TypedSvg.Types exposing (px, Paint(..))
 import Math.Vector2 as Vector2
 import Draggable
-import Draggable.Events exposing (onDragBy, onDragStart)
+import Draggable.Events
 
 type alias Model =
   { fields : List Field
@@ -182,13 +182,15 @@ type Msg
   = OnDragBy Draggable.Delta
   | DragMsg (Draggable.Msg Id)
   | StartDragging Id
+  | ToggleSourceSign Id
 
 
 dragConfig : Draggable.Config Id Msg
 dragConfig =
   Draggable.customConfig
-    [ onDragBy OnDragBy
-    , onDragStart StartDragging
+    [ Draggable.Events.onDragBy OnDragBy
+    , Draggable.Events.onDragStart StartDragging
+    , Draggable.Events.onClick ToggleSourceSign
     ]
 
 
@@ -197,19 +199,12 @@ update msg model =
   case msg of
     OnDragBy delta ->
       let
-        draggedFields =
-          List.map
-            (\field ->
-              if field.source.id == model.activeSourceId then
-                dragSource delta field
-              else
-                field
-            )
-            model.fields
+        newFields =
+          updateActive (dragSource delta) model.activeSourceId model.fields
       in
       ( { model |
         fields =
-          calculateFields draggedFields
+          calculateFields newFields
       }
       , Cmd.none
       )
@@ -221,8 +216,48 @@ update msg model =
       , Cmd.none
       )
 
+    ToggleSourceSign id ->
+      let
+        newFields =
+          updateActive
+            (\field ->
+              let
+                source =
+                  field.source
+              in
+              { field |
+                source =
+                  { source |
+                    sign =
+                      negateSign field.source.sign
+                  }
+              }
+            )
+            id
+            model.fields
+      in
+      ( { model
+        | activeSourceId = id
+        , fields =
+          calculateFields newFields
+      }
+      , Cmd.none
+      )
+
     DragMsg dragMsg ->
       Draggable.update dragConfig dragMsg model
+
+
+updateActive : (Field -> Field) -> Id -> List Field -> List Field
+updateActive func id fields =
+  List.map
+    (\field ->
+      if field.source.id == id then
+        func field
+      else
+        field
+    )
+    fields
 
 
 dragSource : (Float, Float) -> Field -> Field
@@ -282,6 +317,15 @@ signToColor sign =
       Color.orange
     Negative ->
       Color.blue
+
+
+negateSign : Sign -> Sign
+negateSign sign =
+  case sign of
+    Positive ->
+      Negative
+    Negative ->
+      Positive
 
 
 subscriptions : Model -> Sub Msg
