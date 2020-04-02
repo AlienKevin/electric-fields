@@ -52,7 +52,7 @@ initialModel : () -> (Model, Cmd Msg)
 initialModel _ =
   let
     fields =
-      [{ source = { id = 0, sign = Negative, magnitude = 1.0, x = 300.0, y = 350.0, r = 10.0 }
+      [{ source = { id = 0, sign = Negative, magnitude = 3.0, x = 300.0, y = 350.0, r = 10.0 }
       , density = 30
       , steps = 450
       , delta = 2
@@ -70,7 +70,7 @@ initialModel _ =
       , delta = 2
       , lines = []
       }
-      , { source = { id = 3, sign = Negative, magnitude = 1.0, x = 400.0, y = 450.0, r = 10.0 }
+      , { source = { id = 3, sign = Negative, magnitude = 20.0, x = 400.0, y = 450.0, r = 10.0 }
       , density = 30
       , steps = 450
       , delta = 2
@@ -290,13 +290,35 @@ view model =
 
 viewFieldSource : Field -> Svg Msg
 viewFieldSource field =
-  Svg.circle
+  let
+    fill =
+      signToColor field.source.sign
+    gradientId =
+      "gradient" ++ String.fromInt field.source.id
+  in
+  Svg.g []
+  [ Svg.defs []
+    [ Svg.radialGradient
+      [ Attributes.id <| gradientId ]
+      [ Svg.stop
+        [ Attributes.offset "50%"
+        , Attributes.stopColor <| Color.toCssString <| setAlpha 1 fill
+        ] []
+      , Svg.stop
+        [ Attributes.offset "100%"
+        , Attributes.stopColor <| Color.toCssString <| setAlpha 0.2 fill
+        ] []
+      ]
+    ]
+  , Svg.circle
     [ Attributes.cx (px field.source.x)
     , Attributes.cy (px field.source.y)
-    , Attributes.r (px field.source.r)
-    , Attributes.fill <| Paint (signToColor field.source.sign)
+    , Attributes.r (px <| lerp 0 20 8 35 (min 20 field.source.r * field.source.magnitude / 10))
+    , Attributes.fill <| Reference gradientId
     , Draggable.mouseTrigger field.source.id DragMsg
-    ] []
+    ]
+    []
+  ]
 
 
 viewFieldLines : Field -> Svg Msg
@@ -319,6 +341,18 @@ signToColor sign =
       Color.blue
 
 
+setAlpha : Float -> Color -> Color
+setAlpha alpha color =
+  let
+    rgba =
+      Color.toRgba color
+  in
+  Color.fromRgba <|
+    { rgba |
+      alpha = alpha
+    }
+
+
 negateSign : Sign -> Sign
 negateSign sign =
   case sign of
@@ -326,6 +360,15 @@ negateSign sign =
       Negative
     Negative ->
       Positive
+
+
+lerp : Float -> Float -> Float -> Float -> Float -> Float
+lerp min1 max1 min2 max2 num =
+  let
+    ratio =
+      abs <| (num - min1) / (max1 - min1)
+  in
+  min2 + ratio * (max2 - min2)
 
 
 subscriptions : Model -> Sub Msg
