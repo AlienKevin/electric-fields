@@ -184,7 +184,8 @@ type Msg
   = OnDragBy Draggable.Delta
   | DragMsg (Draggable.Msg Id)
   | StartDragging Id
-  | ToggleSourceSign Id
+  | ActivateSource Id
+  | ToggleSourceSign
   | ScaleSourceMagnitude Int
 
 
@@ -193,7 +194,7 @@ dragConfig =
   Draggable.customConfig
     [ Draggable.Events.onDragBy OnDragBy
     , Draggable.Events.onDragStart StartDragging
-    , Draggable.Events.onClick ToggleSourceSign
+    , Draggable.Events.onClick ActivateSource
     ]
 
 
@@ -219,7 +220,14 @@ update msg model =
       , Cmd.none
       )
 
-    ToggleSourceSign id ->
+    ActivateSource id ->
+      ( { model
+        | activeSourceId = id
+      }
+      , Cmd.none
+      )
+
+    ToggleSourceSign ->
       let
         newFields =
           updateActive
@@ -236,12 +244,11 @@ update msg model =
                   }
               }
             )
-            id
+            model.activeSourceId
             model.fields
       in
-      ( { model
-        | activeSourceId = id
-        , fields =
+      ( { model |
+        fields =
           calculateFields newFields
       }
       , Cmd.none
@@ -355,6 +362,7 @@ viewFieldSource activeSourceId field =
     , Attributes.fill <| Paint fill
     , Draggable.mouseTrigger field.source.id DragMsg
     , onWheel ScaleSourceMagnitude
+    , Html.Events.onDoubleClick ToggleSourceSign
     ] ++ if field.source.id == activeSourceId then
         [ Attributes.stroke <| Paint Color.lightGreen
         , Attributes.strokeWidth <| px 2.5
