@@ -254,6 +254,7 @@ type Msg
   = OnDragBy Draggable.Delta
   | DragMsg (Draggable.Msg Id)
   | StartDragging Id
+  | EndDragging
   | ActivateSource Id
   | ToggleSourceSign
   | ScaleSourceMagnitude Int
@@ -280,6 +281,7 @@ dragConfig =
   Draggable.customConfig
     [ Draggable.Events.onDragBy OnDragBy
     , Draggable.Events.onDragStart StartDragging
+    , Draggable.Events.onDragEnd EndDragging
     , Draggable.Events.onClick ActivateSource
     ]
 
@@ -291,7 +293,10 @@ update msg model =
       (onDragBy offsetPos model, Cmd.none)
 
     StartDragging id ->
-      (setActiveSourceId id model, Cmd.none)
+      (startDragging id model, Cmd.none)
+
+    EndDragging ->
+      (endDragging model, Cmd.none)
 
     ActivateSource id ->
       (setActiveSourceId id model, Cmd.none)
@@ -365,6 +370,53 @@ onDragBy offsetPos model =
       calculateFields newFields
   }
 
+
+startDragging : Id -> Model -> Model
+startDragging id model =
+  let
+    optimizedModel =
+      { model
+        | fields =
+          List.map
+            (\field ->
+              if field.delta <= 7 then
+                { field
+                  | delta =
+                    field.delta * 3
+                  , steps =
+                    round <| toFloat field.steps / 3
+                }
+              else
+                field
+            )
+            model.fields
+      }
+  in
+  setActiveSourceId id optimizedModel
+
+
+endDragging : Model -> Model
+endDragging model =
+  let
+    deoptimizedModel =
+      { model
+        | fields =
+          calculateFields <| List.map
+            (\field ->
+              if field.delta <= 7 then
+                { field
+                  | delta =
+                    field.delta / 3
+                  , steps =
+                    field.steps * 3
+                }
+              else
+                field
+            )
+            model.fields
+      }
+  in
+  deoptimizedModel
 
 closeHelpPopUp : Model -> Model
 closeHelpPopUp model =
