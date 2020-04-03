@@ -23,7 +23,7 @@ import Html.Events.Extra.Mouse as Mouse
 
 type alias Model =
   { fields : List Field
-  , activeSourceId : Id
+  , activeSourceId : Maybe Id
   , nextId : Id
   , drag : Draggable.State Id
   , contextMenu : ContextMenu
@@ -79,8 +79,8 @@ default :
 default =
   { r = 10.0
   , density = 30
-  , steps = 450
-  , delta = 2
+  , steps = 900
+  , delta = 1
   , magnitude = 1.0
   }
 
@@ -90,33 +90,33 @@ initialModel _ =
     fields =
       [{ source = { id = 0, sign = Negative, magnitude = 3.0, x = 300.0, y = 350.0, r = 10.0 }
       , density = 30
-      , steps = 450
-      , delta = 2
+      , steps = 900
+      , delta = 1
       , lines = []
       }
       , { source = { id = 1, sign = Positive, magnitude = 1.0, x = 400.0, y = 350.0, r = 10.0 }
       , density = 30
-      , steps = 450
-      , delta = 2
+      , steps = 900
+      , delta = 1
       , lines = []
       }
       , { source = { id = 2, sign = Positive, magnitude = 10.0, x = 300.0, y = 450.0, r = 10.0 }
       , density = 30
-      , steps = 450
-      , delta = 2
+      , steps = 900
+      , delta = 1
       , lines = []
       }
       , { source = { id = 3, sign = Negative, magnitude = 20.0, x = 400.0, y = 450.0, r = 10.0 }
       , density = 30
-      , steps = 450
-      , delta = 2
+      , steps = 900
+      , delta = 1
       , lines = []
       }
       ]
   in
   ({ fields =
     calculateFields fields
-  , activeSourceId = 0
+  , activeSourceId = if List.length fields > 0 then Just 0 else Nothing
   , nextId = List.length fields
   , drag = Draggable.init
   , contextMenu = NoContextMenu
@@ -257,18 +257,10 @@ update msg model =
       )
 
     StartDragging id ->
-      ( { model |
-        activeSourceId = id
-      }
-      , Cmd.none
-      )
+      (setActiveSourceId id model, Cmd.none)
 
     ActivateSource id ->
-      ( { model
-        | activeSourceId = id
-      }
-      , Cmd.none
-      )
+      (setActiveSourceId id model, Cmd.none)
 
     ToggleSourceSign ->
       let
@@ -330,7 +322,11 @@ update msg model =
     ShowFieldContextMenu ->
       ({ model
         | contextMenu =
-          FieldContextMenu
+          case model.activeSourceId of
+            Nothing ->
+              model.contextMenu
+            Just _ ->
+              FieldContextMenu
       }
       , Cmd.none
       )
@@ -346,11 +342,15 @@ update msg model =
     DeleteActiveField ->
       let
         newFields =
-          List.filter
-            (\field ->
-              field.source.id /= model.activeSourceId
-            )
-            model.fields
+          case model.activeSourceId of
+            Nothing ->
+              model.fields
+            Just id ->
+              List.filter
+                (\field ->
+                  field.source.id /= id
+                )
+                model.fields
       in
       ( { model |
         fields =
@@ -358,7 +358,7 @@ update msg model =
         , contextMenu =
           NoContextMenu
         , activeSourceId =
-          -1
+          Nothing
       }
       , Cmd.none
       )
@@ -374,6 +374,13 @@ update msg model =
 
     AddNegativeCharge position ->
       (addCharge Negative position model, Cmd.none)
+
+
+setActiveSourceId : Id -> Model -> Model
+setActiveSourceId id model =
+  { model |
+    activeSourceId = Just id
+  }
 
 
 addCharge : Sign -> Position -> Model -> Model
@@ -448,16 +455,20 @@ resetState model =
   }
 
 
-updateActive : (Field -> Field) -> Id -> List Field -> List Field
-updateActive func id fields =
-  List.map
-    (\field ->
-      if field.source.id == id then
-        func field
-      else
-        field
-    )
-    fields
+updateActive : (Field -> Field) -> Maybe Id -> List Field -> List Field
+updateActive func activeId fields =
+  case activeId of
+    Nothing ->
+      fields
+    Just id ->
+      List.map
+        (\field ->
+          if field.source.id == id then
+            func field
+          else
+            field
+        )
+        fields
 
 
 dragSource : Position -> Field -> Field
@@ -522,11 +533,15 @@ viewContextMenu model =
 
 getActiveFields : Model -> List Field
 getActiveFields model =
-  List.filter
-    (\field ->
-      field.source.id == model.activeSourceId
-    )
-    model.fields
+  case model.activeSourceId of
+    Just id ->
+      List.filter
+        (\field ->
+          field.source.id == id
+        )
+        model.fields
+    Nothing ->
+      []
 
 
 viewFieldContextMenu : List (E.Attribute Msg) -> Model -> E.Element Msg
@@ -575,7 +590,7 @@ viewGeneralContextMenu menuItemStyles (x, y) model =
     ]
 
 
-viewFieldSource : Id -> Field -> Svg Msg
+viewFieldSource : Maybe Id -> Field -> Svg Msg
 viewFieldSource activeSourceId field =
   let
     fill =
@@ -615,11 +630,15 @@ viewFieldSource activeSourceId field =
     , Html.Events.onDoubleClick ToggleSourceSign
     , onRightClick ShowFieldContextMenu
     ] ++ Draggable.touchTriggers field.source.id DragMsg
-    ++ if field.source.id == activeSourceId then
-        [ Attributes.stroke <| Paint Color.lightGreen
-        , Attributes.strokeWidth <| px 2.5
-        ]
-      else
+    ++ case activeSourceId of
+      Just id ->
+        if field.source.id == id then
+          [ Attributes.stroke <| Paint Color.lightGreen
+          , Attributes.strokeWidth <| px 2.5
+          ]
+        else
+          []
+      Nothing ->
         []
     )
     []
