@@ -17,6 +17,7 @@ import Element as E
 import Element.Input as Input
 import Element.Background as Background
 import Element.Border as Border
+import Element.Font as Font
 import Element.Events
 import Html.Events.Extra.Mouse as Mouse
 
@@ -27,6 +28,7 @@ type alias Model =
   , nextId : Id
   , drag : Draggable.State Id
   , contextMenu : ContextMenu
+  , popUp: PopUp
   }
 
 
@@ -34,6 +36,11 @@ type ContextMenu
   = FieldContextMenu
   | GeneralContextMenu Position
   | NoContextMenu
+
+
+type PopUp
+  = HelpPopUp
+  | NoPopUp
 
 
 type alias Field =
@@ -84,6 +91,23 @@ default =
   , magnitude = 1.0
   }
 
+
+style :
+  { button : List (E.Attribute Msg)
+  }
+style =
+  { button =
+    [ Background.color <| toElmUiColor Color.lightGrey
+    , E.mouseOver
+        [ Background.color <| toElmUiColor Color.grey ]
+    , E.paddingXY 10 5
+    , E.width <| E.px 150
+    , Border.widthXY 2 1
+    , Border.color <| toElmUiColor Color.darkGrey
+    ]
+  }
+
+
 initialModel : () -> (Model, Cmd Msg)
 initialModel _ =
   let
@@ -120,6 +144,7 @@ initialModel _ =
   , nextId = List.length fields
   , drag = Draggable.init
   , contextMenu = NoContextMenu
+  , popUp = NoPopUp
   }
   , Cmd.none
   )
@@ -230,6 +255,7 @@ type Msg
   | DuplicateActiveField
   | AddPositiveCharge Position
   | AddNegativeCharge Position
+  | ShowPopUp PopUp
 
 
 dragConfig : Draggable.Config Id Msg
@@ -375,6 +401,17 @@ update msg model =
     AddNegativeCharge position ->
       (addCharge Negative position model, Cmd.none)
 
+    ShowPopUp popUp ->
+      (showPopUp popUp model, Cmd.none)
+
+
+showPopUp : PopUp -> Model -> Model
+showPopUp popUp model =
+  { model |
+    popUp =
+      popUp
+  }
+
 
 setActiveSourceId : Id -> Model -> Model
 setActiveSourceId id model =
@@ -449,9 +486,11 @@ duplicateActiveField model =
 
 resetState : Model -> Model
 resetState model =
-  { model |
-    contextMenu =
+  { model
+    | contextMenu =
       NoContextMenu
+    , popUp =
+      NoPopUp
   }
 
 
@@ -493,9 +532,15 @@ view model =
     , E.height E.fill
     , Element.Events.onClick ClickedBackground
     , E.htmlAttribute <| Mouse.onContextMenu ShowGeneralContextMenu
+    , Font.size 16
+    , Font.family
+      [ Font.monospace
+      ]
     ] <|
     E.el
       [ E.inFront <| viewContextMenu model
+      , E.inFront <| viewPopUp model
+      , E.onRight <| viewPopUpSelector
       , E.centerX
       , E.centerY
       ]
@@ -509,24 +554,82 @@ view model =
       )
 
 
+viewPopUpSelector : E.Element Msg
+viewPopUpSelector =
+  E.column
+    []
+    [ viewButtonNoProp <| ShowPopUp HelpPopUp
+    ]
+
+
+viewButtonNoProp : Msg -> E.Element Msg
+viewButtonNoProp msg =
+  Input.button (style.button ++ [
+    E.htmlAttribute <| onClickNoProp msg
+  ]) <|
+    { onPress =
+      Nothing
+    , label =
+      E.text "Help"
+    }
+
+
+viewPopUp : Model -> E.Element Msg
+viewPopUp model =
+  case model.popUp of
+    HelpPopUp ->
+      viewHelpPopUp
+    NoPopUp ->
+      E.none
+
+
+viewHelpPopUp : E.Element Msg
+viewHelpPopUp =
+  E.column
+    [ E.centerX
+    , E.centerY
+    , E.padding 20
+    , E.spacing 6
+    , Background.color <| toElmUiColor Color.lightGrey
+    , Border.width 2
+    , Border.color <| toElmUiColor Color.black
+    ]
+    [ E.el
+      [ Font.size 18
+      , E.paddingEach
+        { left = 0
+        , right = 0
+        , top = 0
+        , bottom = 10
+        }
+      ] <|
+      E.text "Help"
+    , textHeader "When you mouse over a charge and ..."
+    , E.text "  Single click: select charge"
+    , E.text "  Double click: negate charge"
+    , E.text "  Right click: * delete charge"
+    , E.text "               * duplicate charge"
+    , textHeader "When you mouse over background and ..."
+    , E.text "  Right Click: * add + charge"
+    , E.text "               * add - charge"
+    ]
+
+
+textHeader : String -> E.Element Msg
+textHeader text =
+  E.el
+    [ E.paddingXY 0 6
+    ] <|
+    E.text text
+
+
 viewContextMenu : Model -> E.Element Msg
 viewContextMenu model =
-  let
-    menuItemStyles =
-      [ Background.color <| toElmUiColor Color.lightGrey
-      , E.mouseOver
-          [ Background.color <| toElmUiColor Color.grey ]
-      , E.paddingXY 10 5
-      , E.width <| E.px 150
-      , Border.widthXY 2 1
-      , Border.color <| toElmUiColor Color.darkGrey
-      ]
-  in
   case model.contextMenu of
     FieldContextMenu ->
-      viewFieldContextMenu menuItemStyles model
+      viewFieldContextMenu style.button model
     GeneralContextMenu position ->
-      viewGeneralContextMenu menuItemStyles position model
+      viewGeneralContextMenu style.button position model
     NoContextMenu ->
       E.none
 
@@ -670,6 +773,17 @@ onRightClick msg =
       , preventDefault = True
       }
     )
+
+
+onClickNoProp : msg -> Html.Attribute Msg
+onClickNoProp msg =
+  Html.Events.custom "click"
+    (Json.succeed
+    { message = ShowPopUp HelpPopUp
+    , stopPropagation = True
+    , preventDefault = False
+    }
+  )
 
 
 signToColor : Sign -> Color
