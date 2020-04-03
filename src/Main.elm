@@ -270,6 +270,7 @@ type Msg
   | ApplySettingsToFutureFields
   | ApplySettingsToCurrentAndFutureFields
   | CloseSettingsPopUp
+  | CloseHelpPopUp
   | DoNothing
 
 
@@ -434,8 +435,20 @@ update msg model =
     CloseSettingsPopUp ->
       (closeSettingsPopUp model, Cmd.none)
 
+    CloseHelpPopUp ->
+      (closeHelpPopUp model, Cmd.none)
+
     DoNothing ->
       (model, Cmd.none)
+
+
+closeHelpPopUp : Model -> Model
+closeHelpPopUp model =
+  { model
+    | popUp =
+      NoPopUp
+  }
+
 
 
 closeSettingsPopUp : Model -> Model
@@ -621,12 +634,11 @@ duplicateActiveField model =
 
 resetState : Model -> Model
 resetState model =
+  closeHelpPopUp <|
   closeSettingsPopUp <|
     { model
       | contextMenu =
         NoContextMenu
-      , popUp =
-        NoPopUp
     }
 
 
@@ -708,9 +720,7 @@ viewButtonNoProp text msg =
   ]) <|
     { onPress =
       Nothing
-    , label =
-      E.el [ E.centerX ]
-        (E.text text)
+    , label = centeredText text
     }
 
 
@@ -775,13 +785,13 @@ viewSettingsPopUp model =
       { onPress =
         Just ApplyPendingSettings
       , label =
-        E.text "Apply"
+        centeredText "Apply"
       }
       , Input.button (style.button ++ [E.alignRight])
       { onPress =
         Just CloseSettingsPopUp
       , label =
-        E.text "Cancel"
+        centeredText "Cancel"
       }
     ]
   ]
@@ -795,12 +805,12 @@ viewApplyOptions model =
         [ Input.button
           (style.button ++ [ E.width <| E.fill ] )
           { onPress = Just ApplySettingsToFutureFields
-          , label = E.text "Apply to future fields"
+          , label = centeredText "Apply to future fields"
           }
         , Input.button
           (style.button ++ [ E.width <| E.fill ] )
           { onPress = Just ApplySettingsToCurrentAndFutureFields
-          , label = E.text "Apply to current and future fields"
+          , label = centeredText "Apply to current and future fields"
           }
         ]
     _ ->
@@ -818,7 +828,13 @@ viewHelpPopUp =
     , textHeader "When you mouse over background and ..."
     , E.text "  Right Click: * add + charge"
     , E.text "               * add - charge"
-    ]
+    , E.el [ E.paddingEach { top = 20, right = 0, bottom = 0, left = 0 } ] <|
+      Input.button
+        style.button
+        { onPress = Just CloseHelpPopUp
+        , label = centeredText "Close"
+        }
+      ]
 
 
 viewPopUpOf : String -> List (E.Attribute Msg) -> List (E.Element Msg) -> E.Element Msg
@@ -1045,6 +1061,12 @@ negateSign sign =
       Negative
     Negative ->
       Positive
+
+
+centeredText : String -> E.Element Msg
+centeredText text =
+  E.el [ E.centerX ] <|
+    E.text text
 
 
 lerp : Float -> Float -> Float -> Float -> Float -> Float
