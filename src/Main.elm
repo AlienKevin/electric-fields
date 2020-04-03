@@ -262,6 +262,7 @@ type Msg
   | DeleteActiveField
   | ClickedBackground
   | DuplicateActiveField
+  | DeselectActiveField
   | AddPositiveCharge Position
   | AddNegativeCharge Position
   | ShowPopUp PopUp
@@ -410,6 +411,9 @@ update msg model =
 
     DuplicateActiveField ->
       (duplicateActiveField model, Cmd.none)
+
+    DeselectActiveField ->
+      (deselectActiveField model, Cmd.none)
 
     AddPositiveCharge position ->
       (addCharge Positive position model, Cmd.none)
@@ -632,6 +636,14 @@ duplicateActiveField model =
   }
 
 
+deselectActiveField : Model -> Model
+deselectActiveField model =
+  { model
+    | activeSourceId =
+      Nothing
+  }
+
+
 resetState : Model -> Model
 resetState model =
   closeHelpPopUp <|
@@ -825,6 +837,7 @@ viewHelpPopUp =
     , E.text "  Double click: negate charge"
     , E.text "  Right click: * delete charge"
     , E.text "               * duplicate charge"
+    , E.text "               * deselect charge"
     , textHeader "When you mouse over background and ..."
     , E.text "  Right Click: * add + charge"
     , E.text "               * add - charge"
@@ -917,6 +930,11 @@ viewFieldContextMenu menuItemStyles model =
       menuItemStyles
       { onPress = Just DuplicateActiveField
       , label = E.text "Duplicate"
+      }
+    , Input.button
+      menuItemStyles
+      { onPress = Just DeselectActiveField
+      , label = E.text "Deselect"
       }
     ]
 
