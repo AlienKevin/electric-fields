@@ -18,14 +18,23 @@ import Element.Input as Input
 import Element.Background as Background
 import Element.Border as Border
 import Element.Events
+import Html.Events.Extra.Mouse as Mouse
+
 
 type alias Model =
   { fields : List Field
   , activeSourceId : Id
   , nextId : Id
   , drag : Draggable.State Id
-  , showContextMenu : Bool
+  , contextMenu : ContextMenu
   }
+
+
+type ContextMenu
+  = FieldContextMenu
+  | GeneralContextMenu Position
+  | NoContextMenu
+
 
 type alias Field =
   { source: Charge
@@ -44,6 +53,9 @@ type alias Line =
 type alias Point =
   (Float, Float)
 
+type alias Position =
+  Point
+
 type Sign
   = Positive
   | Negative
@@ -55,6 +67,21 @@ type alias Charge =
   , x: Float
   , y: Float
   , r: Float
+  }
+
+default :
+  { r : Float
+  , density : Int
+  , steps : Int
+  , delta : Float
+  , magnitude : Float
+  }
+default =
+  { r = 10.0
+  , density = 30
+  , steps = 450
+  , delta = 2
+  , magnitude = 1.0
   }
 
 initialModel : () -> (Model, Cmd Msg)
@@ -92,7 +119,7 @@ initialModel _ =
   , activeSourceId = 0
   , nextId = List.length fields
   , drag = Draggable.init
-  , showContextMenu = False
+  , contextMenu = NoContextMenu
   }
   , Cmd.none
   )
@@ -196,10 +223,13 @@ type Msg
   | ActivateSource Id
   | ToggleSourceSign
   | ScaleSourceMagnitude Int
-  | ShowContextMenu
+  | ShowFieldContextMenu
+  | ShowGeneralContextMenu Mouse.Event
   | DeleteActiveField
   | ClickedBackground
   | DuplicateActiveField
+  | AddPositiveCharge Position
+  | AddNegativeCharge Position
 
 
 dragConfig : Draggable.Config Id Msg
@@ -297,9 +327,18 @@ update msg model =
     DragMsg dragMsg ->
       Draggable.update dragConfig dragMsg model
 
-    ShowContextMenu ->
+    ShowFieldContextMenu ->
       ({ model
-        | showContextMenu = True
+        | contextMenu =
+          FieldContextMenu
+      }
+      , Cmd.none
+      )
+
+    ShowGeneralContextMenu { offsetPos } ->
+      ({ model |
+        contextMenu =
+          GeneralContextMenu offsetPos
       }
       , Cmd.none
       )
@@ -316,8 +355,8 @@ update msg model =
       ( { model |
         fields =
           calculateFields newFields
-        , showContextMenu =
-          False
+        , contextMenu =
+          NoContextMenu
         , activeSourceId =
           -1
       }
@@ -329,6 +368,45 @@ update msg model =
 
     DuplicateActiveField ->
       (duplicateActiveField model, Cmd.none)
+
+    AddPositiveCharge position ->
+      (addCharge Positive position model, Cmd.none)
+
+    AddNegativeCharge position ->
+      (addCharge Negative position model, Cmd.none)
+
+
+addCharge : Sign -> Position -> Model -> Model
+addCharge sign (x, y) model =
+  let
+    newCharge : Charge
+    newCharge =
+      { sign = sign
+      , magnitude = default.magnitude
+      , x = x
+      , y = y
+      , r = default.r
+      , id = model.nextId
+      }
+    newField : Field
+    newField =
+      { source = newCharge
+      , density = default.density
+      , steps = default.steps
+      , delta = default.delta
+      , lines = []
+      }
+    newFields : List Field
+    newFields =
+      newField :: model.fields
+  in
+  { model
+    | fields =
+      calculateFields newFields
+    , nextId =
+      model.nextId + 1
+  }
+
 
 duplicateActiveField : Model -> Model
 duplicateActiveField model =
@@ -365,8 +443,8 @@ duplicateActiveField model =
 resetState : Model -> Model
 resetState model =
   { model |
-    showContextMenu =
-      False
+    contextMenu =
+      NoContextMenu
   }
 
 
@@ -382,7 +460,7 @@ updateActive func id fields =
     fields
 
 
-dragSource : (Float, Float) -> Field -> Field
+dragSource : Position -> Field -> Field
 dragSource (dx, dy) field =
   let
     source =
@@ -403,9 +481,10 @@ view model =
     [ E.width E.fill
     , E.height E.fill
     , Element.Events.onClick ClickedBackground
+    , E.htmlAttribute <| Mouse.onContextMenu ShowGeneralContextMenu
     ] <|
     E.el
-      [ E.inFront <| if model.showContextMenu then viewContextMenu model else E.none
+      [ E.inFront <| viewContextMenu model
       , E.centerX
       , E.centerY
       ]
@@ -419,25 +498,10 @@ view model =
       )
 
 
-getActiveFields : Model -> List Field
-getActiveFields model =
-  List.filter
-    (\field ->
-      field.source.id == model.activeSourceId
-    )
-    model.fields
-
-
 viewContextMenu : Model -> E.Element Msg
 viewContextMenu model =
   let
-    (x, y) =
-      case List.head <| getActiveFields model of
-        Just field ->
-          (field.source.x, field.source.y)
-        Nothing ->
-          (0, 0) -- impossible
-    buttonStyles =
+    menuItemStyles =
       [ Background.color <| toElmUiColor Color.lightGrey
       , E.mouseOver
           [ Background.color <| toElmUiColor Color.grey ]
@@ -447,19 +511,66 @@ viewContextMenu model =
       , Border.color <| toElmUiColor Color.darkGrey
       ]
   in
+  case model.contextMenu of
+    FieldContextMenu ->
+      viewFieldContextMenu menuItemStyles model
+    GeneralContextMenu position ->
+      viewGeneralContextMenu menuItemStyles position model
+    NoContextMenu ->
+      E.none
+
+
+getActiveFields : Model -> List Field
+getActiveFields model =
+  List.filter
+    (\field ->
+      field.source.id == model.activeSourceId
+    )
+    model.fields
+
+
+viewFieldContextMenu : List (E.Attribute Msg) -> Model -> E.Element Msg
+viewFieldContextMenu menuItemStyles model =
+  let
+    (x, y) =
+      case List.head <| getActiveFields model of
+        Just field ->
+          (field.source.x, field.source.y)
+        Nothing ->
+          (0, 0) -- impossible
+  in
   E.column
     [ E.moveRight x
     , E.moveDown y
     ]
     [ Input.button
-      buttonStyles
+      menuItemStyles
       { onPress = Just DeleteActiveField
       , label = E.text "delete"
       }
     , Input.button
-      buttonStyles
+      menuItemStyles
       { onPress = Just DuplicateActiveField
       , label = E.text "duplicate"
+      }
+    ]
+
+
+viewGeneralContextMenu : List (E.Attribute Msg) -> Position -> Model -> E.Element Msg
+viewGeneralContextMenu menuItemStyles (x, y) model =
+  E.column
+    [ E.moveRight x
+    , E.moveDown y
+    ]
+    [ Input.button
+      menuItemStyles
+      { onPress = Just <| AddPositiveCharge (x, y)
+      , label = E.text "add + charge"
+      }
+    , Input.button
+      menuItemStyles
+      { onPress = Just <| AddNegativeCharge (x, y)
+      , label = E.text "add - charge"
       }
     ]
 
@@ -502,7 +613,7 @@ viewFieldSource activeSourceId field =
     , Draggable.mouseTrigger field.source.id DragMsg
     , onWheel ScaleSourceMagnitude
     , Html.Events.onDoubleClick ToggleSourceSign
-    , onRightClick ShowContextMenu
+    , onRightClick ShowFieldContextMenu
     ] ++ Draggable.touchTriggers field.source.id DragMsg
     ++ if field.source.id == activeSourceId then
         [ Attributes.stroke <| Paint Color.lightGreen
