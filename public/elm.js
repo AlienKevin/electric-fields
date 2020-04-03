@@ -4234,7 +4234,7 @@ function _Browser_getViewport()
 	return {
 		cd: _Browser_getScene(),
 		cl: {
-			m: _Browser_window.pageXOffset,
+			o: _Browser_window.pageXOffset,
 			u: _Browser_window.pageYOffset,
 			cn: _Browser_doc.documentElement.clientWidth,
 			br: _Browser_doc.documentElement.clientHeight
@@ -4276,7 +4276,7 @@ function _Browser_getViewportOf(id)
 				br: node.scrollHeight
 			},
 			cl: {
-				m: node.scrollLeft,
+				o: node.scrollLeft,
 				u: node.scrollTop,
 				cn: node.clientWidth,
 				br: node.clientHeight
@@ -4311,13 +4311,13 @@ function _Browser_getElement(id)
 		return {
 			cd: _Browser_getScene(),
 			cl: {
-				m: x,
+				o: x,
 				u: y,
 				cn: _Browser_doc.documentElement.clientWidth,
 				br: _Browser_doc.documentElement.clientHeight
 			},
 			c9: {
-				m: x + rect.left,
+				o: x + rect.left,
 				u: y + rect.top,
 				cn: rect.width,
 				br: rect.height
@@ -4408,11 +4408,11 @@ var _MJS_v2setY = F2(function(y, a) {
 });
 
 var _MJS_v2toRecord = function(a) {
-    return { m: a[0], u: a[1] };
+    return { o: a[0], u: a[1] };
 };
 
 var _MJS_v2fromRecord = function(r) {
-    return new Float64Array([r.m, r.u]);
+    return new Float64Array([r.o, r.u]);
 };
 
 var _MJS_v2add = F2(function(a, b) {
@@ -4521,11 +4521,11 @@ var _MJS_v3setZ = F2(function(z, a) {
 });
 
 var _MJS_v3toRecord = function(a) {
-    return { m: a[0], u: a[1], aT: a[2] };
+    return { o: a[0], u: a[1], aT: a[2] };
 };
 
 var _MJS_v3fromRecord = function(r) {
-    return new Float64Array([r.m, r.u, r.aT]);
+    return new Float64Array([r.o, r.u, r.aT]);
 };
 
 var _MJS_v3add = F2(function(a, b) {
@@ -4681,11 +4681,11 @@ var _MJS_v4setW = F2(function(w, a) {
 });
 
 var _MJS_v4toRecord = function(a) {
-    return { m: a[0], u: a[1], aT: a[2], cm: a[3] };
+    return { o: a[0], u: a[1], aT: a[2], cm: a[3] };
 };
 
 var _MJS_v4fromRecord = function(r) {
-    return new Float64Array([r.m, r.u, r.aT, r.cm]);
+    return new Float64Array([r.o, r.u, r.aT, r.cm]);
 };
 
 var _MJS_v4add = F2(function(a, b) {
@@ -5812,25 +5812,25 @@ var $elm$core$Array$treeFromBuilder = F2(
 	});
 var $elm$core$Array$builderToArray = F2(
 	function (reverseNodeList, builder) {
-		if (!builder.e) {
+		if (!builder.f) {
 			return A4(
 				$elm$core$Array$Array_elm_builtin,
-				$elm$core$Elm$JsArray$length(builder.h),
+				$elm$core$Elm$JsArray$length(builder.j),
 				$elm$core$Array$shiftStep,
 				$elm$core$Elm$JsArray$empty,
-				builder.h);
+				builder.j);
 		} else {
-			var treeLen = builder.e * $elm$core$Array$branchFactor;
+			var treeLen = builder.f * $elm$core$Array$branchFactor;
 			var depth = $elm$core$Basics$floor(
 				A2($elm$core$Basics$logBase, $elm$core$Array$branchFactor, treeLen - 1));
-			var correctNodeList = reverseNodeList ? $elm$core$List$reverse(builder.j) : builder.j;
-			var tree = A2($elm$core$Array$treeFromBuilder, correctNodeList, builder.e);
+			var correctNodeList = reverseNodeList ? $elm$core$List$reverse(builder.l) : builder.l;
+			var tree = A2($elm$core$Array$treeFromBuilder, correctNodeList, builder.f);
 			return A4(
 				$elm$core$Array$Array_elm_builtin,
-				$elm$core$Elm$JsArray$length(builder.h) + treeLen,
+				$elm$core$Elm$JsArray$length(builder.j) + treeLen,
 				A2($elm$core$Basics$max, 5, depth * $elm$core$Array$shiftStep),
 				tree,
-				builder.h);
+				builder.j);
 		}
 	});
 var $elm$core$Basics$idiv = _Basics_idiv;
@@ -5843,7 +5843,7 @@ var $elm$core$Array$initializeHelp = F5(
 				return A2(
 					$elm$core$Array$builderToArray,
 					false,
-					{j: nodeList, e: (len / $elm$core$Array$branchFactor) | 0, h: tail});
+					{l: nodeList, f: (len / $elm$core$Array$branchFactor) | 0, j: tail});
 			} else {
 				var leaf = $elm$core$Array$Leaf(
 					A3($elm$core$Elm$JsArray$initialize, $elm$core$Array$branchFactor, fromIndex, fn));
@@ -6245,13 +6245,13 @@ var $author$project$Main$calculateFieldLine = F5(
 								var d = A2(
 									$author$project$Main$distance,
 									_Utils_Tuple2(x, y),
-									_Utils_Tuple2(charge.m, charge.u)) / 100;
-								var magnitude = charge.i / A2($elm$core$Basics$pow, d, 2);
+									_Utils_Tuple2(charge.o, charge.u)) / 100;
+								var magnitude = charge.k / A2($elm$core$Basics$pow, d, 2);
 								var field = A2(
 									$elm_explorations$linear_algebra$Math$Vector2$scale,
 									sign * magnitude,
 									$elm_explorations$linear_algebra$Math$Vector2$normalize(
-										A2($elm_explorations$linear_algebra$Math$Vector2$vec2, x - charge.m, y - charge.u)));
+										A2($elm_explorations$linear_algebra$Math$Vector2$vec2, x - charge.o, y - charge.u)));
 								return A2($elm_explorations$linear_algebra$Math$Vector2$add, sum, field);
 							}),
 						A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 0, 0),
@@ -6288,13 +6288,13 @@ var $author$project$Main$calculateFields = function (fields) {
 	return A2(
 		$elm$core$List$map,
 		function (field) {
-			var deltaAngle = (2 * $elm$core$Basics$pi) / field.n;
+			var deltaAngle = (2 * $elm$core$Basics$pi) / field.p;
 			var lines = A2(
 				$elm$core$List$map,
 				function (index) {
 					var angle = deltaAngle * index;
-					var x = field.a.m + (field.a.g * $elm$core$Basics$cos(angle));
-					var y = field.a.u + (field.a.g * $elm$core$Basics$sin(angle));
+					var x = field.a.o + (field.a.h * $elm$core$Basics$cos(angle));
+					var y = field.a.u + (field.a.h * $elm$core$Basics$sin(angle));
 					return A5(
 						$author$project$Main$calculateFieldLine,
 						A2(
@@ -6303,15 +6303,15 @@ var $author$project$Main$calculateFields = function (fields) {
 								return $.a;
 							},
 							fields),
-						field.s,
-						field.p,
+						field.i,
+						field.e,
 						field.a.C,
 						_Utils_Tuple2(x, y));
 				},
 				A2(
 					$elm$core$List$map,
 					$elm$core$Basics$toFloat,
-					A2($elm$core$List$range, 0, field.n - 1)));
+					A2($elm$core$List$range, 0, field.p - 1)));
 			return _Utils_update(
 				field,
 				{U: lines});
@@ -6327,41 +6327,41 @@ var $author$project$Main$initialModel = function (_v0) {
 	var fields = _List_fromArray(
 		[
 			{
-			p: 1,
-			n: 30,
+			e: 1,
+			p: 30,
 			U: _List_Nil,
-			a: {q: 0, i: 3.0, g: 10.0, C: 1, m: 500.0, u: 350.0},
-			s: 900
+			a: {r: 0, k: 3.0, h: 10.0, C: 1, o: 465.0, u: 270.0},
+			i: 900
 		},
 			{
-			p: 1,
-			n: 30,
+			e: 1,
+			p: 30,
 			U: _List_Nil,
-			a: {q: 1, i: 1.0, g: 10.0, C: 0, m: 600.0, u: 350.0},
-			s: 900
+			a: {r: 1, k: 1.0, h: 10.0, C: 0, o: 618.0, u: 515.0},
+			i: 900
 		},
 			{
-			p: 1,
-			n: 30,
+			e: 1,
+			p: 30,
 			U: _List_Nil,
-			a: {q: 2, i: 10.0, g: 10.0, C: 0, m: 500.0, u: 450.0},
-			s: 900
+			a: {r: 2, k: 10.0, h: 10.0, C: 0, o: 553.0, u: 338.0},
+			i: 900
 		},
 			{
-			p: 1,
-			n: 30,
+			e: 1,
+			p: 30,
 			U: _List_Nil,
-			a: {q: 3, i: 20.0, g: 10.0, C: 1, m: 600.0, u: 450.0},
-			s: 900
+			a: {r: 3, k: 20.0, h: 10.0, C: 1, o: 597.0, u: 182.0},
+			i: 900
 		}
 		]);
-	var defaultSettings = {p: 1, n: 30, i: 1.0, g: 10.0, s: 900};
+	var defaultSettings = {e: 1, p: 30, k: 1.0, h: 10.0, i: 900};
 	return _Utils_Tuple2(
 		{
 			w: ($elm$core$List$length(fields) > 0) ? $elm$core$Maybe$Just(0) : $elm$core$Maybe$Nothing,
 			T: $author$project$Main$NoContextMenu,
 			aY: $zaboco$elm_draggable$Draggable$init,
-			d: $author$project$Main$calculateFields(fields),
+			c: $author$project$Main$calculateFields(fields),
 			V: $elm$core$List$length(fields),
 			W: defaultSettings,
 			G: 3,
@@ -6789,7 +6789,7 @@ var $elm$browser$Browser$Events$onMouseMove = A2($elm$browser$Browser$Events$on,
 var $elm$browser$Browser$Events$onMouseUp = A2($elm$browser$Browser$Events$on, 0, 'mouseup');
 var $zaboco$elm_draggable$Internal$Position = F2(
 	function (x, y) {
-		return {m: x, u: y};
+		return {o: x, u: y};
 	});
 var $elm$json$Json$Decode$field = _Json_decodeField;
 var $elm$json$Json$Decode$float = _Json_decodeFloat;
@@ -6828,21 +6828,17 @@ var $author$project$Main$subscriptions = function (_v0) {
 	var drag = _v0.aY;
 	return A2($zaboco$elm_draggable$Draggable$subscriptions, $author$project$Main$DragMsg, drag);
 };
-var $author$project$Main$FieldContextMenu = {$: 0};
-var $author$project$Main$GeneralContextMenu = function (a) {
-	return {$: 1, a: a};
-};
 var $author$project$Main$addCharge = F3(
 	function (sign, _v0, model) {
 		var x = _v0.a;
 		var y = _v0.b;
-		var newCharge = {q: model.V, i: model.I.i, g: model.I.g, C: sign, m: x, u: y};
-		var newField = {p: model.I.p, n: model.I.n, U: _List_Nil, a: newCharge, s: model.I.s};
-		var newFields = A2($elm$core$List$cons, newField, model.d);
+		var newCharge = {r: model.V, k: model.I.k, h: model.I.h, C: sign, o: x, u: y};
+		var newField = {e: model.I.e, p: model.I.p, U: _List_Nil, a: newCharge, i: model.I.i};
+		var newFields = A2($elm$core$List$cons, newField, model.c);
 		return _Utils_update(
 			model,
 			{
-				d: $author$project$Main$calculateFields(newFields),
+				c: $author$project$Main$calculateFields(newFields),
 				V: model.V + 1
 			});
 	});
@@ -6861,19 +6857,19 @@ var $author$project$Main$applySettingsToCurrentAndFutureFields = function (model
 			return _Utils_update(
 				field,
 				{
+					e: newSettings.e,
 					p: newSettings.p,
-					n: newSettings.n,
 					a: _Utils_update(
 						source,
-						{i: newSettings.i, g: newSettings.g}),
-					s: newSettings.s
+						{k: newSettings.k, h: newSettings.h}),
+					i: newSettings.i
 				});
 		},
-		model.d);
+		model.c);
 	return _Utils_update(
 		model,
 		{
-			d: $author$project$Main$calculateFields(newFields),
+			c: $author$project$Main$calculateFields(newFields),
 			G: 3,
 			I: newSettings
 		});
@@ -6893,14 +6889,50 @@ var $author$project$Main$closeSettingsPopUp = function (model) {
 		model,
 		{W: model.I, G: 3});
 };
+var $elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
+	});
+var $elm$core$Basics$neq = _Utils_notEqual;
+var $author$project$Main$deleteActiveField = function (model) {
+	var newFields = function () {
+		var _v0 = model.w;
+		if (_v0.$ === 1) {
+			return model.c;
+		} else {
+			var id = _v0.a;
+			return A2(
+				$elm$core$List$filter,
+				function (field) {
+					return !_Utils_eq(field.a.r, id);
+				},
+				model.c);
+		}
+	}();
+	return _Utils_update(
+		model,
+		{
+			w: $elm$core$Maybe$Nothing,
+			T: $author$project$Main$NoContextMenu,
+			c: $author$project$Main$calculateFields(newFields)
+		});
+};
 var $author$project$Main$deselectActiveField = function (model) {
 	return _Utils_update(
 		model,
 		{w: $elm$core$Maybe$Nothing});
 };
 var $author$project$Main$ActivateSource = function (a) {
-	return {$: 3, a: a};
+	return {$: 4, a: a};
 };
+var $author$project$Main$EndDragging = {$: 3};
 var $author$project$Main$OnDragBy = function (a) {
 	return {$: 0, a: a};
 };
@@ -6942,6 +6974,14 @@ var $zaboco$elm_draggable$Draggable$Events$onDragBy = F2(
 				dE: A2($elm$core$Basics$composeL, $elm$core$Maybe$Just, toMsg)
 			});
 	});
+var $zaboco$elm_draggable$Draggable$Events$onDragEnd = F2(
+	function (toMsg, config) {
+		return _Utils_update(
+			config,
+			{
+				dF: $elm$core$Maybe$Just(toMsg)
+			});
+	});
 var $zaboco$elm_draggable$Draggable$Events$onDragStart = F2(
 	function (toMsg, config) {
 		return _Utils_update(
@@ -6955,32 +6995,9 @@ var $author$project$Main$dragConfig = $zaboco$elm_draggable$Draggable$customConf
 		[
 			$zaboco$elm_draggable$Draggable$Events$onDragBy($author$project$Main$OnDragBy),
 			$zaboco$elm_draggable$Draggable$Events$onDragStart($author$project$Main$StartDragging),
+			$zaboco$elm_draggable$Draggable$Events$onDragEnd($author$project$Main$EndDragging),
 			$zaboco$elm_draggable$Draggable$Events$onClick($author$project$Main$ActivateSource)
 		]));
-var $author$project$Main$dragSource = F2(
-	function (_v0, field) {
-		var dx = _v0.a;
-		var dy = _v0.b;
-		var source = field.a;
-		return _Utils_update(
-			field,
-			{
-				a: _Utils_update(
-					source,
-					{m: field.a.m + dx, u: field.a.u + dy})
-			});
-	});
-var $elm$core$List$filter = F2(
-	function (isGood, list) {
-		return A3(
-			$elm$core$List$foldr,
-			F2(
-				function (x, xs) {
-					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
-				}),
-			_List_Nil,
-			list);
-	});
 var $author$project$Main$getActiveFields = function (model) {
 	var _v0 = model.w;
 	if (!_v0.$) {
@@ -6988,9 +7005,9 @@ var $author$project$Main$getActiveFields = function (model) {
 		return A2(
 			$elm$core$List$filter,
 			function (field) {
-				return _Utils_eq(field.a.q, id);
+				return _Utils_eq(field.a.r, id);
 			},
-			model.d);
+			model.c);
 	} else {
 		return _List_Nil;
 	}
@@ -7006,30 +7023,74 @@ var $author$project$Main$duplicateActiveField = function (model) {
 					{
 						a: _Utils_update(
 							source,
-							{q: model.V + index, m: (source.m + (source.g * 2)) + 15})
+							{r: model.V + index, o: (source.o + (source.h * 2)) + 15})
 					});
 			}),
 		$author$project$Main$getActiveFields(model));
-	var newFields = _Utils_ap(model.d, duplicatedFields);
+	var newFields = _Utils_ap(model.c, duplicatedFields);
 	return _Utils_update(
 		model,
 		{
-			d: $author$project$Main$calculateFields(newFields),
+			c: $author$project$Main$calculateFields(newFields),
 			V: model.V + $elm$core$List$length(duplicatedFields)
 		});
 };
-var $elm$core$Basics$min = F2(
-	function (x, y) {
-		return (_Utils_cmp(x, y) < 0) ? x : y;
-	});
-var $author$project$Main$negateSign = function (sign) {
-	if (!sign) {
-		return 1;
-	} else {
-		return 0;
-	}
+var $author$project$Main$endDragging = function (model) {
+	var deoptimizedModel = _Utils_update(
+		model,
+		{
+			c: $author$project$Main$calculateFields(
+				A2(
+					$elm$core$List$map,
+					function (field) {
+						return (field.e <= 7) ? _Utils_update(
+							field,
+							{e: field.e / 3, i: field.i * 3}) : field;
+					},
+					model.c))
+		});
+	return deoptimizedModel;
 };
-var $elm$core$Basics$neq = _Utils_notEqual;
+var $author$project$Main$dragSource = F2(
+	function (_v0, field) {
+		var dx = _v0.a;
+		var dy = _v0.b;
+		var source = field.a;
+		return _Utils_update(
+			field,
+			{
+				a: _Utils_update(
+					source,
+					{o: field.a.o + dx, u: field.a.u + dy})
+			});
+	});
+var $author$project$Main$updateActive = F3(
+	function (func, activeId, fields) {
+		if (activeId.$ === 1) {
+			return fields;
+		} else {
+			var id = activeId.a;
+			return A2(
+				$elm$core$List$map,
+				function (field) {
+					return _Utils_eq(field.a.r, id) ? func(field) : field;
+				},
+				fields);
+		}
+	});
+var $author$project$Main$onDragBy = F2(
+	function (offsetPos, model) {
+		var newFields = A3(
+			$author$project$Main$updateActive,
+			$author$project$Main$dragSource(offsetPos),
+			model.w,
+			model.c);
+		return _Utils_update(
+			model,
+			{
+				c: $author$project$Main$calculateFields(newFields)
+			});
+	});
 var $author$project$Main$resetState = function (model) {
 	return $author$project$Main$closeHelpPopUp(
 		$author$project$Main$closeSettingsPopUp(
@@ -7037,6 +7098,37 @@ var $author$project$Main$resetState = function (model) {
 				model,
 				{T: $author$project$Main$NoContextMenu})));
 };
+var $elm$core$Basics$min = F2(
+	function (x, y) {
+		return (_Utils_cmp(x, y) < 0) ? x : y;
+	});
+var $author$project$Main$scaleSourceMagnitude = F2(
+	function (delta, model) {
+		var newFields = A3(
+			$author$project$Main$updateActive,
+			function (field) {
+				var source = field.a;
+				return _Utils_update(
+					field,
+					{
+						a: _Utils_update(
+							source,
+							{
+								k: A2(
+									$elm$core$Basics$min,
+									20,
+									A2($elm$core$Basics$max, 0.5, source.k + (delta * (-0.01))))
+							})
+					});
+			},
+			model.w,
+			model.c);
+		return _Utils_update(
+			model,
+			{
+				c: $author$project$Main$calculateFields(newFields)
+			});
+	});
 var $author$project$Main$setActiveSourceId = F2(
 	function (id, model) {
 		return _Utils_update(
@@ -7045,12 +7137,88 @@ var $author$project$Main$setActiveSourceId = F2(
 				w: $elm$core$Maybe$Just(id)
 			});
 	});
+var $author$project$Main$FieldContextMenu = {$: 0};
+var $author$project$Main$showFieldContextMenu = function (model) {
+	return _Utils_update(
+		model,
+		{
+			T: function () {
+				var _v0 = model.w;
+				if (_v0.$ === 1) {
+					return model.T;
+				} else {
+					return $author$project$Main$FieldContextMenu;
+				}
+			}()
+		});
+};
+var $author$project$Main$GeneralContextMenu = function (a) {
+	return {$: 1, a: a};
+};
+var $author$project$Main$showGeneralContextMenu = F2(
+	function (offsetPos, model) {
+		return _Utils_update(
+			model,
+			{
+				T: $author$project$Main$GeneralContextMenu(offsetPos)
+			});
+	});
 var $author$project$Main$showPopUp = F2(
 	function (popUp, model) {
 		return _Utils_update(
 			model,
 			{G: popUp});
 	});
+var $elm$core$Basics$round = _Basics_round;
+var $author$project$Main$startDragging = F2(
+	function (id, model) {
+		var optimizedModel = _Utils_update(
+			model,
+			{
+				c: A2(
+					$elm$core$List$map,
+					function (field) {
+						return (field.e <= 7) ? _Utils_update(
+							field,
+							{
+								e: field.e * 3,
+								i: $elm$core$Basics$round(field.i / 3)
+							}) : field;
+					},
+					model.c)
+			});
+		return A2($author$project$Main$setActiveSourceId, id, optimizedModel);
+	});
+var $author$project$Main$negateSign = function (sign) {
+	if (!sign) {
+		return 1;
+	} else {
+		return 0;
+	}
+};
+var $author$project$Main$toggleSourceSign = function (model) {
+	var newFields = A3(
+		$author$project$Main$updateActive,
+		function (field) {
+			var source = field.a;
+			return _Utils_update(
+				field,
+				{
+					a: _Utils_update(
+						source,
+						{
+							C: $author$project$Main$negateSign(field.a.C)
+						})
+				});
+		},
+		model.w,
+		model.c);
+	return _Utils_update(
+		model,
+		{
+			c: $author$project$Main$calculateFields(newFields)
+		});
+};
 var $elm$core$Maybe$map = F2(
 	function (f, maybe) {
 		if (!maybe.$) {
@@ -7091,7 +7259,7 @@ var $zaboco$elm_draggable$Internal$DraggingTentative = F2(
 	});
 var $zaboco$elm_draggable$Internal$distanceTo = F2(
 	function (end, start) {
-		return _Utils_Tuple2(end.m - start.m, end.u - start.u);
+		return _Utils_Tuple2(end.o - start.o, end.u - start.u);
 	});
 var $zaboco$elm_draggable$Internal$updateAndEmit = F3(
 	function (config, msg, drag) {
@@ -7172,20 +7340,6 @@ var $zaboco$elm_draggable$Draggable$update = F3(
 				{aY: dragState}),
 			dragCmd);
 	});
-var $author$project$Main$updateActive = F3(
-	function (func, activeId, fields) {
-		if (activeId.$ === 1) {
-			return fields;
-		} else {
-			var id = activeId.a;
-			return A2(
-				$elm$core$List$map,
-				function (field) {
-					return _Utils_eq(field.a.q, id) ? func(field) : field;
-				},
-				fields);
-		}
-	});
 var $elm$core$String$toFloat = _String_toFloat;
 var $author$project$Main$updatePendingSetting = F3(
 	function (field, value, model) {
@@ -7198,7 +7352,7 @@ var $author$project$Main$updatePendingSetting = F3(
 						var v = _v1.a;
 						return _Utils_update(
 							settings,
-							{g: v});
+							{h: v});
 					} else {
 						return settings;
 					}
@@ -7208,7 +7362,7 @@ var $author$project$Main$updatePendingSetting = F3(
 						var v = _v2.a;
 						return _Utils_update(
 							settings,
-							{n: v});
+							{p: v});
 					} else {
 						return settings;
 					}
@@ -7218,7 +7372,7 @@ var $author$project$Main$updatePendingSetting = F3(
 						var v = _v3.a;
 						return _Utils_update(
 							settings,
-							{s: v});
+							{i: v});
 					} else {
 						return settings;
 					}
@@ -7228,7 +7382,7 @@ var $author$project$Main$updatePendingSetting = F3(
 						var v = _v4.a;
 						return _Utils_update(
 							settings,
-							{p: v});
+							{e: v});
 					} else {
 						return settings;
 					}
@@ -7238,7 +7392,7 @@ var $author$project$Main$updatePendingSetting = F3(
 						var v = _v5.a;
 						return _Utils_update(
 							settings,
-							{i: v});
+							{k: v});
 					} else {
 						return settings;
 					}
@@ -7254,182 +7408,99 @@ var $author$project$Main$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
 			case 0:
-				var delta = msg.a;
-				var newFields = A3(
-					$author$project$Main$updateActive,
-					$author$project$Main$dragSource(delta),
-					model.w,
-					model.d);
+				var offsetPos = msg.a;
 				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{
-							d: $author$project$Main$calculateFields(newFields)
-						}),
+					A2($author$project$Main$onDragBy, offsetPos, model),
 					$elm$core$Platform$Cmd$none);
 			case 2:
 				var id = msg.a;
 				return _Utils_Tuple2(
-					A2($author$project$Main$setActiveSourceId, id, model),
+					A2($author$project$Main$startDragging, id, model),
 					$elm$core$Platform$Cmd$none);
 			case 3:
+				return _Utils_Tuple2(
+					$author$project$Main$endDragging(model),
+					$elm$core$Platform$Cmd$none);
+			case 4:
 				var id = msg.a;
 				return _Utils_Tuple2(
 					A2($author$project$Main$setActiveSourceId, id, model),
 					$elm$core$Platform$Cmd$none);
-			case 4:
-				var newFields = A3(
-					$author$project$Main$updateActive,
-					function (field) {
-						var source = field.a;
-						return _Utils_update(
-							field,
-							{
-								a: _Utils_update(
-									source,
-									{
-										C: $author$project$Main$negateSign(field.a.C)
-									})
-							});
-					},
-					model.w,
-					model.d);
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{
-							d: $author$project$Main$calculateFields(newFields)
-						}),
-					$elm$core$Platform$Cmd$none);
 			case 5:
-				var delta = msg.a;
-				var newFields = A3(
-					$author$project$Main$updateActive,
-					function (field) {
-						var source = field.a;
-						return _Utils_update(
-							field,
-							{
-								a: _Utils_update(
-									source,
-									{
-										i: A2(
-											$elm$core$Basics$min,
-											20,
-											A2($elm$core$Basics$max, 0.5, source.i + (delta * (-0.01))))
-									})
-							});
-					},
-					model.w,
-					model.d);
 				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{
-							d: $author$project$Main$calculateFields(newFields)
-						}),
+					$author$project$Main$toggleSourceSign(model),
+					$elm$core$Platform$Cmd$none);
+			case 6:
+				var delta = msg.a;
+				return _Utils_Tuple2(
+					A2($author$project$Main$scaleSourceMagnitude, delta, model),
 					$elm$core$Platform$Cmd$none);
 			case 1:
 				var dragMsg = msg.a;
 				return A3($zaboco$elm_draggable$Draggable$update, $author$project$Main$dragConfig, dragMsg, model);
-			case 6:
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{
-							T: function () {
-								var _v1 = model.w;
-								if (_v1.$ === 1) {
-									return model.T;
-								} else {
-									return $author$project$Main$FieldContextMenu;
-								}
-							}()
-						}),
-					$elm$core$Platform$Cmd$none);
 			case 7:
-				var offsetPos = msg.a.dC;
 				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{
-							T: $author$project$Main$GeneralContextMenu(offsetPos)
-						}),
+					$author$project$Main$showFieldContextMenu(model),
 					$elm$core$Platform$Cmd$none);
 			case 8:
-				var newFields = function () {
-					var _v2 = model.w;
-					if (_v2.$ === 1) {
-						return model.d;
-					} else {
-						var id = _v2.a;
-						return A2(
-							$elm$core$List$filter,
-							function (field) {
-								return !_Utils_eq(field.a.q, id);
-							},
-							model.d);
-					}
-				}();
+				var offsetPos = msg.a.dC;
 				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{
-							w: $elm$core$Maybe$Nothing,
-							T: $author$project$Main$NoContextMenu,
-							d: $author$project$Main$calculateFields(newFields)
-						}),
+					A2($author$project$Main$showGeneralContextMenu, offsetPos, model),
 					$elm$core$Platform$Cmd$none);
 			case 9:
 				return _Utils_Tuple2(
-					$author$project$Main$resetState(model),
+					$author$project$Main$deleteActiveField(model),
 					$elm$core$Platform$Cmd$none);
 			case 10:
 				return _Utils_Tuple2(
-					$author$project$Main$duplicateActiveField(model),
+					$author$project$Main$resetState(model),
 					$elm$core$Platform$Cmd$none);
 			case 11:
 				return _Utils_Tuple2(
-					$author$project$Main$deselectActiveField(model),
+					$author$project$Main$duplicateActiveField(model),
 					$elm$core$Platform$Cmd$none);
 			case 12:
-				var position = msg.a;
 				return _Utils_Tuple2(
-					A3($author$project$Main$addCharge, 0, position, model),
+					$author$project$Main$deselectActiveField(model),
 					$elm$core$Platform$Cmd$none);
 			case 13:
 				var position = msg.a;
 				return _Utils_Tuple2(
-					A3($author$project$Main$addCharge, 1, position, model),
+					A3($author$project$Main$addCharge, 0, position, model),
 					$elm$core$Platform$Cmd$none);
 			case 14:
+				var position = msg.a;
+				return _Utils_Tuple2(
+					A3($author$project$Main$addCharge, 1, position, model),
+					$elm$core$Platform$Cmd$none);
+			case 15:
 				var popUp = msg.a;
 				return _Utils_Tuple2(
 					A2($author$project$Main$showPopUp, popUp, model),
 					$elm$core$Platform$Cmd$none);
-			case 15:
+			case 16:
 				var field = msg.a;
 				var value = msg.b;
 				return _Utils_Tuple2(
 					A3($author$project$Main$updatePendingSetting, field, value, model),
 					$elm$core$Platform$Cmd$none);
-			case 16:
+			case 17:
 				return _Utils_Tuple2(
 					$author$project$Main$applyPendingSettings(model),
 					$elm$core$Platform$Cmd$none);
-			case 17:
+			case 18:
 				return _Utils_Tuple2(
 					$author$project$Main$applySettingsToFutureFields(model),
 					$elm$core$Platform$Cmd$none);
-			case 18:
+			case 19:
 				return _Utils_Tuple2(
 					$author$project$Main$applySettingsToCurrentAndFutureFields(model),
 					$elm$core$Platform$Cmd$none);
-			case 19:
+			case 20:
 				return _Utils_Tuple2(
 					$author$project$Main$closeSettingsPopUp(model),
 					$elm$core$Platform$Cmd$none);
-			case 20:
+			case 21:
 				return _Utils_Tuple2(
 					$author$project$Main$closeHelpPopUp(model),
 					$elm$core$Platform$Cmd$none);
@@ -7437,9 +7508,9 @@ var $author$project$Main$update = F2(
 				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 		}
 	});
-var $author$project$Main$ClickedBackground = {$: 9};
+var $author$project$Main$ClickedBackground = {$: 10};
 var $author$project$Main$ShowGeneralContextMenu = function (a) {
-	return {$: 7, a: a};
+	return {$: 8, a: a};
 };
 var $mdgriffith$elm_ui$Internal$Model$Below = 1;
 var $mdgriffith$elm_ui$Internal$Model$Nearby = F2(
@@ -7625,7 +7696,6 @@ var $elm$core$Tuple$second = function (_v0) {
 	var y = _v0.b;
 	return y;
 };
-var $elm$core$Basics$round = _Basics_round;
 var $mdgriffith$elm_ui$Internal$Model$floatClass = function (x) {
 	return $elm$core$String$fromInt(
 		$elm$core$Basics$round(x * 255));
@@ -9791,7 +9861,7 @@ var $elm$core$String$concat = function (strings) {
 var $mdgriffith$elm_ui$Internal$Style$Intermediate = $elm$core$Basics$identity;
 var $mdgriffith$elm_ui$Internal$Style$emptyIntermediate = F2(
 	function (selector, closing) {
-		return {aF: closing, r: _List_Nil, Y: _List_Nil, O: selector};
+		return {aF: closing, s: _List_Nil, Y: _List_Nil, O: selector};
 	});
 var $mdgriffith$elm_ui$Internal$Style$renderRules = F2(
 	function (_v0, rulesToRender) {
@@ -9818,10 +9888,10 @@ var $mdgriffith$elm_ui$Internal$Style$renderRules = F2(
 						return _Utils_update(
 							rendered,
 							{
-								r: A2(
+								s: A2(
 									$elm$core$List$cons,
-									{aF: '\n}', r: _List_Nil, Y: props, O: '@supports (' + (prop + (':' + (value + (') {' + parent.O))))},
-									rendered.r)
+									{aF: '\n}', s: _List_Nil, Y: props, O: '@supports (' + (prop + (':' + (value + (') {' + parent.O))))},
+									rendered.s)
 							});
 					case 4:
 						var selector = rule.a;
@@ -9829,13 +9899,13 @@ var $mdgriffith$elm_ui$Internal$Style$renderRules = F2(
 						return _Utils_update(
 							rendered,
 							{
-								r: A2(
+								s: A2(
 									$elm$core$List$cons,
 									A2(
 										$mdgriffith$elm_ui$Internal$Style$renderRules,
 										A2($mdgriffith$elm_ui$Internal$Style$emptyIntermediate, parent.O + (' + ' + selector), ''),
 										adjRules),
-									rendered.r)
+									rendered.s)
 							});
 					case 1:
 						var child = rule.a;
@@ -9843,13 +9913,13 @@ var $mdgriffith$elm_ui$Internal$Style$renderRules = F2(
 						return _Utils_update(
 							rendered,
 							{
-								r: A2(
+								s: A2(
 									$elm$core$List$cons,
 									A2(
 										$mdgriffith$elm_ui$Internal$Style$renderRules,
 										A2($mdgriffith$elm_ui$Internal$Style$emptyIntermediate, parent.O + (' > ' + child), ''),
 										childRules),
-									rendered.r)
+									rendered.s)
 							});
 					case 3:
 						var descriptor = rule.a;
@@ -9857,7 +9927,7 @@ var $mdgriffith$elm_ui$Internal$Style$renderRules = F2(
 						return _Utils_update(
 							rendered,
 							{
-								r: A2(
+								s: A2(
 									$elm$core$List$cons,
 									A2(
 										$mdgriffith$elm_ui$Internal$Style$renderRules,
@@ -9866,20 +9936,20 @@ var $mdgriffith$elm_ui$Internal$Style$renderRules = F2(
 											_Utils_ap(parent.O, descriptor),
 											''),
 										descriptorRules),
-									rendered.r)
+									rendered.s)
 							});
 					default:
 						var batched = rule.a;
 						return _Utils_update(
 							rendered,
 							{
-								r: A2(
+								s: A2(
 									$elm$core$List$cons,
 									A2(
 										$mdgriffith$elm_ui$Internal$Style$renderRules,
 										A2($mdgriffith$elm_ui$Internal$Style$emptyIntermediate, parent.O, ''),
 										batched),
-									rendered.r)
+									rendered.s)
 							});
 				}
 			});
@@ -9910,7 +9980,7 @@ var $mdgriffith$elm_ui$Internal$Style$renderCompact = function (styleClasses) {
 		return _Utils_ap(
 			renderClass(rule),
 			$elm$core$String$concat(
-				A2($elm$core$List$map, renderIntermediate, rule.r)));
+				A2($elm$core$List$map, renderIntermediate, rule.s)));
 	};
 	return $elm$core$String$concat(
 		A2(
@@ -13612,9 +13682,9 @@ var $author$project$Main$style = {
 			$author$project$Main$toElmUiColor($avh4$elm_color$Color$darkGrey))
 		])
 };
-var $author$project$Main$DeleteActiveField = {$: 8};
-var $author$project$Main$DeselectActiveField = {$: 11};
-var $author$project$Main$DuplicateActiveField = {$: 10};
+var $author$project$Main$DeleteActiveField = {$: 9};
+var $author$project$Main$DeselectActiveField = {$: 12};
+var $author$project$Main$DuplicateActiveField = {$: 11};
 var $mdgriffith$elm_ui$Internal$Model$Button = {$: 8};
 var $elm$json$Json$Encode$bool = _Json_wrap;
 var $elm$html$Html$Attributes$boolProperty = F2(
@@ -13685,7 +13755,7 @@ var $elm$html$Html$Attributes$tabindex = function (n) {
 var $mdgriffith$elm_ui$Element$Input$button = F2(
 	function (attrs, _v0) {
 		var onPress = _v0.B;
-		var label = _v0.l;
+		var label = _v0.n;
 		return A4(
 			$mdgriffith$elm_ui$Internal$Model$element,
 			$mdgriffith$elm_ui$Internal$Model$asEl,
@@ -13793,7 +13863,7 @@ var $author$project$Main$viewFieldContextMenu = F2(
 				$author$project$Main$getActiveFields(model));
 			if (!_v1.$) {
 				var field = _v1.a;
-				return _Utils_Tuple2(field.a.m, field.a.u);
+				return _Utils_Tuple2(field.a.o, field.a.u);
 			} else {
 				return _Utils_Tuple2(0, 0);
 			}
@@ -13813,30 +13883,30 @@ var $author$project$Main$viewFieldContextMenu = F2(
 					$mdgriffith$elm_ui$Element$Input$button,
 					menuItemStyles,
 					{
-						l: $mdgriffith$elm_ui$Element$text('Delete'),
+						n: $mdgriffith$elm_ui$Element$text('Delete'),
 						B: $elm$core$Maybe$Just($author$project$Main$DeleteActiveField)
 					}),
 					A2(
 					$mdgriffith$elm_ui$Element$Input$button,
 					menuItemStyles,
 					{
-						l: $mdgriffith$elm_ui$Element$text('Duplicate'),
+						n: $mdgriffith$elm_ui$Element$text('Duplicate'),
 						B: $elm$core$Maybe$Just($author$project$Main$DuplicateActiveField)
 					}),
 					A2(
 					$mdgriffith$elm_ui$Element$Input$button,
 					menuItemStyles,
 					{
-						l: $mdgriffith$elm_ui$Element$text('Deselect'),
+						n: $mdgriffith$elm_ui$Element$text('Deselect'),
 						B: $elm$core$Maybe$Just($author$project$Main$DeselectActiveField)
 					})
 				]));
 	});
 var $author$project$Main$AddNegativeCharge = function (a) {
-	return {$: 13, a: a};
+	return {$: 14, a: a};
 };
 var $author$project$Main$AddPositiveCharge = function (a) {
-	return {$: 12, a: a};
+	return {$: 13, a: a};
 };
 var $author$project$Main$viewGeneralContextMenu = F2(
 	function (menuItemStyles, _v0) {
@@ -13855,7 +13925,7 @@ var $author$project$Main$viewGeneralContextMenu = F2(
 					$mdgriffith$elm_ui$Element$Input$button,
 					menuItemStyles,
 					{
-						l: $mdgriffith$elm_ui$Element$text('Add + charge'),
+						n: $mdgriffith$elm_ui$Element$text('Add + charge'),
 						B: $elm$core$Maybe$Just(
 							$author$project$Main$AddPositiveCharge(
 								_Utils_Tuple2(x, y)))
@@ -13864,7 +13934,7 @@ var $author$project$Main$viewGeneralContextMenu = F2(
 					$mdgriffith$elm_ui$Element$Input$button,
 					menuItemStyles,
 					{
-						l: $mdgriffith$elm_ui$Element$text('Add - charge'),
+						n: $mdgriffith$elm_ui$Element$text('Add - charge'),
 						B: $elm$core$Maybe$Just(
 							$author$project$Main$AddNegativeCharge(
 								_Utils_Tuple2(x, y)))
@@ -13979,14 +14049,31 @@ var $author$project$Main$viewFieldLines = function (field) {
 			},
 			field.U));
 };
+var $elm_community$typed_svg$TypedSvg$Types$Duration = function (a) {
+	return {$: 0, a: a};
+};
 var $elm_community$typed_svg$TypedSvg$Types$Reference = function (a) {
 	return {$: 1, a: a};
 };
+var $elm_community$typed_svg$TypedSvg$Types$RepeatIndefinite = {$: 1};
 var $author$project$Main$ScaleSourceMagnitude = function (a) {
-	return {$: 5, a: a};
+	return {$: 6, a: a};
 };
-var $author$project$Main$ShowFieldContextMenu = {$: 6};
-var $author$project$Main$ToggleSourceSign = {$: 4};
+var $author$project$Main$ShowFieldContextMenu = {$: 7};
+var $author$project$Main$ToggleSourceSign = {$: 5};
+var $elm_community$typed_svg$TypedSvg$animate = $elm_community$typed_svg$TypedSvg$Core$node('animate');
+var $elm_community$typed_svg$TypedSvg$Attributes$animationValues = function (values) {
+	return A2(
+		$elm_community$typed_svg$TypedSvg$Core$attribute,
+		'values',
+		A2(
+			$elm$core$String$join,
+			';',
+			A2($elm$core$List$map, $elm$core$String$fromFloat, values)));
+};
+var $elm_community$typed_svg$TypedSvg$Attributes$attributeName = function (nm) {
+	return A2($elm_community$typed_svg$TypedSvg$Core$attribute, 'attributeName', nm);
+};
 var $elm_community$typed_svg$TypedSvg$circle = $elm_community$typed_svg$TypedSvg$Core$node('circle');
 var $elm_community$typed_svg$TypedSvg$Attributes$cx = function (length) {
 	return A2(
@@ -14001,6 +14088,20 @@ var $elm_community$typed_svg$TypedSvg$Attributes$cy = function (length) {
 		$elm_community$typed_svg$TypedSvg$TypesToStrings$lengthToString(length));
 };
 var $elm_community$typed_svg$TypedSvg$defs = $elm_community$typed_svg$TypedSvg$Core$node('defs');
+var $elm_community$typed_svg$TypedSvg$TypesToStrings$durationToString = function (duration) {
+	if (!duration.$) {
+		var clockValue = duration.a;
+		return clockValue;
+	} else {
+		return 'indefinite';
+	}
+};
+var $elm_community$typed_svg$TypedSvg$Attributes$dur = function (duration) {
+	return A2(
+		$elm_community$typed_svg$TypedSvg$Core$attribute,
+		'dur',
+		$elm_community$typed_svg$TypedSvg$TypesToStrings$durationToString(duration));
+};
 var $elm_community$typed_svg$TypedSvg$Attributes$id = $elm_community$typed_svg$TypedSvg$Core$attribute('id');
 var $elm$core$Basics$abs = function (n) {
 	return (n < 0) ? (-n) : n;
@@ -14088,6 +14189,20 @@ var $elm_community$typed_svg$TypedSvg$Attributes$r = function (length) {
 		$elm_community$typed_svg$TypedSvg$TypesToStrings$lengthToString(length));
 };
 var $elm_community$typed_svg$TypedSvg$radialGradient = $elm_community$typed_svg$TypedSvg$Core$node('radialGradient');
+var $elm_community$typed_svg$TypedSvg$TypesToStrings$repeatCountToString = function (repeatCount) {
+	if (!repeatCount.$) {
+		var count = repeatCount.a;
+		return $elm$core$String$fromFloat(count);
+	} else {
+		return 'indefinite';
+	}
+};
+var $elm_community$typed_svg$TypedSvg$Attributes$repeatCount = function (count) {
+	return A2(
+		$elm_community$typed_svg$TypedSvg$Core$attribute,
+		'repeatCount',
+		$elm_community$typed_svg$TypedSvg$TypesToStrings$repeatCountToString(count));
+};
 var $avh4$elm_color$Color$fromRgba = function (components) {
 	return A4($avh4$elm_color$Color$RgbaSpace, components.dU, components.df, components.cJ, components.bg);
 };
@@ -14245,7 +14360,7 @@ var $zaboco$elm_draggable$Draggable$touchTriggers = F2(
 	});
 var $author$project$Main$viewFieldSource = F2(
 	function (activeSourceId, field) {
-		var gradientId = 'gradient' + $elm$core$String$fromInt(field.a.q);
+		var gradientId = 'gradient' + $elm$core$String$fromInt(field.a.r);
 		var fill = $author$project$Main$signToColor(field.a.C);
 		return A2(
 			$elm_community$typed_svg$TypedSvg$g,
@@ -14292,7 +14407,7 @@ var $author$project$Main$viewFieldSource = F2(
 					_List_fromArray(
 						[
 							$elm_community$typed_svg$TypedSvg$Attributes$cx(
-							$elm_community$typed_svg$TypedSvg$Types$px(field.a.m)),
+							$elm_community$typed_svg$TypedSvg$Types$px(field.a.o)),
 							$elm_community$typed_svg$TypedSvg$Attributes$cy(
 							$elm_community$typed_svg$TypedSvg$Types$px(field.a.u)),
 							$elm_community$typed_svg$TypedSvg$Attributes$r(
@@ -14303,7 +14418,7 @@ var $author$project$Main$viewFieldSource = F2(
 									20,
 									10,
 									40,
-									(A2($elm$core$Basics$min, 20, field.a.g) * field.a.i) / 10))),
+									(A2($elm$core$Basics$min, 20, field.a.h) * field.a.k) / 10))),
 							$elm_community$typed_svg$TypedSvg$Attributes$fill(
 							$elm_community$typed_svg$TypedSvg$Types$Reference(gradientId)),
 							A2($elm$html$Html$Attributes$style, 'pointer-events', 'none')
@@ -14315,24 +14430,24 @@ var $author$project$Main$viewFieldSource = F2(
 						_List_fromArray(
 							[
 								$elm_community$typed_svg$TypedSvg$Attributes$cx(
-								$elm_community$typed_svg$TypedSvg$Types$px(field.a.m)),
+								$elm_community$typed_svg$TypedSvg$Types$px(field.a.o)),
 								$elm_community$typed_svg$TypedSvg$Attributes$cy(
 								$elm_community$typed_svg$TypedSvg$Types$px(field.a.u)),
 								$elm_community$typed_svg$TypedSvg$Attributes$r(
-								$elm_community$typed_svg$TypedSvg$Types$px(field.a.g)),
+								$elm_community$typed_svg$TypedSvg$Types$px(field.a.h)),
 								$elm_community$typed_svg$TypedSvg$Attributes$fill(
 								$elm_community$typed_svg$TypedSvg$Types$Paint(fill)),
-								A2($zaboco$elm_draggable$Draggable$mouseTrigger, field.a.q, $author$project$Main$DragMsg),
+								A2($zaboco$elm_draggable$Draggable$mouseTrigger, field.a.r, $author$project$Main$DragMsg),
 								$author$project$Main$onWheel($author$project$Main$ScaleSourceMagnitude),
 								$elm$html$Html$Events$onDoubleClick($author$project$Main$ToggleSourceSign),
 								$author$project$Main$onRightClick($author$project$Main$ShowFieldContextMenu)
 							]),
 						_Utils_ap(
-							A2($zaboco$elm_draggable$Draggable$touchTriggers, field.a.q, $author$project$Main$DragMsg),
+							A2($zaboco$elm_draggable$Draggable$touchTriggers, field.a.r, $author$project$Main$DragMsg),
 							function () {
 								if (!activeSourceId.$) {
 									var id = activeSourceId.a;
-									return _Utils_eq(field.a.q, id) ? _List_fromArray(
+									return _Utils_eq(field.a.r, id) ? _List_fromArray(
 										[
 											$elm_community$typed_svg$TypedSvg$Attributes$stroke(
 											$elm_community$typed_svg$TypedSvg$Types$Paint($avh4$elm_color$Color$lightGreen)),
@@ -14343,11 +14458,26 @@ var $author$project$Main$viewFieldSource = F2(
 									return _List_Nil;
 								}
 							}())),
-					_List_Nil)
+					_List_fromArray(
+						[
+							A2(
+							$elm_community$typed_svg$TypedSvg$animate,
+							_List_fromArray(
+								[
+									$elm_community$typed_svg$TypedSvg$Attributes$attributeName('stroke-opacity'),
+									$elm_community$typed_svg$TypedSvg$Attributes$animationValues(
+									_List_fromArray(
+										[1, 0.3, 1])),
+									$elm_community$typed_svg$TypedSvg$Attributes$dur(
+									$elm_community$typed_svg$TypedSvg$Types$Duration('3s')),
+									$elm_community$typed_svg$TypedSvg$Attributes$repeatCount($elm_community$typed_svg$TypedSvg$Types$RepeatIndefinite)
+								]),
+							_List_Nil)
+						]))
 				]));
 	});
-var $author$project$Main$ApplySettingsToCurrentAndFutureFields = {$: 18};
-var $author$project$Main$ApplySettingsToFutureFields = {$: 17};
+var $author$project$Main$ApplySettingsToCurrentAndFutureFields = {$: 19};
+var $author$project$Main$ApplySettingsToFutureFields = {$: 18};
 var $author$project$Main$centeredText = function (text) {
 	return A2(
 		$mdgriffith$elm_ui$Element$el,
@@ -14355,7 +14485,7 @@ var $author$project$Main$centeredText = function (text) {
 			[$mdgriffith$elm_ui$Element$centerX]),
 		$mdgriffith$elm_ui$Element$text(text));
 };
-var $author$project$Main$DoNothing = {$: 21};
+var $author$project$Main$DoNothing = {$: 22};
 var $author$project$Main$onClickNoProp = function (msg) {
 	return A2(
 		$elm$html$Html$Events$custom,
@@ -14488,7 +14618,7 @@ var $author$project$Main$viewApplyOptions = function (model) {
 								$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill)
 							])),
 					{
-						l: $author$project$Main$centeredText('Apply to future fields'),
+						n: $author$project$Main$centeredText('Apply to future fields'),
 						B: $elm$core$Maybe$Just($author$project$Main$ApplySettingsToFutureFields)
 					}),
 					A2(
@@ -14500,7 +14630,7 @@ var $author$project$Main$viewApplyOptions = function (model) {
 								$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill)
 							])),
 					{
-						l: $author$project$Main$centeredText('Apply to current and future fields'),
+						n: $author$project$Main$centeredText('Apply to current and future fields'),
 						B: $elm$core$Maybe$Just($author$project$Main$ApplySettingsToCurrentAndFutureFields)
 					})
 				]));
@@ -14508,7 +14638,7 @@ var $author$project$Main$viewApplyOptions = function (model) {
 		return $mdgriffith$elm_ui$Element$none;
 	}
 };
-var $author$project$Main$CloseHelpPopUp = {$: 20};
+var $author$project$Main$CloseHelpPopUp = {$: 21};
 var $author$project$Main$textHeader = function (text) {
 	return A2(
 		$mdgriffith$elm_ui$Element$el,
@@ -14544,15 +14674,15 @@ var $author$project$Main$viewHelpPopUp = A3(
 				$mdgriffith$elm_ui$Element$Input$button,
 				$author$project$Main$style.K,
 				{
-					l: $author$project$Main$centeredText('Close'),
+					n: $author$project$Main$centeredText('Close'),
 					B: $elm$core$Maybe$Just($author$project$Main$CloseHelpPopUp)
 				}))
 		]));
-var $author$project$Main$ApplyPendingSettings = {$: 16};
-var $author$project$Main$CloseSettingsPopUp = {$: 19};
+var $author$project$Main$ApplyPendingSettings = {$: 17};
+var $author$project$Main$CloseSettingsPopUp = {$: 20};
 var $author$project$Main$UpdatePendingSetting = F2(
 	function (a, b) {
-		return {$: 15, a: a, b: b};
+		return {$: 16, a: a, b: b};
 	});
 var $mdgriffith$elm_ui$Internal$Model$Left = 0;
 var $mdgriffith$elm_ui$Element$alignLeft = $mdgriffith$elm_ui$Internal$Model$AlignX(0);
@@ -14880,13 +15010,13 @@ var $mdgriffith$elm_ui$Element$Input$redistributeOver = F4(
 				return $mdgriffith$elm_ui$Element$Input$isFill(width) ? _Utils_update(
 					els,
 					{
-						c: A2($elm$core$List$cons, attr, els.c),
-						k: A2($elm$core$List$cons, attr, els.k),
+						d: A2($elm$core$List$cons, attr, els.d),
+						m: A2($elm$core$List$cons, attr, els.m),
 						b: A2($elm$core$List$cons, attr, els.b)
 					}) : (stacked ? _Utils_update(
 					els,
 					{
-						c: A2($elm$core$List$cons, attr, els.c)
+						d: A2($elm$core$List$cons, attr, els.d)
 					}) : _Utils_update(
 					els,
 					{
@@ -14897,12 +15027,12 @@ var $mdgriffith$elm_ui$Element$Input$redistributeOver = F4(
 				return (!stacked) ? _Utils_update(
 					els,
 					{
-						c: A2($elm$core$List$cons, attr, els.c),
+						d: A2($elm$core$List$cons, attr, els.d),
 						b: A2($elm$core$List$cons, attr, els.b)
 					}) : ($mdgriffith$elm_ui$Element$Input$isFill(height) ? _Utils_update(
 					els,
 					{
-						c: A2($elm$core$List$cons, attr, els.c),
+						d: A2($elm$core$List$cons, attr, els.d),
 						b: A2($elm$core$List$cons, attr, els.b)
 					}) : ($mdgriffith$elm_ui$Element$Input$isPixel(height) ? _Utils_update(
 					els,
@@ -14917,13 +15047,13 @@ var $mdgriffith$elm_ui$Element$Input$redistributeOver = F4(
 				return _Utils_update(
 					els,
 					{
-						c: A2($elm$core$List$cons, attr, els.c)
+						d: A2($elm$core$List$cons, attr, els.d)
 					});
 			case 5:
 				return _Utils_update(
 					els,
 					{
-						c: A2($elm$core$List$cons, attr, els.c)
+						d: A2($elm$core$List$cons, attr, els.d)
 					});
 			case 4:
 				switch (attr.b.$) {
@@ -14932,8 +15062,8 @@ var $mdgriffith$elm_ui$Element$Input$redistributeOver = F4(
 						return _Utils_update(
 							els,
 							{
-								c: A2($elm$core$List$cons, attr, els.c),
-								k: A2($elm$core$List$cons, attr, els.k),
+								d: A2($elm$core$List$cons, attr, els.d),
+								m: A2($elm$core$List$cons, attr, els.m),
 								b: A2($elm$core$List$cons, attr, els.b),
 								ar: A2($elm$core$List$cons, attr, els.ar)
 							});
@@ -14976,10 +15106,10 @@ var $mdgriffith$elm_ui$Element$Input$redistributeOver = F4(
 								els,
 								{
 									x: A2($elm$core$List$cons, attr, els.x),
-									k: A2(
+									m: A2(
 										$elm$core$List$cons,
 										newHeight,
-										A2($elm$core$List$cons, newLineHeight, els.k)),
+										A2($elm$core$List$cons, newLineHeight, els.m)),
 									b: A2($elm$core$List$cons, reducedVerticalPadding, els.b)
 								});
 						}
@@ -15002,14 +15132,14 @@ var $mdgriffith$elm_ui$Element$Input$redistributeOver = F4(
 						return _Utils_update(
 							els,
 							{
-								c: A2($elm$core$List$cons, attr, els.c)
+								d: A2($elm$core$List$cons, attr, els.d)
 							});
 					case 1:
 						var _v4 = attr.b;
 						return _Utils_update(
 							els,
 							{
-								c: A2($elm$core$List$cons, attr, els.c)
+								d: A2($elm$core$List$cons, attr, els.d)
 							});
 					default:
 						var flag = attr.a;
@@ -15027,13 +15157,13 @@ var $mdgriffith$elm_ui$Element$Input$redistributeOver = F4(
 				return _Utils_update(
 					els,
 					{
-						k: A2($elm$core$List$cons, attr, els.k)
+						m: A2($elm$core$List$cons, attr, els.m)
 					});
 			case 2:
 				return _Utils_update(
 					els,
 					{
-						k: A2($elm$core$List$cons, attr, els.k)
+						m: A2($elm$core$List$cons, attr, els.m)
 					});
 			case 3:
 				return _Utils_update(
@@ -15045,7 +15175,7 @@ var $mdgriffith$elm_ui$Element$Input$redistributeOver = F4(
 				return _Utils_update(
 					els,
 					{
-						k: A2($elm$core$List$cons, attr, els.k)
+						m: A2($elm$core$List$cons, attr, els.m)
 					});
 		}
 	});
@@ -15054,8 +15184,8 @@ var $mdgriffith$elm_ui$Element$Input$redistribute = F3(
 		return function (redist) {
 			return {
 				x: $elm$core$List$reverse(redist.x),
-				c: $elm$core$List$reverse(redist.c),
-				k: $elm$core$List$reverse(redist.k),
+				d: $elm$core$List$reverse(redist.d),
+				m: $elm$core$List$reverse(redist.m),
 				b: $elm$core$List$reverse(redist.b),
 				ar: $elm$core$List$reverse(redist.ar)
 			};
@@ -15063,7 +15193,7 @@ var $mdgriffith$elm_ui$Element$Input$redistribute = F3(
 			A3(
 				$elm$core$List$foldl,
 				A2($mdgriffith$elm_ui$Element$Input$redistributeOver, isMultiline, stacked),
-				{x: _List_Nil, c: _List_Nil, k: _List_Nil, b: _List_Nil, ar: _List_Nil},
+				{x: _List_Nil, d: _List_Nil, m: _List_Nil, b: _List_Nil, ar: _List_Nil},
 				attrs));
 	});
 var $mdgriffith$elm_ui$Element$Input$renderBox = function (_v0) {
@@ -15144,7 +15274,7 @@ var $mdgriffith$elm_ui$Element$Input$textHelper = F3(
 		var redistributed = A3(
 			$mdgriffith$elm_ui$Element$Input$redistribute,
 			_Utils_eq(textInput.t, $mdgriffith$elm_ui$Element$Input$TextArea),
-			$mdgriffith$elm_ui$Element$Input$isStacked(textOptions.l),
+			$mdgriffith$elm_ui$Element$Input$isStacked(textOptions.n),
 			withDefaults);
 		var onlySpacing = function (attr) {
 			if ((attr.$ === 4) && (attr.b.$ === 5)) {
@@ -15257,14 +15387,14 @@ var $mdgriffith$elm_ui$Element$Input$textHelper = F3(
 							$mdgriffith$elm_ui$Element$Input$value(textOptions.ay),
 							$mdgriffith$elm_ui$Internal$Model$Attr(
 							$elm$html$Html$Events$onInput(textOptions.av)),
-							$mdgriffith$elm_ui$Element$Input$hiddenLabelAttribute(textOptions.l),
+							$mdgriffith$elm_ui$Element$Input$hiddenLabelAttribute(textOptions.n),
 							$mdgriffith$elm_ui$Element$Input$spellcheck(textInput.J),
 							A2(
 							$elm$core$Maybe$withDefault,
 							$mdgriffith$elm_ui$Internal$Model$NoAttribute,
 							A2($elm$core$Maybe$map, $mdgriffith$elm_ui$Element$Input$autofill, textInput.D))
 						]),
-					redistributed.k)),
+					redistributed.m)),
 			$mdgriffith$elm_ui$Internal$Model$Unkeyed(_List_Nil));
 		var wrappedInput = function () {
 			var _v0 = textInput.t;
@@ -15378,9 +15508,9 @@ var $mdgriffith$elm_ui$Element$Input$textHelper = F3(
 				A2($mdgriffith$elm_ui$Internal$Model$Class, $mdgriffith$elm_ui$Internal$Flag$cursor, $mdgriffith$elm_ui$Internal$Style$classes.c2),
 				A2(
 					$elm$core$List$cons,
-					$mdgriffith$elm_ui$Element$Input$isHiddenLabel(textOptions.l) ? $mdgriffith$elm_ui$Internal$Model$NoAttribute : $mdgriffith$elm_ui$Element$spacing(5),
-					A2($elm$core$List$cons, $mdgriffith$elm_ui$Element$Region$announce, redistributed.c))),
-			textOptions.l,
+					$mdgriffith$elm_ui$Element$Input$isHiddenLabel(textOptions.n) ? $mdgriffith$elm_ui$Internal$Model$NoAttribute : $mdgriffith$elm_ui$Element$spacing(5),
+					A2($elm$core$List$cons, $mdgriffith$elm_ui$Element$Region$announce, redistributed.d))),
+			textOptions.n,
 			wrappedInput);
 	});
 var $mdgriffith$elm_ui$Element$Input$text = $mdgriffith$elm_ui$Element$Input$textHelper(
@@ -15405,66 +15535,66 @@ var $author$project$Main$viewSettingsPopUp = function (model) {
 				$mdgriffith$elm_ui$Element$Input$text,
 				_List_Nil,
 				{
-					l: A2(
+					n: A2(
 						$mdgriffith$elm_ui$Element$Input$labelLeft,
 						_List_fromArray(
 							[$mdgriffith$elm_ui$Element$centerY]),
 						$mdgriffith$elm_ui$Element$text('Charge radius (px)')),
 					av: $author$project$Main$UpdatePendingSetting('r'),
 					aw: $elm$core$Maybe$Nothing,
-					ay: $elm$core$String$fromFloat(settings.g)
+					ay: $elm$core$String$fromFloat(settings.h)
 				}),
 				A2(
 				$mdgriffith$elm_ui$Element$Input$text,
 				_List_Nil,
 				{
-					l: A2(
+					n: A2(
 						$mdgriffith$elm_ui$Element$Input$labelLeft,
 						_List_fromArray(
 							[$mdgriffith$elm_ui$Element$centerY]),
 						$mdgriffith$elm_ui$Element$text('Field line density')),
 					av: $author$project$Main$UpdatePendingSetting('density'),
 					aw: $elm$core$Maybe$Nothing,
-					ay: $elm$core$String$fromInt(settings.n)
+					ay: $elm$core$String$fromInt(settings.p)
 				}),
 				A2(
 				$mdgriffith$elm_ui$Element$Input$text,
 				_List_Nil,
 				{
-					l: A2(
+					n: A2(
 						$mdgriffith$elm_ui$Element$Input$labelLeft,
 						_List_fromArray(
 							[$mdgriffith$elm_ui$Element$centerY]),
 						$mdgriffith$elm_ui$Element$text('Draw steps')),
 					av: $author$project$Main$UpdatePendingSetting('steps'),
 					aw: $elm$core$Maybe$Nothing,
-					ay: $elm$core$String$fromInt(settings.s)
+					ay: $elm$core$String$fromInt(settings.i)
 				}),
 				A2(
 				$mdgriffith$elm_ui$Element$Input$text,
 				_List_Nil,
 				{
-					l: A2(
+					n: A2(
 						$mdgriffith$elm_ui$Element$Input$labelLeft,
 						_List_fromArray(
 							[$mdgriffith$elm_ui$Element$centerY]),
 						$mdgriffith$elm_ui$Element$text('Draw step size (px)')),
 					av: $author$project$Main$UpdatePendingSetting('delta'),
 					aw: $elm$core$Maybe$Nothing,
-					ay: $elm$core$String$fromFloat(settings.p)
+					ay: $elm$core$String$fromFloat(settings.e)
 				}),
 				A2(
 				$mdgriffith$elm_ui$Element$Input$text,
 				_List_Nil,
 				{
-					l: A2(
+					n: A2(
 						$mdgriffith$elm_ui$Element$Input$labelLeft,
 						_List_fromArray(
 							[$mdgriffith$elm_ui$Element$centerY]),
 						$mdgriffith$elm_ui$Element$text('Charge magnitude')),
 					av: $author$project$Main$UpdatePendingSetting('magnitude'),
 					aw: $elm$core$Maybe$Nothing,
-					ay: $elm$core$String$fromFloat(settings.i)
+					ay: $elm$core$String$fromFloat(settings.k)
 				}),
 				A2(
 				$mdgriffith$elm_ui$Element$row,
@@ -15483,7 +15613,7 @@ var $author$project$Main$viewSettingsPopUp = function (model) {
 							_List_fromArray(
 								[$mdgriffith$elm_ui$Element$alignLeft])),
 						{
-							l: $author$project$Main$centeredText('Apply'),
+							n: $author$project$Main$centeredText('Apply'),
 							B: $elm$core$Maybe$Just($author$project$Main$ApplyPendingSettings)
 						}),
 						A2(
@@ -15493,7 +15623,7 @@ var $author$project$Main$viewSettingsPopUp = function (model) {
 							_List_fromArray(
 								[$mdgriffith$elm_ui$Element$alignRight])),
 						{
-							l: $author$project$Main$centeredText('Cancel'),
+							n: $author$project$Main$centeredText('Cancel'),
 							B: $elm$core$Maybe$Just($author$project$Main$CloseSettingsPopUp)
 						})
 					]))
@@ -15515,7 +15645,7 @@ var $author$project$Main$viewPopUp = function (model) {
 var $author$project$Main$HelpPopUp = 0;
 var $author$project$Main$SettingsPopUp = 1;
 var $author$project$Main$ShowPopUp = function (a) {
-	return {$: 14, a: a};
+	return {$: 15, a: a};
 };
 var $author$project$Main$viewButtonNoProp = F2(
 	function (text, msg) {
@@ -15529,7 +15659,7 @@ var $author$project$Main$viewButtonNoProp = F2(
 						$author$project$Main$onClickNoProp(msg))
 					])),
 			{
-				l: $author$project$Main$centeredText(text),
+				n: $author$project$Main$centeredText(text),
 				B: $elm$core$Maybe$Nothing
 			});
 	});
@@ -15596,11 +15726,11 @@ var $author$project$Main$view = function (model) {
 							A4($elm_community$typed_svg$TypedSvg$Attributes$viewBox, 0, 0, 1200, 780)
 						]),
 					_Utils_ap(
-						A2($elm$core$List$map, $author$project$Main$viewFieldLines, model.d),
+						A2($elm$core$List$map, $author$project$Main$viewFieldLines, model.c),
 						A2(
 							$elm$core$List$map,
 							$author$project$Main$viewFieldSource(model.w),
-							model.d))))));
+							model.c))))));
 };
 var $author$project$Main$main = $elm$browser$Browser$element(
 	{dp: $author$project$Main$initialModel, ec: $author$project$Main$subscriptions, ez: $author$project$Main$update, eA: $author$project$Main$view});
