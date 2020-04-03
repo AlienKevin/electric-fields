@@ -1,0 +1,22 @@
+{
+  "name": "electric-field",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AlienKevin/electric-fields.git"
+  },
+  "author": "Kevin Li",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/AlienKevin/electric-fields/issues"
+  },
+  "homepage": "https://github.com/AlienKevin/electric-fields#readme",
+  "devDependencies": {
+    "terser": "^4.6.10"
+  }
+}

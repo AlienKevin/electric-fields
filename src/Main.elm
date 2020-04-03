@@ -88,25 +88,25 @@ initialModel : () -> (Model, Cmd Msg)
 initialModel _ =
   let
     fields =
-      [{ source = { id = 0, sign = Negative, magnitude = 3.0, x = 300.0, y = 350.0, r = 10.0 }
+      [{ source = { id = 0, sign = Negative, magnitude = 3.0, x = 500.0, y = 350.0, r = 10.0 }
       , density = 30
       , steps = 900
       , delta = 1
       , lines = []
       }
-      , { source = { id = 1, sign = Positive, magnitude = 1.0, x = 400.0, y = 350.0, r = 10.0 }
+      , { source = { id = 1, sign = Positive, magnitude = 1.0, x = 600.0, y = 350.0, r = 10.0 }
       , density = 30
       , steps = 900
       , delta = 1
       , lines = []
       }
-      , { source = { id = 2, sign = Positive, magnitude = 10.0, x = 300.0, y = 450.0, r = 10.0 }
+      , { source = { id = 2, sign = Positive, magnitude = 10.0, x = 500.0, y = 450.0, r = 10.0 }
       , density = 30
       , steps = 900
       , delta = 1
       , lines = []
       }
-      , { source = { id = 3, sign = Negative, magnitude = 20.0, x = 400.0, y = 450.0, r = 10.0 }
+      , { source = { id = 3, sign = Negative, magnitude = 20.0, x = 600.0, y = 450.0, r = 10.0 }
       , density = 30
       , steps = 900
       , delta = 1
@@ -500,9 +500,9 @@ view model =
       , E.centerY
       ]
       ( E.html <| Svg.svg
-        [ Attributes.width (px 1000)
+        [ Attributes.width (px 1200)
         , Attributes.height (px 780)
-        , Attributes.viewBox 0 0 1000 780
+        , Attributes.viewBox 0 0 1200 780
         ] <|
         List.map viewFieldLines model.fields
         ++ List.map (viewFieldSource model.activeSourceId) model.fields
