@@ -110,25 +110,25 @@ initialModel : () -> (Model, Cmd Msg)
 initialModel _ =
   let
     fields =
-      [{ source = { id = 0, sign = Negative, magnitude = 3.0, x = 500.0, y = 350.0, r = 10.0 }
+      [{ source = { id = 0, sign = Negative, magnitude = 3.0, x = 465.0, y = 270.0, r = 10.0 }
       , density = 30
       , steps = 900
       , delta = 1
       , lines = []
       }
-      , { source = { id = 1, sign = Positive, magnitude = 1.0, x = 600.0, y = 350.0, r = 10.0 }
+      , { source = { id = 1, sign = Positive, magnitude = 1.0, x = 618.0, y = 515.0, r = 10.0 }
       , density = 30
       , steps = 900
       , delta = 1
       , lines = []
       }
-      , { source = { id = 2, sign = Positive, magnitude = 10.0, x = 500.0, y = 450.0, r = 10.0 }
+      , { source = { id = 2, sign = Positive, magnitude = 10.0, x = 553.0, y = 338.0, r = 10.0 }
       , density = 30
       , steps = 900
       , delta = 1
       , lines = []
       }
-      , { source = { id = 3, sign = Negative, magnitude = 20.0, x = 600.0, y = 450.0, r = 10.0 }
+      , { source = { id = 3, sign = Negative, magnitude = 20.0, x = 597.0, y = 182.0, r = 10.0 }
       , density = 30
       , steps = 900
       , delta = 1
