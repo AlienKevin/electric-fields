@@ -29,6 +29,17 @@ type alias Model =
   , drag : Draggable.State Id
   , contextMenu : ContextMenu
   , popUp: PopUp
+  , settings : Settings
+  , pendingSettings : Settings
+  }
+
+
+type alias Settings =
+  { r : Float
+  , density : Int
+  , steps : Int
+  , delta : Float
+  , magnitude : Float
   }
 
 
@@ -40,6 +51,8 @@ type ContextMenu
 
 type PopUp
   = HelpPopUp
+  | SettingsPopUp
+  | ApplyOptionsPopUp
   | NoPopUp
 
 
@@ -74,21 +87,6 @@ type alias Charge =
   , x: Float
   , y: Float
   , r: Float
-  }
-
-default :
-  { r : Float
-  , density : Int
-  , steps : Int
-  , delta : Float
-  , magnitude : Float
-  }
-default =
-  { r = 10.0
-  , density = 30
-  , steps = 900
-  , delta = 1
-  , magnitude = 1.0
   }
 
 
@@ -137,6 +135,13 @@ initialModel _ =
       , lines = []
       }
       ]
+    defaultSettings =
+      { r = 10.0
+      , density = 30
+      , steps = 900
+      , delta = 1
+      , magnitude = 1.0
+      }
   in
   ({ fields =
     calculateFields fields
@@ -145,6 +150,10 @@ initialModel _ =
   , drag = Draggable.init
   , contextMenu = NoContextMenu
   , popUp = NoPopUp
+  , settings =
+    defaultSettings
+  , pendingSettings =
+    defaultSettings
   }
   , Cmd.none
   )
@@ -256,6 +265,11 @@ type Msg
   | AddPositiveCharge Position
   | AddNegativeCharge Position
   | ShowPopUp PopUp
+  | UpdatePendingSetting String String
+  | ApplyPendingSettings
+  | ApplySettingsToFutureFields
+  | ApplySettingsToCurrentAndFutureFields
+  | DoNothing
 
 
 dragConfig : Draggable.Config Id Msg
@@ -404,6 +418,113 @@ update msg model =
     ShowPopUp popUp ->
       (showPopUp popUp model, Cmd.none)
 
+    UpdatePendingSetting field value ->
+      (updatePendingSetting field value model, Cmd.none)
+
+    ApplyPendingSettings ->
+      (applyPendingSettings model, Cmd.none)
+
+    ApplySettingsToFutureFields ->
+      (applySettingsToFutureFields model, Cmd.none)
+
+    ApplySettingsToCurrentAndFutureFields ->
+      (applySettingsToCurrentAndFutureFields model, Cmd.none)
+
+    DoNothing ->
+      (model, Cmd.none)
+
+
+applyPendingSettings : Model -> Model
+applyPendingSettings model =
+  { model |
+    popUp =
+      ApplyOptionsPopUp
+  }
+
+
+applySettingsToFutureFields : Model -> Model
+applySettingsToFutureFields model =
+  { model
+    | settings =
+      model.pendingSettings
+    , popUp =
+      NoPopUp
+  }
+
+
+applySettingsToCurrentAndFutureFields : Model -> Model
+applySettingsToCurrentAndFutureFields model =
+  let
+    newSettings =
+      model.pendingSettings
+    newFields =
+      List.map
+        (\field ->
+          let
+            source =
+              field.source
+          in
+          { field
+            | source =
+              { source
+                | r = newSettings.r
+                , magnitude = newSettings.magnitude
+              }
+            , density =
+              newSettings.density
+            , steps =
+              newSettings.steps
+            , delta =
+              newSettings.delta
+          }
+        )
+        model.fields
+  in
+  { model
+    | fields =
+      calculateFields newFields
+    , settings =
+      newSettings
+    , popUp =
+      NoPopUp
+  }
+
+
+updatePendingSetting : String -> String -> Model -> Model
+updatePendingSetting field value model =
+  let
+    settings =
+      model.pendingSettings
+    newSettings =
+      case field of
+        "r" ->
+          case String.toFloat value of
+            Just v -> { settings | r = v }
+            Nothing -> settings
+        "density" ->
+          case String.toInt value of
+            Just v -> { settings | density = v }
+            Nothing -> settings
+        "steps" ->
+          case String.toInt value of
+            Just v -> { settings | steps = v }
+            Nothing -> settings
+        "delta" ->
+          case String.toFloat value of
+            Just v -> { settings | delta = v }
+            Nothing -> settings
+        "magnitude" ->
+          case String.toFloat value of
+            Just v -> { settings | magnitude = v }
+            Nothing -> settings
+        _ ->
+          settings
+  in
+  { model |
+    pendingSettings =
+      newSettings
+  }
+
 
 showPopUp : PopUp -> Model -> Model
 showPopUp popUp model =
@@ -426,18 +547,18 @@ addCharge sign (x, y) model =
     newCharge : Charge
     newCharge =
       { sign = sign
-      , magnitude = default.magnitude
+      , magnitude = model.settings.magnitude
       , x = x
       , y = y
-      , r = default.r
+      , r = model.settings.r
       , id = model.nextId
       }
     newField : Field
     newField =
       { source = newCharge
-      , density = default.density
-      , steps = default.steps
-      , delta = default.delta
+      , density = model.settings.density
+      , steps = model.settings.steps
+      , delta = model.settings.delta
       , lines = []
       }
     newFields : List Field
@@ -556,15 +677,16 @@ view model =
 
 viewPopUpSelector : E.Element Msg
 viewPopUpSelector =
-  E.column
+  E.row
     [ E.centerX
     ]
-    [ viewButtonNoProp <| ShowPopUp HelpPopUp
+    [ viewButtonNoProp "Help" <| ShowPopUp HelpPopUp
+    , viewButtonNoProp "Settings" <| ShowPopUp SettingsPopUp
     ]
 
 
-viewButtonNoProp : Msg -> E.Element Msg
-viewButtonNoProp msg =
+viewButtonNoProp : String -> Msg -> E.Element Msg
+viewButtonNoProp text msg =
   Input.button (style.button ++ [
     E.htmlAttribute <| onClickNoProp msg
   ]) <|
@@ -572,7 +694,7 @@ viewButtonNoProp msg =
       Nothing
     , label =
       E.el [ E.centerX ]
-        (E.text "Help")
+        (E.text text)
     }
 
 
@@ -581,21 +703,114 @@ viewPopUp model =
   case model.popUp of
     HelpPopUp ->
       viewHelpPopUp
+    SettingsPopUp ->
+      viewSettingsPopUp model
+    ApplyOptionsPopUp ->
+      viewApplyOptions model
     NoPopUp ->
+      E.none
+
+
+viewSettingsPopUp : Model -> E.Element Msg
+viewSettingsPopUp model =
+  let
+    settings =
+      model.pendingSettings
+  in
+  viewPopUpOf "Settings"
+    [ E.inFront <| viewApplyOptions model
+    ]
+    [ Input.text []
+      { onChange = UpdatePendingSetting "r"
+       , text = String.fromFloat settings.r
+       , placeholder = Nothing
+       , label = Input.labelLeft [] <| E.text "Charge radius (px)"
+       }
+    , Input.text []
+      { onChange = UpdatePendingSetting "density"
+       , text = String.fromInt settings.density
+       , placeholder = Nothing
+       , label = Input.labelLeft [] <| E.text "Field line density"
+       }
+    , Input.text []
+      { onChange = UpdatePendingSetting "steps"
+      , text = String.fromInt settings.steps
+      , placeholder = Nothing
+      , label = Input.labelLeft [] <| E.text "Draw steps"
+      }
+  , Input.text []
+    { onChange = UpdatePendingSetting "delta"
+    , text = String.fromFloat settings.delta
+    , placeholder = Nothing
+    , label = Input.labelLeft [] <| E.text "Draw step size (px)"
+    }
+  , Input.text []
+    { onChange = UpdatePendingSetting "magnitude"
+    , text = String.fromFloat settings.magnitude
+    , placeholder = Nothing
+    , label = Input.labelLeft [] <| E.text "Charge magnitude"
+    }
+  , Input.button style.button
+    { onPress =
+      Just ApplyPendingSettings
+    , label =
+      E.text "Apply"
+    }
+  , Input.button style.button
+    { onPress =
+      Just ClickedBackground
+    , label =
+      E.text "Cancel"
+    }
+  ]
+
+
+viewApplyOptions : Model -> E.Element Msg
+viewApplyOptions model =
+  case model.popUp of
+    ApplyOptionsPopUp ->
+      viewPopUpOf "Which fields do you want to apply to?" []
+        [ Input.button
+          style.button
+          { onPress = Just ApplySettingsToFutureFields
+          , label = E.text "Apply to future fields"
+          }
+        , Input.button
+          style.button
+          { onPress = Just ApplySettingsToCurrentAndFutureFields
+          , label = E.text "Apply to current and future fields"
+          }
+        ]
+    _ ->
       E.none
 
 
 viewHelpPopUp : E.Element Msg
 viewHelpPopUp =
+  viewPopUpOf "Help" []
+    [ textHeader "When you mouse over a charge and ..."
+    , E.text "  Single click: select charge"
+    , E.text "  Double click: negate charge"
+    , E.text "  Right click: * delete charge"
+    , E.text "               * duplicate charge"
+    , textHeader "When you mouse over background and ..."
+    , E.text "  Right Click: * add + charge"
+    , E.text "               * add - charge"
+    ]
+
+
+viewPopUpOf : String -> List (E.Attribute Msg) -> List (E.Element Msg) -> E.Element Msg
+viewPopUpOf title attributes content =
   E.column
-    [ E.centerX
+    ([ E.centerX
     , E.centerY
     , E.padding 20
     , E.spacing 6
     , Background.color <| toElmUiColor Color.lightGrey
     , Border.width 2
     , Border.color <| toElmUiColor Color.black
-    ]
+    , E.htmlAttribute <| onClickNoProp DoNothing
+    ] ++ attributes) <|
     [ E.el
       [ Font.size 18
       , E.paddingEach
@@ -605,16 +820,8 @@ viewHelpPopUp =
         , bottom = 10
         }
       ] <|
-      E.text "Help"
-    , textHeader "When you mouse over a charge and ..."
-    , E.text "  Single click: select charge"
-    , E.text "  Double click: negate charge"
-    , E.text "  Right click: * delete charge"
-    , E.text "               * duplicate charge"
-    , textHeader "When you mouse over background and ..."
-    , E.text "  Right Click: * add + charge"
-    , E.text "               * add - charge"
-    ]
+      E.text title
+    ] ++ content
 
 
 textHeader : String -> E.Element Msg
@@ -631,7 +838,7 @@ viewContextMenu model =
     FieldContextMenu ->
       viewFieldContextMenu style.button model
     GeneralContextMenu position ->
-      viewGeneralContextMenu style.button position model
+      viewGeneralContextMenu style.button position
     NoContextMenu ->
       E.none
 
@@ -676,8 +883,8 @@ viewFieldContextMenu menuItemStyles model =
     ]
 
 
-viewGeneralContextMenu : List (E.Attribute Msg) -> Position -> Model -> E.Element Msg
-viewGeneralContextMenu menuItemStyles (x, y) model =
+viewGeneralContextMenu : List (E.Attribute Msg) -> Position -> E.Element Msg
+viewGeneralContextMenu menuItemStyles (x, y) =
   E.column
     [ E.moveRight x
     , E.moveDown y
@@ -777,11 +984,11 @@ onRightClick msg =
     )
 
 
-onClickNoProp : msg -> Html.Attribute Msg
+onClickNoProp : Msg -> Html.Attribute Msg
 onClickNoProp msg =
   Html.Events.custom "click"
     (Json.succeed
-    { message = ShowPopUp HelpPopUp
+    { message = msg
     , stopPropagation = True
     , preventDefault = False
     }
