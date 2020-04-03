@@ -269,6 +269,7 @@ type Msg
   | ApplyPendingSettings
   | ApplySettingsToFutureFields
   | ApplySettingsToCurrentAndFutureFields
+  | CloseSettingsPopUp
   | DoNothing
 
 
@@ -430,8 +431,21 @@ update msg model =
     ApplySettingsToCurrentAndFutureFields ->
       (applySettingsToCurrentAndFutureFields model, Cmd.none)
 
+    CloseSettingsPopUp ->
+      (closeSettingsPopUp model, Cmd.none)
+
     DoNothing ->
       (model, Cmd.none)
+
+
+closeSettingsPopUp : Model -> Model
+closeSettingsPopUp model =
+  { model
+    | popUp =
+      NoPopUp
+    , pendingSettings =
+      model.settings
+  }
 
 
 applyPendingSettings : Model -> Model
@@ -607,12 +621,13 @@ duplicateActiveField model =
 
 resetState : Model -> Model
 resetState model =
-  { model
-    | contextMenu =
-      NoContextMenu
-    , popUp =
-      NoPopUp
-  }
+  closeSettingsPopUp <|
+    { model
+      | contextMenu =
+        NoContextMenu
+      , popUp =
+        NoPopUp
+    }
 
 
 updateActive : (Field -> Field) -> Maybe Id -> List Field -> List Field
@@ -764,7 +779,7 @@ viewSettingsPopUp model =
       }
       , Input.button (style.button ++ [E.alignRight])
       { onPress =
-        Just ClickedBackground
+        Just CloseSettingsPopUp
       , label =
         E.text "Cancel"
       }
