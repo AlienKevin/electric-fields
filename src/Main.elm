@@ -1079,7 +1079,13 @@ viewFieldSource activeSourceId field =
       Nothing ->
         []
     )
-    []
+    [ Svg.animate
+      [ Attributes.attributeName "stroke-opacity"
+      , Attributes.animationValues [ 1, 0.3, 1 ]
+      , Attributes.dur <| TypedSvg.Types.Duration "3s"
+      , Attributes.repeatCount TypedSvg.Types.RepeatIndefinite
+      ] []
+    ]
   ]
 
 
