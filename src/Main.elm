@@ -287,17 +287,8 @@ dragConfig =
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
-    OnDragBy delta ->
-      let
-        newFields =
-          updateActive (dragSource delta) model.activeSourceId model.fields
-      in
-      ( { model |
-        fields =
-          calculateFields newFields
-      }
-      , Cmd.none
-      )
+    OnDragBy offsetPos ->
+      (onDragBy offsetPos model, Cmd.none)
 
     StartDragging id ->
       (setActiveSourceId id model, Cmd.none)
@@ -306,105 +297,22 @@ update msg model =
       (setActiveSourceId id model, Cmd.none)
 
     ToggleSourceSign ->
-      let
-        newFields =
-          updateActive
-            (\field ->
-              let
-                source =
-                  field.source
-              in
-              { field |
-                source =
-                  { source |
-                    sign =
-                      negateSign field.source.sign
-                  }
-              }
-            )
-            model.activeSourceId
-            model.fields
-      in
-      ( { model |
-        fields =
-          calculateFields newFields
-      }
-      , Cmd.none
-      )
+      (toggleSourceSign model, Cmd.none)
 
     ScaleSourceMagnitude delta ->
-      let
-        newFields =
-          updateActive
-            (\field ->
-              let
-                source =
-                  field.source
-              in
-              { field |
-                source =
-                  { source |
-                    magnitude =
-                      min 20 <| max 0.5 <| source.magnitude + toFloat delta * -0.01
-                  }
-              }
-            )
-            model.activeSourceId
-            model.fields
-      in
-      ( { model |
-        fields =
-          calculateFields newFields
-      }
-      , Cmd.none
-      )
+      (scaleSourceMagnitude delta model, Cmd.none)
 
     DragMsg dragMsg ->
       Draggable.update dragConfig dragMsg model
 
     ShowFieldContextMenu ->
-      ({ model
-        | contextMenu =
-          case model.activeSourceId of
-            Nothing ->
-              model.contextMenu
-            Just _ ->
-              FieldContextMenu
-      }
-      , Cmd.none
-      )
+      (showFieldContextMenu model, Cmd.none)
 
     ShowGeneralContextMenu { offsetPos } ->
-      ({ model |
-        contextMenu =
-          GeneralContextMenu offsetPos
-      }
-      , Cmd.none
-      )
+      (showGeneralContextMenu offsetPos model, Cmd.none)
 
     DeleteActiveField ->
-      let
-        newFields =
-          case model.activeSourceId of
-            Nothing ->
-              model.fields
-            Just id ->
-              List.filter
-                (\field ->
-                  field.source.id /= id
-                )
-                model.fields
-      in
-      ( { model |
-        fields =
-          calculateFields newFields
-        , contextMenu =
-          NoContextMenu
-        , activeSourceId =
-          Nothing
-      }
-      , Cmd.none
-      )
+      (deleteActiveField model, Cmd.none)
 
     ClickedBackground ->
       (resetState model, Cmd.none)
@@ -444,6 +352,18 @@ update msg model =
 
     DoNothing ->
       (model, Cmd.none)
+
+
+onDragBy : Position -> Model -> Model
+onDragBy offsetPos model =
+  let
+    newFields =
+      updateActive (dragSource offsetPos) model.activeSourceId model.fields
+  in
+  { model |
+    fields =
+      calculateFields newFields
+  }
 
 
 closeHelpPopUp : Model -> Model
@@ -569,6 +489,104 @@ setActiveSourceId : Id -> Model -> Model
 setActiveSourceId id model =
   { model |
     activeSourceId = Just id
+  }
+
+
+toggleSourceSign : Model -> Model
+toggleSourceSign model =
+  let
+    newFields =
+      updateActive
+        (\field ->
+          let
+            source =
+              field.source
+          in
+          { field |
+            source =
+              { source |
+                sign =
+                  negateSign field.source.sign
+              }
+          }
+        )
+        model.activeSourceId
+        model.fields
+  in
+  { model
+    | fields =
+      calculateFields newFields
+  }
+
+
+scaleSourceMagnitude : Int -> Model -> Model
+scaleSourceMagnitude delta model =
+  let
+    newFields =
+      updateActive
+        (\field ->
+          let
+            source =
+              field.source
+          in
+          { field |
+            source =
+              { source |
+                magnitude =
+                  min 20 <| max 0.5 <| source.magnitude + toFloat delta * -0.01
+              }
+          }
+        )
+        model.activeSourceId
+        model.fields
+  in
+  { model |
+    fields =
+      calculateFields newFields
+  }
+
+
+showFieldContextMenu : Model -> Model
+showFieldContextMenu model =
+  { model
+    | contextMenu =
+      case model.activeSourceId of
+        Nothing ->
+          model.contextMenu
+        Just _ ->
+          FieldContextMenu
+  }
+
+
+showGeneralContextMenu : Position -> Model -> Model
+showGeneralContextMenu offsetPos model =
+  { model |
+    contextMenu =
+      GeneralContextMenu offsetPos
+  }
+
+
+deleteActiveField : Model -> Model
+deleteActiveField model =
+  let
+    newFields =
+      case model.activeSourceId of
+        Nothing ->
+          model.fields
+        Just id ->
+          List.filter
+            (\field ->
+              field.source.id /= id
+            )
+            model.fields
+  in
+  { model |
+    fields =
+      calculateFields newFields
+    , contextMenu =
+      NoContextMenu
+    , activeSourceId =
+      Nothing
   }
 
 
