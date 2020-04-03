@@ -540,7 +540,7 @@ view model =
     E.el
       [ E.inFront <| viewContextMenu model
       , E.inFront <| viewPopUp model
-      , E.onRight <| viewPopUpSelector
+      , E.below <| viewPopUpSelector
       , E.centerX
       , E.centerY
       ]
@@ -557,7 +557,8 @@ view model =
 viewPopUpSelector : E.Element Msg
 viewPopUpSelector =
   E.column
-    []
+    [ E.centerX
+    ]
     [ viewButtonNoProp <| ShowPopUp HelpPopUp
     ]
 
@@ -570,7 +571,8 @@ viewButtonNoProp msg =
     { onPress =
       Nothing
     , label =
-      E.text "Help"
+      E.el [ E.centerX ]
+        (E.text "Help")
     }
 
 
