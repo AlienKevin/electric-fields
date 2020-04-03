@@ -911,12 +911,12 @@ viewFieldContextMenu menuItemStyles model =
     [ Input.button
       menuItemStyles
       { onPress = Just DeleteActiveField
-      , label = E.text "delete"
+      , label = E.text "Delete"
       }
     , Input.button
       menuItemStyles
       { onPress = Just DuplicateActiveField
-      , label = E.text "duplicate"
+      , label = E.text "Duplicate"
       }
     ]
 
@@ -930,12 +930,12 @@ viewGeneralContextMenu menuItemStyles (x, y) =
     [ Input.button
       menuItemStyles
       { onPress = Just <| AddPositiveCharge (x, y)
-      , label = E.text "add + charge"
+      , label = E.text "Add + charge"
       }
     , Input.button
       menuItemStyles
       { onPress = Just <| AddNegativeCharge (x, y)
-      , label = E.text "add - charge"
+      , label = E.text "Add - charge"
       }
     ]
 
