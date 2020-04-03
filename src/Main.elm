@@ -679,6 +679,7 @@ viewPopUpSelector : E.Element Msg
 viewPopUpSelector =
   E.row
     [ E.centerX
+    , E.spacing 10
     ]
     [ viewButtonNoProp "Help" <| ShowPopUp HelpPopUp
     , viewButtonNoProp "Settings" <| ShowPopUp SettingsPopUp
@@ -724,44 +725,50 @@ viewSettingsPopUp model =
       { onChange = UpdatePendingSetting "r"
        , text = String.fromFloat settings.r
        , placeholder = Nothing
-       , label = Input.labelLeft [] <| E.text "Charge radius (px)"
+       , label = Input.labelLeft [ E.centerY ] <| E.text "Charge radius (px)"
        }
     , Input.text []
       { onChange = UpdatePendingSetting "density"
        , text = String.fromInt settings.density
        , placeholder = Nothing
-       , label = Input.labelLeft [] <| E.text "Field line density"
+       , label = Input.labelLeft [ E.centerY ] <| E.text "Field line density"
        }
     , Input.text []
       { onChange = UpdatePendingSetting "steps"
       , text = String.fromInt settings.steps
       , placeholder = Nothing
-      , label = Input.labelLeft [] <| E.text "Draw steps"
+      , label = Input.labelLeft [ E.centerY ] <| E.text "Draw steps"
       }
   , Input.text []
     { onChange = UpdatePendingSetting "delta"
     , text = String.fromFloat settings.delta
     , placeholder = Nothing
-    , label = Input.labelLeft [] <| E.text "Draw step size (px)"
+    , label = Input.labelLeft [ E.centerY ] <| E.text "Draw step size (px)"
     }
   , Input.text []
     { onChange = UpdatePendingSetting "magnitude"
     , text = String.fromFloat settings.magnitude
     , placeholder = Nothing
-    , label = Input.labelLeft [] <| E.text "Charge magnitude"
+    , label = Input.labelLeft [ E.centerY ] <| E.text "Charge magnitude"
     }
-  , Input.button style.button
-    { onPress =
-      Just ApplyPendingSettings
-    , label =
-      E.text "Apply"
-    }
-  , Input.button style.button
-    { onPress =
-      Just ClickedBackground
-    , label =
-      E.text "Cancel"
-    }
+  , E.row
+    [ E.width E.fill
+    , E.paddingEach
+      { top = 20, right = 0, bottom = 0, left = 0 }
+    ]
+    [ Input.button (style.button ++ [E.alignLeft])
+      { onPress =
+        Just ApplyPendingSettings
+      , label =
+        E.text "Apply"
+      }
+      , Input.button (style.button ++ [E.alignRight])
+      { onPress =
+        Just ClickedBackground
+      , label =
+        E.text "Cancel"
+      }
+    ]
   ]
 
 
@@ -771,12 +778,12 @@ viewApplyOptions model =
     ApplyOptionsPopUp ->
       viewPopUpOf "Which fields do you want to apply to?" []
         [ Input.button
-          style.button
+          (style.button ++ [ E.width <| E.fill ] )
           { onPress = Just ApplySettingsToFutureFields
           , label = E.text "Apply to future fields"
           }
         , Input.button
-          style.button
+          (style.button ++ [ E.width <| E.fill ] )
           { onPress = Just ApplySettingsToCurrentAndFutureFields
           , label = E.text "Apply to current and future fields"
           }
