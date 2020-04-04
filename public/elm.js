@@ -14510,8 +14510,7 @@ var $author$project$Main$viewControlPanel = A2(
 			$author$project$Main$viewButtonNoProp,
 			'Settings',
 			$author$project$Main$ShowPopUp($author$project$Main$SettingsPopUp)),
-			A2($author$project$Main$viewButtonNoProp, 'Download', $author$project$Main$DownloadModel),
-			A2($author$project$Main$viewButtonNoProp, 'Save', $author$project$Main$SaveModel)
+			A2($author$project$Main$viewButtonNoProp, 'Download', $author$project$Main$DownloadModel)
 		]));
 var $elm_community$typed_svg$TypedSvg$Types$Paint = function (a) {
 	return {$: 'Paint', a: a};

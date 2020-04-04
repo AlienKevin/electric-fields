@@ -1043,7 +1043,6 @@ viewControlPanel =
     [ viewButtonNoProp "Help" <| ShowPopUp HelpPopUp
     , viewButtonNoProp "Settings" <| ShowPopUp SettingsPopUp
     , viewButtonNoProp "Download" <| DownloadModel
-    , viewButtonNoProp "Save" <| SaveModel
     ]
 
 
