@@ -6195,14 +6195,14 @@ var $elm$core$Task$perform = F2(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
 var $elm$browser$Browser$element = _Browser_element;
-var $author$project$Main$Negative = {$: 'Negative'};
-var $author$project$Main$NoContextMenu = {$: 'NoContextMenu'};
-var $author$project$Main$NoPopUp = {$: 'NoPopUp'};
-var $author$project$Main$Positive = {$: 'Positive'};
+var $author$project$Simulation$Negative = {$: 'Negative'};
+var $author$project$Simulation$NoContextMenu = {$: 'NoContextMenu'};
+var $author$project$Simulation$NoPopUp = {$: 'NoPopUp'};
+var $author$project$Simulation$Positive = {$: 'Positive'};
 var $elm_explorations$linear_algebra$Math$Vector2$add = _MJS_v2add;
 var $elm$core$Basics$pow = _Basics_pow;
 var $elm$core$Basics$sqrt = _Basics_sqrt;
-var $author$project$Main$distance = F2(
+var $author$project$Simulation$distance = F2(
 	function (_v0, _v1) {
 		var x1 = _v0.a;
 		var y1 = _v0.b;
@@ -6211,7 +6211,7 @@ var $author$project$Main$distance = F2(
 		return $elm$core$Basics$sqrt(
 			A2($elm$core$Basics$pow, x2 - x1, 2) + A2($elm$core$Basics$pow, y2 - y1, 2));
 	});
-var $author$project$Main$foldlWhile = F3(
+var $author$project$Simulation$foldlWhile = F3(
 	function (accumulate, initial, list) {
 		var foldlHelper = F2(
 			function (accumulated, aList) {
@@ -6248,7 +6248,7 @@ var $elm_explorations$linear_algebra$Math$Vector2$negate = _MJS_v2negate;
 var $elm_explorations$linear_algebra$Math$Vector2$normalize = _MJS_v2normalize;
 var $elm_explorations$linear_algebra$Math$Vector2$scale = _MJS_v2scale;
 var $elm_explorations$linear_algebra$Math$Vector2$vec2 = _MJS_v2;
-var $author$project$Main$calculateFieldLine = function (_v0) {
+var $author$project$Simulation$calculateFieldLine = function (_v0) {
 	var charges = _v0.charges;
 	var steps = _v0.steps;
 	var delta = _v0.delta;
@@ -6257,7 +6257,7 @@ var $author$project$Main$calculateFieldLine = function (_v0) {
 	var xBound = _v0.xBound;
 	var yBound = _v0.yBound;
 	return A3(
-		$author$project$Main$foldlWhile,
+		$author$project$Simulation$foldlWhile,
 		F2(
 			function (_v1, line) {
 				var _v2 = function () {
@@ -6284,7 +6284,7 @@ var $author$project$Main$calculateFieldLine = function (_v0) {
 								}
 							}();
 							var d = A2(
-								$author$project$Main$distance,
+								$author$project$Simulation$distance,
 								_Utils_Tuple2(x, y),
 								_Utils_Tuple2(charge.x, charge.y)) / 100;
 							var magnitude = charge.magnitude / A2($elm$core$Basics$pow, d, 2);
@@ -6331,7 +6331,7 @@ var $author$project$Main$calculateFieldLine = function (_v0) {
 var $elm$core$Basics$cos = _Basics_cos;
 var $elm$core$Basics$pi = _Basics_pi;
 var $elm$core$Basics$sin = _Basics_sin;
-var $author$project$Main$calculateFields = F3(
+var $author$project$Simulation$calculateFields = F3(
 	function (width, height, fields) {
 		return A2(
 			$elm$core$List$map,
@@ -6343,7 +6343,7 @@ var $author$project$Main$calculateFields = F3(
 						var angle = deltaAngle * index;
 						var x = field.source.x + (field.source.r * $elm$core$Basics$cos(angle));
 						var y = field.source.y + (field.source.r * $elm$core$Basics$sin(angle));
-						return $author$project$Main$calculateFieldLine(
+						return $author$project$Simulation$calculateFieldLine(
 							{
 								charges: A2(
 									$elm$core$List$map,
@@ -6388,7 +6388,7 @@ var $webbhuset$elm_json_decode$Json$Decode$Field$attempt = F3(
 			$elm$json$Json$Decode$maybe(
 				A2($elm$json$Json$Decode$field, fieldName, valueDecoder)));
 	});
-var $author$project$Main$defaultSettings = {delta: 1, density: 30, magnitude: 1.0, r: 10.0, steps: 900};
+var $author$project$Simulation$defaultSettings = {delta: 1, density: 30, magnitude: 1.0, r: 10.0, steps: 900};
 var $elm$json$Json$Decode$fail = _Json_fail;
 var $elm$json$Json$Decode$float = _Json_decodeFloat;
 var $zaboco$elm_draggable$Internal$NotDragging = {$: 'NotDragging'};
@@ -6406,15 +6406,15 @@ var $webbhuset$elm_json_decode$Json$Decode$Field$require = F3(
 			A2($elm$json$Json$Decode$field, fieldName, valueDecoder));
 	});
 var $elm$json$Json$Decode$string = _Json_decodeString;
-var $author$project$Main$decodeModel = function () {
+var $author$project$Simulation$decodeModel = function () {
 	var decodeSign = A2(
 		$elm$json$Json$Decode$andThen,
 		function (sign) {
 			switch (sign) {
 				case 'Positive':
-					return $elm$json$Json$Decode$succeed($author$project$Main$Positive);
+					return $elm$json$Json$Decode$succeed($author$project$Simulation$Positive);
 				case 'Negative':
-					return $elm$json$Json$Decode$succeed($author$project$Main$Negative);
+					return $elm$json$Json$Decode$succeed($author$project$Simulation$Negative);
 				default:
 					return $elm$json$Json$Decode$fail('I can\'t recognize \"' + (sign + '\". It should be either \"Postive\" or \"Negative\"'));
 			}
@@ -6552,7 +6552,7 @@ var $author$project$Main$decodeModel = function () {
 														$elm$json$Json$Decode$float,
 														function (height) {
 															return $elm$json$Json$Decode$succeed(
-																{activeSourceId: activeSourceId, contextMenu: $author$project$Main$NoContextMenu, drag: $zaboco$elm_draggable$Draggable$init, fields: fields, height: height, isWheeling: false, isWheelingTimeOutCleared: false, name: name, nextId: nextId, pendingSettings: $author$project$Main$defaultSettings, popUp: $author$project$Main$NoPopUp, settings: settings, width: width});
+																{activeSourceId: activeSourceId, contextMenu: $author$project$Simulation$NoContextMenu, drag: $zaboco$elm_draggable$Draggable$init, fields: fields, height: height, isWheeling: false, isWheelingTimeOutCleared: false, name: name, nextId: nextId, pendingSettings: $author$project$Simulation$defaultSettings, popUp: $author$project$Simulation$NoPopUp, settings: settings, width: width});
 														});
 												});
 										});
@@ -6562,10 +6562,10 @@ var $author$project$Main$decodeModel = function () {
 		});
 }();
 var $elm$json$Json$Decode$decodeString = _Json_runOnString;
-var $author$project$Main$defaultName = 'Untitled Model';
+var $author$project$Simulation$defaultName = 'Untitled Model';
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
-var $author$project$Main$initialModel = function (savedModel) {
+var $author$project$Simulation$init = function (savedModel) {
 	var defaultWidth = 1200;
 	var defaultHeight = 750;
 	var defaultFields = _List_fromArray(
@@ -6574,57 +6574,57 @@ var $author$project$Main$initialModel = function (savedModel) {
 			delta: 1,
 			density: 30,
 			lines: _List_Nil,
-			source: {id: 0, magnitude: 3.0, r: 10.0, sign: $author$project$Main$Negative, x: 465.0, y: 270.0},
+			source: {id: 0, magnitude: 3.0, r: 10.0, sign: $author$project$Simulation$Negative, x: 465.0, y: 270.0},
 			steps: 900
 		},
 			{
 			delta: 1,
 			density: 30,
 			lines: _List_Nil,
-			source: {id: 1, magnitude: 1.0, r: 10.0, sign: $author$project$Main$Positive, x: 618.0, y: 515.0},
+			source: {id: 1, magnitude: 1.0, r: 10.0, sign: $author$project$Simulation$Positive, x: 618.0, y: 515.0},
 			steps: 900
 		},
 			{
 			delta: 1,
 			density: 30,
 			lines: _List_Nil,
-			source: {id: 2, magnitude: 10.0, r: 10.0, sign: $author$project$Main$Positive, x: 553.0, y: 338.0},
+			source: {id: 2, magnitude: 10.0, r: 10.0, sign: $author$project$Simulation$Positive, x: 553.0, y: 338.0},
 			steps: 900
 		},
 			{
 			delta: 1,
 			density: 30,
 			lines: _List_Nil,
-			source: {id: 3, magnitude: 20.0, r: 10.0, sign: $author$project$Main$Negative, x: 597.0, y: 182.0},
+			source: {id: 3, magnitude: 20.0, r: 10.0, sign: $author$project$Simulation$Negative, x: 597.0, y: 182.0},
 			steps: 900
 		}
 		]);
 	var defaultModel = {
 		activeSourceId: ($elm$core$List$length(defaultFields) > 0) ? $elm$core$Maybe$Just(0) : $elm$core$Maybe$Nothing,
-		contextMenu: $author$project$Main$NoContextMenu,
+		contextMenu: $author$project$Simulation$NoContextMenu,
 		drag: $zaboco$elm_draggable$Draggable$init,
-		fields: A3($author$project$Main$calculateFields, defaultWidth, defaultHeight, defaultFields),
+		fields: A3($author$project$Simulation$calculateFields, defaultWidth, defaultHeight, defaultFields),
 		height: defaultHeight,
 		isWheeling: false,
 		isWheelingTimeOutCleared: false,
-		name: $author$project$Main$defaultName,
+		name: $author$project$Simulation$defaultName,
 		nextId: $elm$core$List$length(defaultFields),
-		pendingSettings: $author$project$Main$defaultSettings,
-		popUp: $author$project$Main$NoPopUp,
-		settings: $author$project$Main$defaultSettings,
+		pendingSettings: $author$project$Simulation$defaultSettings,
+		popUp: $author$project$Simulation$NoPopUp,
+		settings: $author$project$Simulation$defaultSettings,
 		width: defaultWidth
 	};
 	return _Utils_Tuple2(
 		function () {
 			if (savedModel.$ === 'Just') {
 				var modelStr = savedModel.a;
-				var _v1 = A2($elm$json$Json$Decode$decodeString, $author$project$Main$decodeModel, modelStr);
+				var _v1 = A2($elm$json$Json$Decode$decodeString, $author$project$Simulation$decodeModel, modelStr);
 				if (_v1.$ === 'Ok') {
 					var model = _v1.a;
 					return _Utils_update(
 						model,
 						{
-							fields: A3($author$project$Main$calculateFields, model.width, model.height, model.fields)
+							fields: A3($author$project$Simulation$calculateFields, model.width, model.height, model.fields)
 						});
 				} else {
 					return defaultModel;
@@ -6635,13 +6635,28 @@ var $author$project$Main$initialModel = function (savedModel) {
 		}(),
 		$elm$core$Platform$Cmd$none);
 };
+var $author$project$Main$init = function (savedSimulation) {
+	var _v0 = $author$project$Simulation$init(savedSimulation);
+	var simulation = _v0.a;
+	return _Utils_Tuple2(
+		{
+			activeSimulation: simulation,
+			simulations: _List_fromArray(
+				[simulation])
+		},
+		$elm$core$Platform$Cmd$none);
+};
 var $elm$json$Json$Decode$null = _Json_decodeNull;
-var $author$project$Main$DragMsg = function (a) {
+var $author$project$Main$SimulationMsg = function (a) {
+	return {$: 'SimulationMsg', a: a};
+};
+var $elm$core$Platform$Sub$map = _Platform_map;
+var $author$project$Simulation$DragMsg = function (a) {
 	return {$: 'DragMsg', a: a};
 };
-var $author$project$Main$SaveModel = {$: 'SaveModel'};
+var $author$project$Simulation$SaveModel = {$: 'SaveModel'};
 var $elm$core$Platform$Sub$batch = _Platform_batch;
-var $author$project$Main$pageWillClose = _Platform_incomingPort(
+var $author$project$Simulation$pageWillClose = _Platform_incomingPort(
 	'pageWillClose',
 	$elm$json$Json$Decode$null(_Utils_Tuple0));
 var $zaboco$elm_draggable$Internal$DragAt = function (a) {
@@ -6656,7 +6671,6 @@ var $elm$core$Basics$composeL = F3(
 		return g(
 			f(x));
 	});
-var $elm$core$Platform$Sub$map = _Platform_map;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $elm$browser$Browser$Events$Document = {$: 'Document'};
 var $elm$browser$Browser$Events$MySub = F3(
@@ -7095,19 +7109,58 @@ var $zaboco$elm_draggable$Draggable$subscriptions = F2(
 						])));
 		}
 	});
-var $author$project$Main$subscriptions = function (_v0) {
+var $author$project$Simulation$subscriptions = function (_v0) {
 	var drag = _v0.drag;
 	return $elm$core$Platform$Sub$batch(
 		_List_fromArray(
 			[
-				A2($zaboco$elm_draggable$Draggable$subscriptions, $author$project$Main$DragMsg, drag),
-				$author$project$Main$pageWillClose(
+				A2($zaboco$elm_draggable$Draggable$subscriptions, $author$project$Simulation$DragMsg, drag),
+				$author$project$Simulation$pageWillClose(
 				function (_v1) {
-					return $author$project$Main$SaveModel;
+					return $author$project$Simulation$SaveModel;
 				})
 			]));
 };
-var $author$project$Main$addCharge = F3(
+var $author$project$Main$subscriptions = function (model) {
+	return A2(
+		$elm$core$Platform$Sub$map,
+		$author$project$Main$SimulationMsg,
+		$author$project$Simulation$subscriptions(model.activeSimulation));
+};
+var $elm$core$Debug$log = _Debug_log;
+var $author$project$Main$changeActiveSimulation = F2(
+	function (newSimulation, model) {
+		var _v0 = A2($elm$core$Debug$log, 'AL -> newSimulation.name', newSimulation.name);
+		return _Utils_update(
+			model,
+			{activeSimulation: newSimulation});
+	});
+var $author$project$Main$updateActiveSimulation = F2(
+	function (newActiveSimulation, model) {
+		return _Utils_update(
+			model,
+			{
+				activeSimulation: newActiveSimulation,
+				simulations: A2(
+					$elm$core$List$map,
+					function (simulation) {
+						return _Utils_eq(simulation, model.activeSimulation) ? newActiveSimulation : simulation;
+					},
+					model.simulations)
+			});
+	});
+var $author$project$Main$updateActiveSimulationName = F2(
+	function (newName, model) {
+		var oldActiveSimulation = model.activeSimulation;
+		var newActiveSimulation = _Utils_update(
+			oldActiveSimulation,
+			{
+				name: (newName === '') ? $author$project$Simulation$defaultName : newName
+			});
+		return A2($author$project$Main$updateActiveSimulation, newActiveSimulation, model);
+	});
+var $elm$core$Platform$Cmd$map = _Platform_map;
+var $author$project$Simulation$addCharge = F3(
 	function (sign, _v0, model) {
 		var x = _v0.a;
 		var y = _v0.b;
@@ -7117,17 +7170,17 @@ var $author$project$Main$addCharge = F3(
 		return _Utils_update(
 			model,
 			{
-				fields: A3($author$project$Main$calculateFields, model.width, model.height, newFields),
+				fields: A3($author$project$Simulation$calculateFields, model.width, model.height, newFields),
 				nextId: model.nextId + 1
 			});
 	});
-var $author$project$Main$ApplyOptionsPopUp = {$: 'ApplyOptionsPopUp'};
-var $author$project$Main$applyPendingSettings = function (model) {
+var $author$project$Simulation$ApplyOptionsPopUp = {$: 'ApplyOptionsPopUp'};
+var $author$project$Simulation$applyPendingSettings = function (model) {
 	return _Utils_update(
 		model,
-		{popUp: $author$project$Main$ApplyOptionsPopUp});
+		{popUp: $author$project$Simulation$ApplyOptionsPopUp});
 };
-var $author$project$Main$applySettingsToCurrentAndFutureFields = function (model) {
+var $author$project$Simulation$applySettingsToCurrentAndFutureFields = function (model) {
 	var newSettings = model.pendingSettings;
 	var newFields = A2(
 		$elm$core$List$map,
@@ -7148,25 +7201,25 @@ var $author$project$Main$applySettingsToCurrentAndFutureFields = function (model
 	return _Utils_update(
 		model,
 		{
-			fields: A3($author$project$Main$calculateFields, model.width, model.height, newFields),
-			popUp: $author$project$Main$NoPopUp,
+			fields: A3($author$project$Simulation$calculateFields, model.width, model.height, newFields),
+			popUp: $author$project$Simulation$NoPopUp,
 			settings: newSettings
 		});
 };
-var $author$project$Main$applySettingsToFutureFields = function (model) {
+var $author$project$Simulation$applySettingsToFutureFields = function (model) {
 	return _Utils_update(
 		model,
-		{popUp: $author$project$Main$NoPopUp, settings: model.pendingSettings});
+		{popUp: $author$project$Simulation$NoPopUp, settings: model.pendingSettings});
 };
-var $author$project$Main$closeHelpPopUp = function (model) {
+var $author$project$Simulation$closeHelpPopUp = function (model) {
 	return _Utils_update(
 		model,
-		{popUp: $author$project$Main$NoPopUp});
+		{popUp: $author$project$Simulation$NoPopUp});
 };
-var $author$project$Main$closeSettingsPopUp = function (model) {
+var $author$project$Simulation$closeSettingsPopUp = function (model) {
 	return _Utils_update(
 		model,
-		{pendingSettings: model.settings, popUp: $author$project$Main$NoPopUp});
+		{pendingSettings: model.settings, popUp: $author$project$Simulation$NoPopUp});
 };
 var $elm$core$List$filter = F2(
 	function (isGood, list) {
@@ -7180,7 +7233,7 @@ var $elm$core$List$filter = F2(
 			list);
 	});
 var $elm$core$Basics$neq = _Utils_notEqual;
-var $author$project$Main$deleteActiveField = function (model) {
+var $author$project$Simulation$deleteActiveField = function (model) {
 	var newFields = function () {
 		var _v0 = model.activeSourceId;
 		if (_v0.$ === 'Nothing') {
@@ -7199,29 +7252,29 @@ var $author$project$Main$deleteActiveField = function (model) {
 		model,
 		{
 			activeSourceId: $elm$core$Maybe$Nothing,
-			contextMenu: $author$project$Main$NoContextMenu,
-			fields: A3($author$project$Main$calculateFields, model.width, model.height, newFields)
+			contextMenu: $author$project$Simulation$NoContextMenu,
+			fields: A3($author$project$Simulation$calculateFields, model.width, model.height, newFields)
 		});
 };
-var $author$project$Main$deselectActiveField = function (model) {
+var $author$project$Simulation$deselectActiveField = function (model) {
 	return _Utils_update(
 		model,
 		{activeSourceId: $elm$core$Maybe$Nothing});
 };
 var $elm$json$Json$Encode$null = _Json_encodeNull;
-var $author$project$Main$downloadModel = _Platform_outgoingPort(
+var $author$project$Simulation$downloadModel = _Platform_outgoingPort(
 	'downloadModel',
 	function ($) {
 		return $elm$json$Json$Encode$null;
 	});
-var $author$project$Main$ActivateSource = function (a) {
+var $author$project$Simulation$ActivateSource = function (a) {
 	return {$: 'ActivateSource', a: a};
 };
-var $author$project$Main$EndDragging = {$: 'EndDragging'};
-var $author$project$Main$OnDragBy = function (a) {
+var $author$project$Simulation$EndDragging = {$: 'EndDragging'};
+var $author$project$Simulation$OnDragBy = function (a) {
 	return {$: 'OnDragBy', a: a};
 };
-var $author$project$Main$StartDragging = function (a) {
+var $author$project$Simulation$StartDragging = function (a) {
 	return {$: 'StartDragging', a: a};
 };
 var $zaboco$elm_draggable$Draggable$Config = function (a) {
@@ -7278,15 +7331,15 @@ var $zaboco$elm_draggable$Draggable$Events$onDragStart = F2(
 				onDragStart: A2($elm$core$Basics$composeL, $elm$core$Maybe$Just, toMsg)
 			});
 	});
-var $author$project$Main$dragConfig = $zaboco$elm_draggable$Draggable$customConfig(
+var $author$project$Simulation$dragConfig = $zaboco$elm_draggable$Draggable$customConfig(
 	_List_fromArray(
 		[
-			$zaboco$elm_draggable$Draggable$Events$onDragBy($author$project$Main$OnDragBy),
-			$zaboco$elm_draggable$Draggable$Events$onDragStart($author$project$Main$StartDragging),
-			$zaboco$elm_draggable$Draggable$Events$onDragEnd($author$project$Main$EndDragging),
-			$zaboco$elm_draggable$Draggable$Events$onClick($author$project$Main$ActivateSource)
+			$zaboco$elm_draggable$Draggable$Events$onDragBy($author$project$Simulation$OnDragBy),
+			$zaboco$elm_draggable$Draggable$Events$onDragStart($author$project$Simulation$StartDragging),
+			$zaboco$elm_draggable$Draggable$Events$onDragEnd($author$project$Simulation$EndDragging),
+			$zaboco$elm_draggable$Draggable$Events$onClick($author$project$Simulation$ActivateSource)
 		]));
-var $author$project$Main$getActiveFields = function (model) {
+var $author$project$Simulation$getActiveFields = function (model) {
 	var _v0 = model.activeSourceId;
 	if (_v0.$ === 'Just') {
 		var id = _v0.a;
@@ -7300,7 +7353,7 @@ var $author$project$Main$getActiveFields = function (model) {
 		return _List_Nil;
 	}
 };
-var $author$project$Main$duplicateActiveField = function (model) {
+var $author$project$Simulation$duplicateActiveField = function (model) {
 	var duplicatedFields = A2(
 		$elm$core$List$indexedMap,
 		F2(
@@ -7314,12 +7367,12 @@ var $author$project$Main$duplicateActiveField = function (model) {
 							{id: model.nextId + index, x: (source.x + (source.r * 2)) + 15})
 					});
 			}),
-		$author$project$Main$getActiveFields(model));
+		$author$project$Simulation$getActiveFields(model));
 	var newFields = _Utils_ap(model.fields, duplicatedFields);
 	return _Utils_update(
 		model,
 		{
-			fields: A3($author$project$Main$calculateFields, model.width, model.height, newFields),
+			fields: A3($author$project$Simulation$calculateFields, model.width, model.height, newFields),
 			nextId: model.nextId + $elm$core$List$length(duplicatedFields)
 		});
 };
@@ -7348,7 +7401,7 @@ var $elm$json$Json$Encode$object = function (pairs) {
 			pairs));
 };
 var $elm$json$Json$Encode$string = _Json_wrap;
-var $author$project$Main$encodeModel = function (_v0) {
+var $author$project$Simulation$encodeModel = function (_v0) {
 	var name = _v0.name;
 	var fields = _v0.fields;
 	var activeSourceId = _v0.activeSourceId;
@@ -7475,12 +7528,12 @@ var $author$project$Main$encodeModel = function (_v0) {
 				$elm$json$Json$Encode$float(height))
 			]));
 };
-var $author$project$Main$deoptimizeModel = function (model) {
+var $author$project$Simulation$deoptimizeModel = function (model) {
 	return _Utils_update(
 		model,
 		{
 			fields: A3(
-				$author$project$Main$calculateFields,
+				$author$project$Simulation$calculateFields,
 				model.width,
 				model.height,
 				A2(
@@ -7493,10 +7546,10 @@ var $author$project$Main$deoptimizeModel = function (model) {
 					model.fields))
 		});
 };
-var $author$project$Main$endDragging = function (model) {
-	return $author$project$Main$deoptimizeModel(model);
+var $author$project$Simulation$endDragging = function (model) {
+	return $author$project$Simulation$deoptimizeModel(model);
 };
-var $author$project$Main$dragSource = F2(
+var $author$project$Simulation$dragSource = F2(
 	function (_v0, field) {
 		var dx = _v0.a;
 		var dy = _v0.b;
@@ -7509,7 +7562,7 @@ var $author$project$Main$dragSource = F2(
 					{x: field.source.x + dx, y: field.source.y + dy})
 			});
 	});
-var $author$project$Main$updateActive = F3(
+var $author$project$Simulation$updateActive = F3(
 	function (func, activeId, fields) {
 		if (activeId.$ === 'Nothing') {
 			return fields;
@@ -7523,34 +7576,34 @@ var $author$project$Main$updateActive = F3(
 				fields);
 		}
 	});
-var $author$project$Main$onDragBy = F2(
+var $author$project$Simulation$onDragBy = F2(
 	function (offsetPos, model) {
 		var newFields = A3(
-			$author$project$Main$updateActive,
-			$author$project$Main$dragSource(offsetPos),
+			$author$project$Simulation$updateActive,
+			$author$project$Simulation$dragSource(offsetPos),
 			model.activeSourceId,
 			model.fields);
 		return _Utils_update(
 			model,
 			{
-				fields: A3($author$project$Main$calculateFields, model.width, model.height, newFields)
+				fields: A3($author$project$Simulation$calculateFields, model.width, model.height, newFields)
 			});
 	});
-var $author$project$Main$resetState = function (model) {
-	return $author$project$Main$closeHelpPopUp(
-		$author$project$Main$closeSettingsPopUp(
+var $author$project$Simulation$resetState = function (model) {
+	return $author$project$Simulation$closeHelpPopUp(
+		$author$project$Simulation$closeSettingsPopUp(
 			_Utils_update(
 				model,
-				{contextMenu: $author$project$Main$NoContextMenu})));
+				{contextMenu: $author$project$Simulation$NoContextMenu})));
 };
-var $author$project$Main$saveModel = _Platform_outgoingPort('saveModel', $elm$core$Basics$identity);
-var $author$project$Main$StopWheelingTimeOut = {$: 'StopWheelingTimeOut'};
+var $author$project$Simulation$saveModel = _Platform_outgoingPort('saveModel', $elm$core$Basics$identity);
+var $author$project$Simulation$StopWheelingTimeOut = {$: 'StopWheelingTimeOut'};
 var $elm$core$Basics$min = F2(
 	function (x, y) {
 		return (_Utils_cmp(x, y) < 0) ? x : y;
 	});
 var $elm$core$Basics$round = _Basics_round;
-var $author$project$Main$optimizeModel = function (model) {
+var $author$project$Simulation$optimizeModel = function (model) {
 	return _Utils_update(
 		model,
 		{
@@ -7568,7 +7621,7 @@ var $author$project$Main$optimizeModel = function (model) {
 		});
 };
 var $elm$core$Process$sleep = _Process_sleep;
-var $author$project$Main$setTimeOut = F2(
+var $author$project$Simulation$setTimeOut = F2(
 	function (time, msg) {
 		return A2(
 			$elm$core$Task$perform,
@@ -7577,11 +7630,11 @@ var $author$project$Main$setTimeOut = F2(
 			},
 			$elm$core$Process$sleep(time));
 	});
-var $author$project$Main$scaleSourceMagnitude = F2(
+var $author$project$Simulation$scaleSourceMagnitude = F2(
 	function (delta, model) {
-		var newModel = model.isWheeling ? model : $author$project$Main$optimizeModel(model);
+		var newModel = model.isWheeling ? model : $author$project$Simulation$optimizeModel(model);
 		var newFields = A3(
-			$author$project$Main$updateActive,
+			$author$project$Simulation$updateActive,
 			function (field) {
 				var source = field.source;
 				return _Utils_update(
@@ -7603,13 +7656,13 @@ var $author$project$Main$scaleSourceMagnitude = F2(
 			_Utils_update(
 				model,
 				{
-					fields: A3($author$project$Main$calculateFields, model.width, model.height, newFields),
+					fields: A3($author$project$Simulation$calculateFields, model.width, model.height, newFields),
 					isWheeling: true,
 					isWheelingTimeOutCleared: true
 				}),
-			A2($author$project$Main$setTimeOut, 200, $author$project$Main$StopWheelingTimeOut));
+			A2($author$project$Simulation$setTimeOut, 200, $author$project$Simulation$StopWheelingTimeOut));
 	});
-var $author$project$Main$setActiveSourceId = F2(
+var $author$project$Simulation$setActiveSourceId = F2(
 	function (id, model) {
 		return _Utils_update(
 			model,
@@ -7617,8 +7670,8 @@ var $author$project$Main$setActiveSourceId = F2(
 				activeSourceId: $elm$core$Maybe$Just(id)
 			});
 	});
-var $author$project$Main$FieldContextMenu = {$: 'FieldContextMenu'};
-var $author$project$Main$showFieldContextMenu = function (model) {
+var $author$project$Simulation$FieldContextMenu = {$: 'FieldContextMenu'};
+var $author$project$Simulation$showFieldContextMenu = function (model) {
 	return _Utils_update(
 		model,
 		{
@@ -7627,53 +7680,53 @@ var $author$project$Main$showFieldContextMenu = function (model) {
 				if (_v0.$ === 'Nothing') {
 					return model.contextMenu;
 				} else {
-					return $author$project$Main$FieldContextMenu;
+					return $author$project$Simulation$FieldContextMenu;
 				}
 			}()
 		});
 };
-var $author$project$Main$GeneralContextMenu = function (a) {
+var $author$project$Simulation$GeneralContextMenu = function (a) {
 	return {$: 'GeneralContextMenu', a: a};
 };
-var $author$project$Main$showGeneralContextMenu = F2(
+var $author$project$Simulation$showGeneralContextMenu = F2(
 	function (offsetPos, model) {
 		return _Utils_update(
 			model,
 			{
-				contextMenu: $author$project$Main$GeneralContextMenu(offsetPos)
+				contextMenu: $author$project$Simulation$GeneralContextMenu(offsetPos)
 			});
 	});
-var $author$project$Main$showPopUp = F2(
+var $author$project$Simulation$showPopUp = F2(
 	function (popUp, model) {
 		return _Utils_update(
 			model,
 			{popUp: popUp});
 	});
-var $author$project$Main$startDragging = F2(
+var $author$project$Simulation$startDragging = F2(
 	function (id, model) {
 		return A2(
-			$author$project$Main$setActiveSourceId,
+			$author$project$Simulation$setActiveSourceId,
 			id,
-			$author$project$Main$optimizeModel(model));
+			$author$project$Simulation$optimizeModel(model));
 	});
-var $author$project$Main$stopWheelingTimeOut = function (model) {
+var $author$project$Simulation$stopWheelingTimeOut = function (model) {
 	return model.isWheelingTimeOutCleared ? _Utils_update(
 		model,
-		{isWheelingTimeOutCleared: false}) : $author$project$Main$deoptimizeModel(
+		{isWheelingTimeOutCleared: false}) : $author$project$Simulation$deoptimizeModel(
 		_Utils_update(
 			model,
 			{isWheeling: false, isWheelingTimeOutCleared: false}));
 };
-var $author$project$Main$negateSign = function (sign) {
+var $author$project$Simulation$negateSign = function (sign) {
 	if (sign.$ === 'Positive') {
-		return $author$project$Main$Negative;
+		return $author$project$Simulation$Negative;
 	} else {
-		return $author$project$Main$Positive;
+		return $author$project$Simulation$Positive;
 	}
 };
-var $author$project$Main$toggleSourceSign = function (model) {
+var $author$project$Simulation$toggleSourceSign = function (model) {
 	var newFields = A3(
-		$author$project$Main$updateActive,
+		$author$project$Simulation$updateActive,
 		function (field) {
 			var source = field.source;
 			return _Utils_update(
@@ -7682,7 +7735,7 @@ var $author$project$Main$toggleSourceSign = function (model) {
 					source: _Utils_update(
 						source,
 						{
-							sign: $author$project$Main$negateSign(field.source.sign)
+							sign: $author$project$Simulation$negateSign(field.source.sign)
 						})
 				});
 		},
@@ -7691,7 +7744,7 @@ var $author$project$Main$toggleSourceSign = function (model) {
 	return _Utils_update(
 		model,
 		{
-			fields: A3($author$project$Main$calculateFields, model.width, model.height, newFields)
+			fields: A3($author$project$Simulation$calculateFields, model.width, model.height, newFields)
 		});
 };
 var $elm$core$Maybe$map = F2(
@@ -7815,16 +7868,8 @@ var $zaboco$elm_draggable$Draggable$update = F3(
 				{drag: dragState}),
 			dragCmd);
 	});
-var $author$project$Main$updateModelName = F2(
-	function (newName, model) {
-		return _Utils_update(
-			model,
-			{
-				name: (newName === '') ? $author$project$Main$defaultName : newName
-			});
-	});
 var $elm$core$String$toFloat = _String_toFloat;
-var $author$project$Main$updatePendingSetting = F3(
+var $author$project$Simulation$updatePendingSetting = F3(
 	function (field, value, model) {
 		var settings = model.pendingSettings;
 		var newSettings = function () {
@@ -7887,130 +7932,148 @@ var $author$project$Main$updatePendingSetting = F3(
 			model,
 			{pendingSettings: newSettings});
 	});
-var $author$project$Main$update = F2(
+var $author$project$Simulation$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
 			case 'OnDragBy':
 				var offsetPos = msg.a;
 				return _Utils_Tuple2(
-					A2($author$project$Main$onDragBy, offsetPos, model),
+					A2($author$project$Simulation$onDragBy, offsetPos, model),
 					$elm$core$Platform$Cmd$none);
 			case 'StartDragging':
 				var id = msg.a;
 				return _Utils_Tuple2(
-					A2($author$project$Main$startDragging, id, model),
+					A2($author$project$Simulation$startDragging, id, model),
 					$elm$core$Platform$Cmd$none);
 			case 'EndDragging':
 				return _Utils_Tuple2(
-					$author$project$Main$endDragging(model),
+					$author$project$Simulation$endDragging(model),
 					$elm$core$Platform$Cmd$none);
 			case 'ActivateSource':
 				var id = msg.a;
 				return _Utils_Tuple2(
-					A2($author$project$Main$setActiveSourceId, id, model),
+					A2($author$project$Simulation$setActiveSourceId, id, model),
 					$elm$core$Platform$Cmd$none);
 			case 'ToggleSourceSign':
 				return _Utils_Tuple2(
-					$author$project$Main$toggleSourceSign(model),
+					$author$project$Simulation$toggleSourceSign(model),
 					$elm$core$Platform$Cmd$none);
 			case 'ScaleSourceMagnitude':
 				var delta = msg.a;
-				return A2($author$project$Main$scaleSourceMagnitude, delta, model);
+				return A2($author$project$Simulation$scaleSourceMagnitude, delta, model);
 			case 'StopWheelingTimeOut':
 				return _Utils_Tuple2(
-					$author$project$Main$stopWheelingTimeOut(model),
+					$author$project$Simulation$stopWheelingTimeOut(model),
 					$elm$core$Platform$Cmd$none);
 			case 'DragMsg':
 				var dragMsg = msg.a;
-				return A3($zaboco$elm_draggable$Draggable$update, $author$project$Main$dragConfig, dragMsg, model);
+				return A3($zaboco$elm_draggable$Draggable$update, $author$project$Simulation$dragConfig, dragMsg, model);
 			case 'ShowFieldContextMenu':
 				return _Utils_Tuple2(
-					$author$project$Main$showFieldContextMenu(model),
+					$author$project$Simulation$showFieldContextMenu(model),
 					$elm$core$Platform$Cmd$none);
 			case 'ShowGeneralContextMenu':
 				var offsetPos = msg.a.offsetPos;
 				return _Utils_Tuple2(
-					A2($author$project$Main$showGeneralContextMenu, offsetPos, model),
+					A2($author$project$Simulation$showGeneralContextMenu, offsetPos, model),
 					$elm$core$Platform$Cmd$none);
 			case 'DeleteActiveField':
 				return _Utils_Tuple2(
-					$author$project$Main$deleteActiveField(model),
+					$author$project$Simulation$deleteActiveField(model),
 					$elm$core$Platform$Cmd$none);
 			case 'ClickedBackground':
 				return _Utils_Tuple2(
-					$author$project$Main$resetState(model),
+					$author$project$Simulation$resetState(model),
 					$elm$core$Platform$Cmd$none);
 			case 'DuplicateActiveField':
 				return _Utils_Tuple2(
-					$author$project$Main$duplicateActiveField(model),
+					$author$project$Simulation$duplicateActiveField(model),
 					$elm$core$Platform$Cmd$none);
 			case 'DeselectActiveField':
 				return _Utils_Tuple2(
-					$author$project$Main$deselectActiveField(model),
+					$author$project$Simulation$deselectActiveField(model),
 					$elm$core$Platform$Cmd$none);
 			case 'AddPositiveCharge':
 				var position = msg.a;
 				return _Utils_Tuple2(
-					A3($author$project$Main$addCharge, $author$project$Main$Positive, position, model),
+					A3($author$project$Simulation$addCharge, $author$project$Simulation$Positive, position, model),
 					$elm$core$Platform$Cmd$none);
 			case 'AddNegativeCharge':
 				var position = msg.a;
 				return _Utils_Tuple2(
-					A3($author$project$Main$addCharge, $author$project$Main$Negative, position, model),
+					A3($author$project$Simulation$addCharge, $author$project$Simulation$Negative, position, model),
 					$elm$core$Platform$Cmd$none);
 			case 'ShowPopUp':
 				var popUp = msg.a;
 				return _Utils_Tuple2(
-					A2($author$project$Main$showPopUp, popUp, model),
+					A2($author$project$Simulation$showPopUp, popUp, model),
 					$elm$core$Platform$Cmd$none);
 			case 'UpdatePendingSetting':
 				var field = msg.a;
 				var value = msg.b;
 				return _Utils_Tuple2(
-					A3($author$project$Main$updatePendingSetting, field, value, model),
+					A3($author$project$Simulation$updatePendingSetting, field, value, model),
 					$elm$core$Platform$Cmd$none);
 			case 'ApplyPendingSettings':
 				return _Utils_Tuple2(
-					$author$project$Main$applyPendingSettings(model),
+					$author$project$Simulation$applyPendingSettings(model),
 					$elm$core$Platform$Cmd$none);
 			case 'ApplySettingsToFutureFields':
 				return _Utils_Tuple2(
-					$author$project$Main$applySettingsToFutureFields(model),
+					$author$project$Simulation$applySettingsToFutureFields(model),
 					$elm$core$Platform$Cmd$none);
 			case 'ApplySettingsToCurrentAndFutureFields':
 				return _Utils_Tuple2(
-					$author$project$Main$applySettingsToCurrentAndFutureFields(model),
+					$author$project$Simulation$applySettingsToCurrentAndFutureFields(model),
 					$elm$core$Platform$Cmd$none);
 			case 'CloseSettingsPopUp':
 				return _Utils_Tuple2(
-					$author$project$Main$closeSettingsPopUp(model),
+					$author$project$Simulation$closeSettingsPopUp(model),
 					$elm$core$Platform$Cmd$none);
 			case 'CloseHelpPopUp':
 				return _Utils_Tuple2(
-					$author$project$Main$closeHelpPopUp(model),
+					$author$project$Simulation$closeHelpPopUp(model),
 					$elm$core$Platform$Cmd$none);
 			case 'DownloadModel':
 				return _Utils_Tuple2(
 					model,
-					$author$project$Main$downloadModel(_Utils_Tuple0));
+					$author$project$Simulation$downloadModel(_Utils_Tuple0));
 			case 'SaveModel':
 				return _Utils_Tuple2(
 					model,
-					$author$project$Main$saveModel(
-						$author$project$Main$encodeModel(model)));
-			case 'UpdateModelName':
-				var newName = msg.a;
-				return _Utils_Tuple2(
-					A2($author$project$Main$updateModelName, newName, model),
-					$elm$core$Platform$Cmd$none);
+					$author$project$Simulation$saveModel(
+						$author$project$Simulation$encodeModel(model)));
 			default:
 				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 		}
 	});
-var $author$project$Main$ClickedBackground = {$: 'ClickedBackground'};
-var $author$project$Main$ShowGeneralContextMenu = function (a) {
-	return {$: 'ShowGeneralContextMenu', a: a};
-};
+var $author$project$Main$updateActiveSimulationWithMsg = F2(
+	function (msg, model) {
+		var _v0 = A2($author$project$Simulation$update, msg, model.activeSimulation);
+		var newSimulation = _v0.a;
+		var cmd = _v0.b;
+		return _Utils_Tuple2(
+			A2($author$project$Main$updateActiveSimulation, newSimulation, model),
+			A2($elm$core$Platform$Cmd$map, $author$project$Main$SimulationMsg, cmd));
+	});
+var $author$project$Main$update = F2(
+	function (message, model) {
+		switch (message.$) {
+			case 'UpdateActiveSimulationName':
+				var newName = message.a;
+				return _Utils_Tuple2(
+					A2($author$project$Main$updateActiveSimulationName, newName, model),
+					$elm$core$Platform$Cmd$none);
+			case 'ChangeActiveSimulation':
+				var newSimulation = message.a;
+				return _Utils_Tuple2(
+					A2($author$project$Main$changeActiveSimulation, newSimulation, model),
+					$elm$core$Platform$Cmd$none);
+			default:
+				var msg = message.a;
+				return A2($author$project$Main$updateActiveSimulationWithMsg, msg, model);
+		}
+	});
 var $mdgriffith$elm_ui$Internal$Model$Above = {$: 'Above'};
 var $mdgriffith$elm_ui$Internal$Model$Nearby = F2(
 	function (a, b) {
@@ -8027,10 +8090,6 @@ var $mdgriffith$elm_ui$Element$createNearby = F2(
 	});
 var $mdgriffith$elm_ui$Element$above = function (element) {
 	return A2($mdgriffith$elm_ui$Element$createNearby, $mdgriffith$elm_ui$Internal$Model$Above, element);
-};
-var $mdgriffith$elm_ui$Internal$Model$Below = {$: 'Below'};
-var $mdgriffith$elm_ui$Element$below = function (element) {
-	return A2($mdgriffith$elm_ui$Element$createNearby, $mdgriffith$elm_ui$Internal$Model$Below, element);
 };
 var $mdgriffith$elm_ui$Internal$Model$AlignX = function (a) {
 	return {$: 'AlignX', a: a};
@@ -13480,58 +13539,12 @@ var $mdgriffith$elm_ui$Internal$Model$Fill = function (a) {
 	return {$: 'Fill', a: a};
 };
 var $mdgriffith$elm_ui$Element$fill = $mdgriffith$elm_ui$Internal$Model$Fill(1);
-var $elm_community$typed_svg$TypedSvg$Core$attribute = $elm$virtual_dom$VirtualDom$attribute;
-var $elm_community$typed_svg$TypedSvg$TypesToStrings$lengthToString = function (length) {
-	switch (length.$) {
-		case 'Cm':
-			var x = length.a;
-			return $elm$core$String$fromFloat(x) + 'cm';
-		case 'Em':
-			var x = length.a;
-			return $elm$core$String$fromFloat(x) + 'em';
-		case 'Ex':
-			var x = length.a;
-			return $elm$core$String$fromFloat(x) + 'ex';
-		case 'In':
-			var x = length.a;
-			return $elm$core$String$fromFloat(x) + 'in';
-		case 'Mm':
-			var x = length.a;
-			return $elm$core$String$fromFloat(x) + 'mm';
-		case 'Num':
-			var x = length.a;
-			return $elm$core$String$fromFloat(x);
-		case 'Pc':
-			var x = length.a;
-			return $elm$core$String$fromFloat(x) + 'pc';
-		case 'Percent':
-			var x = length.a;
-			return $elm$core$String$fromFloat(x) + '%';
-		case 'Pt':
-			var x = length.a;
-			return $elm$core$String$fromFloat(x) + 'pt';
-		default:
-			var x = length.a;
-			return $elm$core$String$fromFloat(x) + 'px';
-	}
-};
-var $elm_community$typed_svg$TypedSvg$Attributes$height = function (length) {
-	return A2(
-		$elm_community$typed_svg$TypedSvg$Core$attribute,
-		'height',
-		$elm_community$typed_svg$TypedSvg$TypesToStrings$lengthToString(length));
-};
 var $elm$core$Basics$always = F2(
 	function (a, _v0) {
 		return a;
 	});
 var $mdgriffith$elm_ui$Internal$Model$unstyled = A2($elm$core$Basics$composeL, $mdgriffith$elm_ui$Internal$Model$Unstyled, $elm$core$Basics$always);
 var $mdgriffith$elm_ui$Element$html = $mdgriffith$elm_ui$Internal$Model$unstyled;
-var $elm_community$typed_svg$TypedSvg$Attributes$id = $elm_community$typed_svg$TypedSvg$Core$attribute('id');
-var $mdgriffith$elm_ui$Internal$Model$InFront = {$: 'InFront'};
-var $mdgriffith$elm_ui$Element$inFront = function (element) {
-	return A2($mdgriffith$elm_ui$Element$createNearby, $mdgriffith$elm_ui$Internal$Model$InFront, element);
-};
 var $mdgriffith$elm_ui$Internal$Model$Attr = function (a) {
 	return {$: 'Attr', a: a};
 };
@@ -13768,8 +13781,70 @@ var $mdgriffith$elm_ui$Element$layoutWith = F3(
 	});
 var $mdgriffith$elm_ui$Element$layout = $mdgriffith$elm_ui$Element$layoutWith(
 	{options: _List_Nil});
+var $elm$virtual_dom$VirtualDom$map = _VirtualDom_map;
+var $elm$html$Html$map = $elm$virtual_dom$VirtualDom$map;
 var $mdgriffith$elm_ui$Internal$Model$Monospace = {$: 'Monospace'};
 var $mdgriffith$elm_ui$Element$Font$monospace = $mdgriffith$elm_ui$Internal$Model$Monospace;
+var $mdgriffith$elm_ui$Element$Font$size = function (i) {
+	return A2(
+		$mdgriffith$elm_ui$Internal$Model$StyleClass,
+		$mdgriffith$elm_ui$Internal$Flag$fontSize,
+		$mdgriffith$elm_ui$Internal$Model$FontSize(i));
+};
+var $author$project$Simulation$ClickedBackground = {$: 'ClickedBackground'};
+var $author$project$Simulation$ShowGeneralContextMenu = function (a) {
+	return {$: 'ShowGeneralContextMenu', a: a};
+};
+var $mdgriffith$elm_ui$Internal$Model$Below = {$: 'Below'};
+var $mdgriffith$elm_ui$Element$below = function (element) {
+	return A2($mdgriffith$elm_ui$Element$createNearby, $mdgriffith$elm_ui$Internal$Model$Below, element);
+};
+var $elm_community$typed_svg$TypedSvg$Core$attribute = $elm$virtual_dom$VirtualDom$attribute;
+var $elm_community$typed_svg$TypedSvg$TypesToStrings$lengthToString = function (length) {
+	switch (length.$) {
+		case 'Cm':
+			var x = length.a;
+			return $elm$core$String$fromFloat(x) + 'cm';
+		case 'Em':
+			var x = length.a;
+			return $elm$core$String$fromFloat(x) + 'em';
+		case 'Ex':
+			var x = length.a;
+			return $elm$core$String$fromFloat(x) + 'ex';
+		case 'In':
+			var x = length.a;
+			return $elm$core$String$fromFloat(x) + 'in';
+		case 'Mm':
+			var x = length.a;
+			return $elm$core$String$fromFloat(x) + 'mm';
+		case 'Num':
+			var x = length.a;
+			return $elm$core$String$fromFloat(x);
+		case 'Pc':
+			var x = length.a;
+			return $elm$core$String$fromFloat(x) + 'pc';
+		case 'Percent':
+			var x = length.a;
+			return $elm$core$String$fromFloat(x) + '%';
+		case 'Pt':
+			var x = length.a;
+			return $elm$core$String$fromFloat(x) + 'pt';
+		default:
+			var x = length.a;
+			return $elm$core$String$fromFloat(x) + 'px';
+	}
+};
+var $elm_community$typed_svg$TypedSvg$Attributes$height = function (length) {
+	return A2(
+		$elm_community$typed_svg$TypedSvg$Core$attribute,
+		'height',
+		$elm_community$typed_svg$TypedSvg$TypesToStrings$lengthToString(length));
+};
+var $elm_community$typed_svg$TypedSvg$Attributes$id = $elm_community$typed_svg$TypedSvg$Core$attribute('id');
+var $mdgriffith$elm_ui$Internal$Model$InFront = {$: 'InFront'};
+var $mdgriffith$elm_ui$Element$inFront = function (element) {
+	return A2($mdgriffith$elm_ui$Element$createNearby, $mdgriffith$elm_ui$Internal$Model$InFront, element);
+};
 var $elm$virtual_dom$VirtualDom$Normal = function (a) {
 	return {$: 'Normal', a: a};
 };
@@ -13923,12 +13998,6 @@ var $elm_community$typed_svg$TypedSvg$Types$Px = function (a) {
 	return {$: 'Px', a: a};
 };
 var $elm_community$typed_svg$TypedSvg$Types$px = $elm_community$typed_svg$TypedSvg$Types$Px;
-var $mdgriffith$elm_ui$Element$Font$size = function (i) {
-	return A2(
-		$mdgriffith$elm_ui$Internal$Model$StyleClass,
-		$mdgriffith$elm_ui$Internal$Flag$fontSize,
-		$mdgriffith$elm_ui$Internal$Model$FontSize(i));
-};
 var $elm$virtual_dom$VirtualDom$nodeNS = function (tag) {
 	return _VirtualDom_nodeNS(
 		_VirtualDom_noScript(tag));
@@ -13999,7 +14068,6 @@ var $mdgriffith$elm_ui$Internal$Model$TransformComponent = F2(
 var $mdgriffith$elm_ui$Internal$Model$Text = function (a) {
 	return {$: 'Text', a: a};
 };
-var $elm$virtual_dom$VirtualDom$map = _VirtualDom_map;
 var $mdgriffith$elm_ui$Internal$Model$map = F2(
 	function (fn, el) {
 		switch (el.$) {
@@ -14134,7 +14202,7 @@ var $avh4$elm_color$Color$toRgba = function (_v0) {
 	var a = _v0.d;
 	return {alpha: a, blue: b, green: g, red: r};
 };
-var $author$project$Main$toElmUiColor = function (color) {
+var $author$project$Utils$toElmUiColor = function (color) {
 	var _v0 = $avh4$elm_color$Color$toRgba(color);
 	var red = _v0.red;
 	var green = _v0.green;
@@ -14159,28 +14227,28 @@ var $mdgriffith$elm_ui$Element$Border$widthXY = F2(
 				y,
 				x));
 	});
-var $author$project$Main$style = {
+var $author$project$Utils$styles = {
 	button: _List_fromArray(
 		[
 			$mdgriffith$elm_ui$Element$Background$color(
-			$author$project$Main$toElmUiColor($avh4$elm_color$Color$lightGrey)),
+			$author$project$Utils$toElmUiColor($avh4$elm_color$Color$lightGrey)),
 			$mdgriffith$elm_ui$Element$mouseOver(
 			_List_fromArray(
 				[
 					$mdgriffith$elm_ui$Element$Background$color(
-					$author$project$Main$toElmUiColor($avh4$elm_color$Color$grey))
+					$author$project$Utils$toElmUiColor($avh4$elm_color$Color$grey))
 				])),
 			A2($mdgriffith$elm_ui$Element$paddingXY, 10, 5),
 			$mdgriffith$elm_ui$Element$width(
 			$mdgriffith$elm_ui$Element$px(150)),
 			A2($mdgriffith$elm_ui$Element$Border$widthXY, 2, 1),
 			$mdgriffith$elm_ui$Element$Border$color(
-			$author$project$Main$toElmUiColor($avh4$elm_color$Color$darkGrey))
+			$author$project$Utils$toElmUiColor($avh4$elm_color$Color$darkGrey))
 		])
 };
-var $author$project$Main$DeleteActiveField = {$: 'DeleteActiveField'};
-var $author$project$Main$DeselectActiveField = {$: 'DeselectActiveField'};
-var $author$project$Main$DuplicateActiveField = {$: 'DuplicateActiveField'};
+var $author$project$Simulation$DeleteActiveField = {$: 'DeleteActiveField'};
+var $author$project$Simulation$DeselectActiveField = {$: 'DeselectActiveField'};
+var $author$project$Simulation$DuplicateActiveField = {$: 'DuplicateActiveField'};
 var $mdgriffith$elm_ui$Internal$Model$Button = {$: 'Button'};
 var $elm$json$Json$Encode$bool = _Json_wrap;
 var $elm$html$Html$Attributes$boolProperty = F2(
@@ -14349,11 +14417,11 @@ var $mdgriffith$elm_ui$Element$moveRight = function (x) {
 var $mdgriffith$elm_ui$Element$text = function (content) {
 	return $mdgriffith$elm_ui$Internal$Model$Text(content);
 };
-var $author$project$Main$viewFieldContextMenu = F2(
-	function (menuItemStyles, model) {
+var $author$project$Simulation$viewFieldContextMenu = F2(
+	function (menuItemstyless, model) {
 		var _v0 = function () {
 			var _v1 = $elm$core$List$head(
-				$author$project$Main$getActiveFields(model));
+				$author$project$Simulation$getActiveFields(model));
 			if (_v1.$ === 'Just') {
 				var field = _v1.a;
 				return _Utils_Tuple2(field.source.x, field.source.y);
@@ -14374,35 +14442,35 @@ var $author$project$Main$viewFieldContextMenu = F2(
 				[
 					A2(
 					$mdgriffith$elm_ui$Element$Input$button,
-					menuItemStyles,
+					menuItemstyless,
 					{
 						label: $mdgriffith$elm_ui$Element$text('Delete'),
-						onPress: $elm$core$Maybe$Just($author$project$Main$DeleteActiveField)
+						onPress: $elm$core$Maybe$Just($author$project$Simulation$DeleteActiveField)
 					}),
 					A2(
 					$mdgriffith$elm_ui$Element$Input$button,
-					menuItemStyles,
+					menuItemstyless,
 					{
 						label: $mdgriffith$elm_ui$Element$text('Duplicate'),
-						onPress: $elm$core$Maybe$Just($author$project$Main$DuplicateActiveField)
+						onPress: $elm$core$Maybe$Just($author$project$Simulation$DuplicateActiveField)
 					}),
 					A2(
 					$mdgriffith$elm_ui$Element$Input$button,
-					menuItemStyles,
+					menuItemstyless,
 					{
 						label: $mdgriffith$elm_ui$Element$text('Deselect'),
-						onPress: $elm$core$Maybe$Just($author$project$Main$DeselectActiveField)
+						onPress: $elm$core$Maybe$Just($author$project$Simulation$DeselectActiveField)
 					})
 				]));
 	});
-var $author$project$Main$AddNegativeCharge = function (a) {
+var $author$project$Simulation$AddNegativeCharge = function (a) {
 	return {$: 'AddNegativeCharge', a: a};
 };
-var $author$project$Main$AddPositiveCharge = function (a) {
+var $author$project$Simulation$AddPositiveCharge = function (a) {
 	return {$: 'AddPositiveCharge', a: a};
 };
-var $author$project$Main$viewGeneralContextMenu = F2(
-	function (menuItemStyles, _v0) {
+var $author$project$Simulation$viewGeneralContextMenu = F2(
+	function (menuItemstyless, _v0) {
 		var x = _v0.a;
 		var y = _v0.b;
 		return A2(
@@ -14416,40 +14484,40 @@ var $author$project$Main$viewGeneralContextMenu = F2(
 				[
 					A2(
 					$mdgriffith$elm_ui$Element$Input$button,
-					menuItemStyles,
+					menuItemstyless,
 					{
 						label: $mdgriffith$elm_ui$Element$text('Add + charge'),
 						onPress: $elm$core$Maybe$Just(
-							$author$project$Main$AddPositiveCharge(
+							$author$project$Simulation$AddPositiveCharge(
 								_Utils_Tuple2(x, y)))
 					}),
 					A2(
 					$mdgriffith$elm_ui$Element$Input$button,
-					menuItemStyles,
+					menuItemstyless,
 					{
 						label: $mdgriffith$elm_ui$Element$text('Add - charge'),
 						onPress: $elm$core$Maybe$Just(
-							$author$project$Main$AddNegativeCharge(
+							$author$project$Simulation$AddNegativeCharge(
 								_Utils_Tuple2(x, y)))
 					})
 				]));
 	});
-var $author$project$Main$viewContextMenu = function (model) {
+var $author$project$Simulation$viewContextMenu = function (model) {
 	var _v0 = model.contextMenu;
 	switch (_v0.$) {
 		case 'FieldContextMenu':
-			return A2($author$project$Main$viewFieldContextMenu, $author$project$Main$style.button, model);
+			return A2($author$project$Simulation$viewFieldContextMenu, $author$project$Utils$styles.button, model);
 		case 'GeneralContextMenu':
 			var position = _v0.a;
-			return A2($author$project$Main$viewGeneralContextMenu, $author$project$Main$style.button, position);
+			return A2($author$project$Simulation$viewGeneralContextMenu, $author$project$Utils$styles.button, position);
 		default:
 			return $mdgriffith$elm_ui$Element$none;
 	}
 };
-var $author$project$Main$DownloadModel = {$: 'DownloadModel'};
-var $author$project$Main$HelpPopUp = {$: 'HelpPopUp'};
-var $author$project$Main$SettingsPopUp = {$: 'SettingsPopUp'};
-var $author$project$Main$ShowPopUp = function (a) {
+var $author$project$Simulation$DownloadModel = {$: 'DownloadModel'};
+var $author$project$Simulation$HelpPopUp = {$: 'HelpPopUp'};
+var $author$project$Simulation$SettingsPopUp = {$: 'SettingsPopUp'};
+var $author$project$Simulation$ShowPopUp = function (a) {
 	return {$: 'ShowPopUp', a: a};
 };
 var $mdgriffith$elm_ui$Internal$Model$AsRow = {$: 'AsRow'};
@@ -14491,7 +14559,7 @@ var $mdgriffith$elm_ui$Element$spacing = function (x) {
 			x,
 			x));
 };
-var $author$project$Main$centeredText = function (text) {
+var $author$project$Simulation$centeredText = function (text) {
 	return A2(
 		$mdgriffith$elm_ui$Element$el,
 		_List_fromArray(
@@ -14499,30 +14567,30 @@ var $author$project$Main$centeredText = function (text) {
 		$mdgriffith$elm_ui$Element$text(text));
 };
 var $mdgriffith$elm_ui$Element$htmlAttribute = $mdgriffith$elm_ui$Internal$Model$Attr;
-var $author$project$Main$onClickNoProp = function (msg) {
+var $author$project$Simulation$onClickNoProp = function (msg) {
 	return A2(
 		$elm$html$Html$Events$custom,
 		'click',
 		$elm$json$Json$Decode$succeed(
 			{message: msg, preventDefault: false, stopPropagation: true}));
 };
-var $author$project$Main$viewButtonNoProp = F2(
+var $author$project$Simulation$viewButtonNoProp = F2(
 	function (text, msg) {
 		return A2(
 			$mdgriffith$elm_ui$Element$Input$button,
 			_Utils_ap(
-				$author$project$Main$style.button,
+				$author$project$Utils$styles.button,
 				_List_fromArray(
 					[
 						$mdgriffith$elm_ui$Element$htmlAttribute(
-						$author$project$Main$onClickNoProp(msg))
+						$author$project$Simulation$onClickNoProp(msg))
 					])),
 			{
-				label: $author$project$Main$centeredText(text),
+				label: $author$project$Simulation$centeredText(text),
 				onPress: $elm$core$Maybe$Nothing
 			});
 	});
-var $author$project$Main$viewControlPanel = A2(
+var $author$project$Simulation$viewControlPanel = A2(
 	$mdgriffith$elm_ui$Element$row,
 	_List_fromArray(
 		[
@@ -14532,14 +14600,14 @@ var $author$project$Main$viewControlPanel = A2(
 	_List_fromArray(
 		[
 			A2(
-			$author$project$Main$viewButtonNoProp,
+			$author$project$Simulation$viewButtonNoProp,
 			'Help',
-			$author$project$Main$ShowPopUp($author$project$Main$HelpPopUp)),
+			$author$project$Simulation$ShowPopUp($author$project$Simulation$HelpPopUp)),
 			A2(
-			$author$project$Main$viewButtonNoProp,
+			$author$project$Simulation$viewButtonNoProp,
 			'Settings',
-			$author$project$Main$ShowPopUp($author$project$Main$SettingsPopUp)),
-			A2($author$project$Main$viewButtonNoProp, 'Download', $author$project$Main$DownloadModel)
+			$author$project$Simulation$ShowPopUp($author$project$Simulation$SettingsPopUp)),
+			A2($author$project$Simulation$viewButtonNoProp, 'Download', $author$project$Simulation$DownloadModel)
 		]));
 var $elm_community$typed_svg$TypedSvg$Types$Paint = function (a) {
 	return {$: 'Paint', a: a};
@@ -14617,7 +14685,7 @@ var $elm_community$typed_svg$TypedSvg$Attributes$stroke = A2(
 	$elm$core$Basics$composeL,
 	$elm_community$typed_svg$TypedSvg$Core$attribute('stroke'),
 	$elm_community$typed_svg$TypedSvg$TypesToStrings$paintToString);
-var $author$project$Main$viewFieldLines = function (field) {
+var $author$project$Simulation$viewFieldLines = function (field) {
 	return A2(
 		$elm_community$typed_svg$TypedSvg$g,
 		_List_Nil,
@@ -14644,11 +14712,11 @@ var $elm_community$typed_svg$TypedSvg$Types$Reference = function (a) {
 	return {$: 'Reference', a: a};
 };
 var $elm_community$typed_svg$TypedSvg$Types$RepeatIndefinite = {$: 'RepeatIndefinite'};
-var $author$project$Main$ScaleSourceMagnitude = function (a) {
+var $author$project$Simulation$ScaleSourceMagnitude = function (a) {
 	return {$: 'ScaleSourceMagnitude', a: a};
 };
-var $author$project$Main$ShowFieldContextMenu = {$: 'ShowFieldContextMenu'};
-var $author$project$Main$ToggleSourceSign = {$: 'ToggleSourceSign'};
+var $author$project$Simulation$ShowFieldContextMenu = {$: 'ShowFieldContextMenu'};
+var $author$project$Simulation$ToggleSourceSign = {$: 'ToggleSourceSign'};
 var $elm_community$typed_svg$TypedSvg$animate = $elm_community$typed_svg$TypedSvg$Core$node('animate');
 var $elm_community$typed_svg$TypedSvg$Attributes$animationValues = function (values) {
 	return A2(
@@ -14693,7 +14761,7 @@ var $elm_community$typed_svg$TypedSvg$Attributes$dur = function (duration) {
 var $elm$core$Basics$abs = function (n) {
 	return (n < 0) ? (-n) : n;
 };
-var $author$project$Main$lerp = F5(
+var $author$project$Simulation$lerp = F5(
 	function (min1, max1, min2, max2, num) {
 		var ratio = $elm$core$Basics$abs((num - min1) / (max1 - min1));
 		return min2 + (ratio * (max2 - min2));
@@ -14745,7 +14813,7 @@ var $elm$html$Html$Events$onDoubleClick = function (msg) {
 		'dblclick',
 		$elm$json$Json$Decode$succeed(msg));
 };
-var $author$project$Main$onRightClick = function (msg) {
+var $author$project$Simulation$onRightClick = function (msg) {
 	return A2(
 		$elm$html$Html$Events$custom,
 		'contextmenu',
@@ -14756,7 +14824,7 @@ var $elm$json$Json$Decode$at = F2(
 	function (fields, decoder) {
 		return A3($elm$core$List$foldr, $elm$json$Json$Decode$field, decoder, fields);
 	});
-var $author$project$Main$onWheel = function (message) {
+var $author$project$Simulation$onWheel = function (message) {
 	return A2(
 		$elm$html$Html$Events$on,
 		'wheel',
@@ -14793,7 +14861,7 @@ var $elm_community$typed_svg$TypedSvg$Attributes$repeatCount = function (count) 
 var $avh4$elm_color$Color$fromRgba = function (components) {
 	return A4($avh4$elm_color$Color$RgbaSpace, components.red, components.green, components.blue, components.alpha);
 };
-var $author$project$Main$setAlpha = F2(
+var $author$project$Simulation$setAlpha = F2(
 	function (alpha, color) {
 		var rgba = $avh4$elm_color$Color$toRgba(color);
 		return $avh4$elm_color$Color$fromRgba(
@@ -14803,7 +14871,7 @@ var $author$project$Main$setAlpha = F2(
 	});
 var $avh4$elm_color$Color$blue = A4($avh4$elm_color$Color$RgbaSpace, 52 / 255, 101 / 255, 164 / 255, 1.0);
 var $avh4$elm_color$Color$orange = A4($avh4$elm_color$Color$RgbaSpace, 245 / 255, 121 / 255, 0 / 255, 1.0);
-var $author$project$Main$signToColor = function (sign) {
+var $author$project$Simulation$signToColor = function (sign) {
 	if (sign.$ === 'Positive') {
 		return $avh4$elm_color$Color$orange;
 	} else {
@@ -14945,10 +15013,10 @@ var $zaboco$elm_draggable$Draggable$touchTriggers = F2(
 					}))
 			]);
 	});
-var $author$project$Main$viewFieldSource = F2(
+var $author$project$Simulation$viewFieldSource = F2(
 	function (activeSourceId, field) {
 		var gradientId = 'gradient' + $elm$core$String$fromInt(field.source.id);
-		var fill = $author$project$Main$signToColor(field.source.sign);
+		var fill = $author$project$Simulation$signToColor(field.source.sign);
 		return A2(
 			$elm_community$typed_svg$TypedSvg$g,
 			_List_Nil,
@@ -14974,7 +15042,7 @@ var $author$project$Main$viewFieldSource = F2(
 											$elm_community$typed_svg$TypedSvg$Attributes$offset('1%'),
 											$elm_community$typed_svg$TypedSvg$Attributes$stopColor(
 											$avh4$elm_color$Color$toCssString(
-												A2($author$project$Main$setAlpha, 1, fill)))
+												A2($author$project$Simulation$setAlpha, 1, fill)))
 										]),
 									_List_Nil),
 									A2(
@@ -14984,7 +15052,7 @@ var $author$project$Main$viewFieldSource = F2(
 											$elm_community$typed_svg$TypedSvg$Attributes$offset('100%'),
 											$elm_community$typed_svg$TypedSvg$Attributes$stopColor(
 											$avh4$elm_color$Color$toCssString(
-												A2($author$project$Main$setAlpha, 0.2, fill)))
+												A2($author$project$Simulation$setAlpha, 0.2, fill)))
 										]),
 									_List_Nil)
 								]))
@@ -15000,7 +15068,7 @@ var $author$project$Main$viewFieldSource = F2(
 							$elm_community$typed_svg$TypedSvg$Attributes$r(
 							$elm_community$typed_svg$TypedSvg$Types$px(
 								A5(
-									$author$project$Main$lerp,
+									$author$project$Simulation$lerp,
 									0,
 									20,
 									10,
@@ -15024,13 +15092,13 @@ var $author$project$Main$viewFieldSource = F2(
 								$elm_community$typed_svg$TypedSvg$Types$px(field.source.r)),
 								$elm_community$typed_svg$TypedSvg$Attributes$fill(
 								$elm_community$typed_svg$TypedSvg$Types$Paint(fill)),
-								A2($zaboco$elm_draggable$Draggable$mouseTrigger, field.source.id, $author$project$Main$DragMsg),
-								$author$project$Main$onWheel($author$project$Main$ScaleSourceMagnitude),
-								$elm$html$Html$Events$onDoubleClick($author$project$Main$ToggleSourceSign),
-								$author$project$Main$onRightClick($author$project$Main$ShowFieldContextMenu)
+								A2($zaboco$elm_draggable$Draggable$mouseTrigger, field.source.id, $author$project$Simulation$DragMsg),
+								$author$project$Simulation$onWheel($author$project$Simulation$ScaleSourceMagnitude),
+								$elm$html$Html$Events$onDoubleClick($author$project$Simulation$ToggleSourceSign),
+								$author$project$Simulation$onRightClick($author$project$Simulation$ShowFieldContextMenu)
 							]),
 						_Utils_ap(
-							A2($zaboco$elm_draggable$Draggable$touchTriggers, field.source.id, $author$project$Main$DragMsg),
+							A2($zaboco$elm_draggable$Draggable$touchTriggers, field.source.id, $author$project$Simulation$DragMsg),
 							function () {
 								if (activeSourceId.$ === 'Just') {
 									var id = activeSourceId.a;
@@ -15064,13 +15132,193 @@ var $author$project$Main$viewFieldSource = F2(
 						]))
 				]));
 	});
-var $author$project$Main$UpdateModelName = function (a) {
-	return {$: 'UpdateModelName', a: a};
+var $author$project$Simulation$ApplySettingsToCurrentAndFutureFields = {$: 'ApplySettingsToCurrentAndFutureFields'};
+var $author$project$Simulation$ApplySettingsToFutureFields = {$: 'ApplySettingsToFutureFields'};
+var $author$project$Simulation$DoNothing = {$: 'DoNothing'};
+var $mdgriffith$elm_ui$Element$padding = function (x) {
+	return A2(
+		$mdgriffith$elm_ui$Internal$Model$StyleClass,
+		$mdgriffith$elm_ui$Internal$Flag$padding,
+		A5(
+			$mdgriffith$elm_ui$Internal$Model$PaddingStyle,
+			'p-' + $elm$core$String$fromInt(x),
+			x,
+			x,
+			x,
+			x));
 };
-var $mdgriffith$elm_ui$Element$Input$HiddenLabel = function (a) {
-	return {$: 'HiddenLabel', a: a};
+var $mdgriffith$elm_ui$Internal$Model$paddingName = F4(
+	function (top, right, bottom, left) {
+		return 'pad-' + ($elm$core$String$fromInt(top) + ('-' + ($elm$core$String$fromInt(right) + ('-' + ($elm$core$String$fromInt(bottom) + ('-' + $elm$core$String$fromInt(left)))))));
+	});
+var $mdgriffith$elm_ui$Element$paddingEach = function (_v0) {
+	var top = _v0.top;
+	var right = _v0.right;
+	var bottom = _v0.bottom;
+	var left = _v0.left;
+	return (_Utils_eq(top, right) && (_Utils_eq(top, bottom) && _Utils_eq(top, left))) ? A2(
+		$mdgriffith$elm_ui$Internal$Model$StyleClass,
+		$mdgriffith$elm_ui$Internal$Flag$padding,
+		A5(
+			$mdgriffith$elm_ui$Internal$Model$PaddingStyle,
+			'p-' + $elm$core$String$fromInt(top),
+			top,
+			top,
+			top,
+			top)) : A2(
+		$mdgriffith$elm_ui$Internal$Model$StyleClass,
+		$mdgriffith$elm_ui$Internal$Flag$padding,
+		A5(
+			$mdgriffith$elm_ui$Internal$Model$PaddingStyle,
+			A4($mdgriffith$elm_ui$Internal$Model$paddingName, top, right, bottom, left),
+			top,
+			right,
+			bottom,
+			left));
 };
-var $mdgriffith$elm_ui$Element$Input$labelHidden = $mdgriffith$elm_ui$Element$Input$HiddenLabel;
+var $mdgriffith$elm_ui$Element$Border$width = function (v) {
+	return A2(
+		$mdgriffith$elm_ui$Internal$Model$StyleClass,
+		$mdgriffith$elm_ui$Internal$Flag$borderWidth,
+		A5(
+			$mdgriffith$elm_ui$Internal$Model$BorderWidth,
+			'b-' + $elm$core$String$fromInt(v),
+			v,
+			v,
+			v,
+			v));
+};
+var $author$project$Simulation$viewPopUpOf = F3(
+	function (title, attributes, content) {
+		return A2(
+			$mdgriffith$elm_ui$Element$column,
+			_Utils_ap(
+				_List_fromArray(
+					[
+						$mdgriffith$elm_ui$Element$centerX,
+						$mdgriffith$elm_ui$Element$centerY,
+						$mdgriffith$elm_ui$Element$padding(20),
+						$mdgriffith$elm_ui$Element$spacing(6),
+						$mdgriffith$elm_ui$Element$Background$color(
+						$author$project$Utils$toElmUiColor($avh4$elm_color$Color$lightGrey)),
+						$mdgriffith$elm_ui$Element$Border$width(2),
+						$mdgriffith$elm_ui$Element$Border$color(
+						$author$project$Utils$toElmUiColor($avh4$elm_color$Color$black)),
+						$mdgriffith$elm_ui$Element$htmlAttribute(
+						$author$project$Simulation$onClickNoProp($author$project$Simulation$DoNothing))
+					]),
+				attributes),
+			_Utils_ap(
+				_List_fromArray(
+					[
+						A2(
+						$mdgriffith$elm_ui$Element$el,
+						_List_fromArray(
+							[
+								$mdgriffith$elm_ui$Element$Font$size(18),
+								$mdgriffith$elm_ui$Element$paddingEach(
+								{bottom: 10, left: 0, right: 0, top: 0})
+							]),
+						$mdgriffith$elm_ui$Element$text(title))
+					]),
+				content));
+	});
+var $author$project$Simulation$viewApplyOptions = function (model) {
+	var _v0 = model.popUp;
+	if (_v0.$ === 'ApplyOptionsPopUp') {
+		return A3(
+			$author$project$Simulation$viewPopUpOf,
+			'Which fields do you want to apply to?',
+			_List_Nil,
+			_List_fromArray(
+				[
+					A2(
+					$mdgriffith$elm_ui$Element$Input$button,
+					_Utils_ap(
+						$author$project$Utils$styles.button,
+						_List_fromArray(
+							[
+								$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill)
+							])),
+					{
+						label: $author$project$Simulation$centeredText('Apply to future fields'),
+						onPress: $elm$core$Maybe$Just($author$project$Simulation$ApplySettingsToFutureFields)
+					}),
+					A2(
+					$mdgriffith$elm_ui$Element$Input$button,
+					_Utils_ap(
+						$author$project$Utils$styles.button,
+						_List_fromArray(
+							[
+								$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill)
+							])),
+					{
+						label: $author$project$Simulation$centeredText('Apply to current and future fields'),
+						onPress: $elm$core$Maybe$Just($author$project$Simulation$ApplySettingsToCurrentAndFutureFields)
+					})
+				]));
+	} else {
+		return $mdgriffith$elm_ui$Element$none;
+	}
+};
+var $author$project$Simulation$CloseHelpPopUp = {$: 'CloseHelpPopUp'};
+var $author$project$Simulation$textHeader = function (text) {
+	return A2(
+		$mdgriffith$elm_ui$Element$el,
+		_List_fromArray(
+			[
+				A2($mdgriffith$elm_ui$Element$paddingXY, 0, 6)
+			]),
+		$mdgriffith$elm_ui$Element$text(text));
+};
+var $author$project$Simulation$viewHelpPopUp = A3(
+	$author$project$Simulation$viewPopUpOf,
+	'Help',
+	_List_Nil,
+	_List_fromArray(
+		[
+			$author$project$Simulation$textHeader('When you mouse over a charge and ...'),
+			$mdgriffith$elm_ui$Element$text('  Single click: select charge'),
+			$mdgriffith$elm_ui$Element$text('  Double click: negate charge'),
+			$mdgriffith$elm_ui$Element$text('  Right click:  * delete charge'),
+			$mdgriffith$elm_ui$Element$text('                * duplicate charge'),
+			$mdgriffith$elm_ui$Element$text('                * deselect charge'),
+			$mdgriffith$elm_ui$Element$text('  Scroll up:    increase charge magnitude'),
+			$mdgriffith$elm_ui$Element$text('  Scroll down:  decrease charge magnitude'),
+			$author$project$Simulation$textHeader('When you mouse over background and ...'),
+			$mdgriffith$elm_ui$Element$text('  Right Click:  * add + charge'),
+			$mdgriffith$elm_ui$Element$text('                * add - charge'),
+			A2(
+			$mdgriffith$elm_ui$Element$el,
+			_List_fromArray(
+				[
+					$mdgriffith$elm_ui$Element$paddingEach(
+					{bottom: 0, left: 0, right: 0, top: 20})
+				]),
+			A2(
+				$mdgriffith$elm_ui$Element$Input$button,
+				$author$project$Utils$styles.button,
+				{
+					label: $author$project$Simulation$centeredText('Close'),
+					onPress: $elm$core$Maybe$Just($author$project$Simulation$CloseHelpPopUp)
+				}))
+		]));
+var $author$project$Simulation$ApplyPendingSettings = {$: 'ApplyPendingSettings'};
+var $author$project$Simulation$CloseSettingsPopUp = {$: 'CloseSettingsPopUp'};
+var $author$project$Simulation$UpdatePendingSetting = F2(
+	function (a, b) {
+		return {$: 'UpdatePendingSetting', a: a, b: b};
+	});
+var $mdgriffith$elm_ui$Internal$Model$Left = {$: 'Left'};
+var $mdgriffith$elm_ui$Element$alignLeft = $mdgriffith$elm_ui$Internal$Model$AlignX($mdgriffith$elm_ui$Internal$Model$Left);
+var $mdgriffith$elm_ui$Internal$Model$Right = {$: 'Right'};
+var $mdgriffith$elm_ui$Element$alignRight = $mdgriffith$elm_ui$Internal$Model$AlignX($mdgriffith$elm_ui$Internal$Model$Right);
+var $mdgriffith$elm_ui$Element$Input$Label = F3(
+	function (a, b, c) {
+		return {$: 'Label', a: a, b: b, c: c};
+	});
+var $mdgriffith$elm_ui$Element$Input$OnLeft = {$: 'OnLeft'};
+var $mdgriffith$elm_ui$Element$Input$labelLeft = $mdgriffith$elm_ui$Element$Input$Label($mdgriffith$elm_ui$Element$Input$OnLeft);
 var $mdgriffith$elm_ui$Element$Input$TextInputNode = function (a) {
 	return {$: 'TextInputNode', a: a};
 };
@@ -15201,18 +15449,6 @@ var $mdgriffith$elm_ui$Element$Border$rounded = function (radius) {
 			$elm$core$String$fromInt(radius) + 'px'));
 };
 var $mdgriffith$elm_ui$Element$Input$white = A3($mdgriffith$elm_ui$Element$rgb, 1, 1, 1);
-var $mdgriffith$elm_ui$Element$Border$width = function (v) {
-	return A2(
-		$mdgriffith$elm_ui$Internal$Model$StyleClass,
-		$mdgriffith$elm_ui$Internal$Flag$borderWidth,
-		A5(
-			$mdgriffith$elm_ui$Internal$Model$BorderWidth,
-			'b-' + $elm$core$String$fromInt(v),
-			v,
-			v,
-			v,
-			v));
-};
 var $mdgriffith$elm_ui$Element$Input$defaultTextBoxStyle = _List_fromArray(
 	[
 		$mdgriffith$elm_ui$Element$Input$defaultTextPadding,
@@ -15318,35 +15554,6 @@ var $elm$html$Html$Events$onInput = function (tagger) {
 			$elm$json$Json$Decode$map,
 			$elm$html$Html$Events$alwaysStop,
 			A2($elm$json$Json$Decode$map, tagger, $elm$html$Html$Events$targetValue)));
-};
-var $mdgriffith$elm_ui$Internal$Model$paddingName = F4(
-	function (top, right, bottom, left) {
-		return 'pad-' + ($elm$core$String$fromInt(top) + ('-' + ($elm$core$String$fromInt(right) + ('-' + ($elm$core$String$fromInt(bottom) + ('-' + $elm$core$String$fromInt(left)))))));
-	});
-var $mdgriffith$elm_ui$Element$paddingEach = function (_v0) {
-	var top = _v0.top;
-	var right = _v0.right;
-	var bottom = _v0.bottom;
-	var left = _v0.left;
-	return (_Utils_eq(top, right) && (_Utils_eq(top, bottom) && _Utils_eq(top, left))) ? A2(
-		$mdgriffith$elm_ui$Internal$Model$StyleClass,
-		$mdgriffith$elm_ui$Internal$Flag$padding,
-		A5(
-			$mdgriffith$elm_ui$Internal$Model$PaddingStyle,
-			'p-' + $elm$core$String$fromInt(top),
-			top,
-			top,
-			top,
-			top)) : A2(
-		$mdgriffith$elm_ui$Internal$Model$StyleClass,
-		$mdgriffith$elm_ui$Internal$Flag$padding,
-		A5(
-			$mdgriffith$elm_ui$Internal$Model$PaddingStyle,
-			A4($mdgriffith$elm_ui$Internal$Model$paddingName, top, right, bottom, left),
-			top,
-			right,
-			bottom,
-			left));
 };
 var $mdgriffith$elm_ui$Element$Input$isFill = function (len) {
 	isFill:
@@ -15917,184 +16124,15 @@ var $mdgriffith$elm_ui$Element$Input$text = $mdgriffith$elm_ui$Element$Input$tex
 		spellchecked: false,
 		type_: $mdgriffith$elm_ui$Element$Input$TextInputNode('text')
 	});
-var $author$project$Main$viewModelTabs = function (model) {
-	return A2(
-		$mdgriffith$elm_ui$Element$row,
-		_List_Nil,
-		_List_fromArray(
-			[
-				A2(
-				$mdgriffith$elm_ui$Element$Input$text,
-				_List_fromArray(
-					[
-						$mdgriffith$elm_ui$Element$width(
-						$mdgriffith$elm_ui$Element$px(150)),
-						$mdgriffith$elm_ui$Element$Background$color(
-						$author$project$Main$toElmUiColor($avh4$elm_color$Color$grey))
-					]),
-				{
-					label: $mdgriffith$elm_ui$Element$Input$labelHidden('current model name'),
-					onChange: $author$project$Main$UpdateModelName,
-					placeholder: $elm$core$Maybe$Nothing,
-					text: model.name
-				})
-			]));
-};
-var $author$project$Main$ApplySettingsToCurrentAndFutureFields = {$: 'ApplySettingsToCurrentAndFutureFields'};
-var $author$project$Main$ApplySettingsToFutureFields = {$: 'ApplySettingsToFutureFields'};
-var $author$project$Main$DoNothing = {$: 'DoNothing'};
-var $mdgriffith$elm_ui$Element$padding = function (x) {
-	return A2(
-		$mdgriffith$elm_ui$Internal$Model$StyleClass,
-		$mdgriffith$elm_ui$Internal$Flag$padding,
-		A5(
-			$mdgriffith$elm_ui$Internal$Model$PaddingStyle,
-			'p-' + $elm$core$String$fromInt(x),
-			x,
-			x,
-			x,
-			x));
-};
-var $author$project$Main$viewPopUpOf = F3(
-	function (title, attributes, content) {
-		return A2(
-			$mdgriffith$elm_ui$Element$column,
-			_Utils_ap(
-				_List_fromArray(
-					[
-						$mdgriffith$elm_ui$Element$centerX,
-						$mdgriffith$elm_ui$Element$centerY,
-						$mdgriffith$elm_ui$Element$padding(20),
-						$mdgriffith$elm_ui$Element$spacing(6),
-						$mdgriffith$elm_ui$Element$Background$color(
-						$author$project$Main$toElmUiColor($avh4$elm_color$Color$lightGrey)),
-						$mdgriffith$elm_ui$Element$Border$width(2),
-						$mdgriffith$elm_ui$Element$Border$color(
-						$author$project$Main$toElmUiColor($avh4$elm_color$Color$black)),
-						$mdgriffith$elm_ui$Element$htmlAttribute(
-						$author$project$Main$onClickNoProp($author$project$Main$DoNothing))
-					]),
-				attributes),
-			_Utils_ap(
-				_List_fromArray(
-					[
-						A2(
-						$mdgriffith$elm_ui$Element$el,
-						_List_fromArray(
-							[
-								$mdgriffith$elm_ui$Element$Font$size(18),
-								$mdgriffith$elm_ui$Element$paddingEach(
-								{bottom: 10, left: 0, right: 0, top: 0})
-							]),
-						$mdgriffith$elm_ui$Element$text(title))
-					]),
-				content));
-	});
-var $author$project$Main$viewApplyOptions = function (model) {
-	var _v0 = model.popUp;
-	if (_v0.$ === 'ApplyOptionsPopUp') {
-		return A3(
-			$author$project$Main$viewPopUpOf,
-			'Which fields do you want to apply to?',
-			_List_Nil,
-			_List_fromArray(
-				[
-					A2(
-					$mdgriffith$elm_ui$Element$Input$button,
-					_Utils_ap(
-						$author$project$Main$style.button,
-						_List_fromArray(
-							[
-								$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill)
-							])),
-					{
-						label: $author$project$Main$centeredText('Apply to future fields'),
-						onPress: $elm$core$Maybe$Just($author$project$Main$ApplySettingsToFutureFields)
-					}),
-					A2(
-					$mdgriffith$elm_ui$Element$Input$button,
-					_Utils_ap(
-						$author$project$Main$style.button,
-						_List_fromArray(
-							[
-								$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill)
-							])),
-					{
-						label: $author$project$Main$centeredText('Apply to current and future fields'),
-						onPress: $elm$core$Maybe$Just($author$project$Main$ApplySettingsToCurrentAndFutureFields)
-					})
-				]));
-	} else {
-		return $mdgriffith$elm_ui$Element$none;
-	}
-};
-var $author$project$Main$CloseHelpPopUp = {$: 'CloseHelpPopUp'};
-var $author$project$Main$textHeader = function (text) {
-	return A2(
-		$mdgriffith$elm_ui$Element$el,
-		_List_fromArray(
-			[
-				A2($mdgriffith$elm_ui$Element$paddingXY, 0, 6)
-			]),
-		$mdgriffith$elm_ui$Element$text(text));
-};
-var $author$project$Main$viewHelpPopUp = A3(
-	$author$project$Main$viewPopUpOf,
-	'Help',
-	_List_Nil,
-	_List_fromArray(
-		[
-			$author$project$Main$textHeader('When you mouse over a charge and ...'),
-			$mdgriffith$elm_ui$Element$text('  Single click: select charge'),
-			$mdgriffith$elm_ui$Element$text('  Double click: negate charge'),
-			$mdgriffith$elm_ui$Element$text('  Right click:  * delete charge'),
-			$mdgriffith$elm_ui$Element$text('                * duplicate charge'),
-			$mdgriffith$elm_ui$Element$text('                * deselect charge'),
-			$mdgriffith$elm_ui$Element$text('  Scroll up:    increase charge magnitude'),
-			$mdgriffith$elm_ui$Element$text('  Scroll down:  decrease charge magnitude'),
-			$author$project$Main$textHeader('When you mouse over background and ...'),
-			$mdgriffith$elm_ui$Element$text('  Right Click:  * add + charge'),
-			$mdgriffith$elm_ui$Element$text('                * add - charge'),
-			A2(
-			$mdgriffith$elm_ui$Element$el,
-			_List_fromArray(
-				[
-					$mdgriffith$elm_ui$Element$paddingEach(
-					{bottom: 0, left: 0, right: 0, top: 20})
-				]),
-			A2(
-				$mdgriffith$elm_ui$Element$Input$button,
-				$author$project$Main$style.button,
-				{
-					label: $author$project$Main$centeredText('Close'),
-					onPress: $elm$core$Maybe$Just($author$project$Main$CloseHelpPopUp)
-				}))
-		]));
-var $author$project$Main$ApplyPendingSettings = {$: 'ApplyPendingSettings'};
-var $author$project$Main$CloseSettingsPopUp = {$: 'CloseSettingsPopUp'};
-var $author$project$Main$UpdatePendingSetting = F2(
-	function (a, b) {
-		return {$: 'UpdatePendingSetting', a: a, b: b};
-	});
-var $mdgriffith$elm_ui$Internal$Model$Left = {$: 'Left'};
-var $mdgriffith$elm_ui$Element$alignLeft = $mdgriffith$elm_ui$Internal$Model$AlignX($mdgriffith$elm_ui$Internal$Model$Left);
-var $mdgriffith$elm_ui$Internal$Model$Right = {$: 'Right'};
-var $mdgriffith$elm_ui$Element$alignRight = $mdgriffith$elm_ui$Internal$Model$AlignX($mdgriffith$elm_ui$Internal$Model$Right);
-var $mdgriffith$elm_ui$Element$Input$Label = F3(
-	function (a, b, c) {
-		return {$: 'Label', a: a, b: b, c: c};
-	});
-var $mdgriffith$elm_ui$Element$Input$OnLeft = {$: 'OnLeft'};
-var $mdgriffith$elm_ui$Element$Input$labelLeft = $mdgriffith$elm_ui$Element$Input$Label($mdgriffith$elm_ui$Element$Input$OnLeft);
-var $author$project$Main$viewSettingsPopUp = function (model) {
+var $author$project$Simulation$viewSettingsPopUp = function (model) {
 	var settings = model.pendingSettings;
 	return A3(
-		$author$project$Main$viewPopUpOf,
+		$author$project$Simulation$viewPopUpOf,
 		'Settings',
 		_List_fromArray(
 			[
 				$mdgriffith$elm_ui$Element$inFront(
-				$author$project$Main$viewApplyOptions(model))
+				$author$project$Simulation$viewApplyOptions(model))
 			]),
 		_List_fromArray(
 			[
@@ -16107,7 +16145,7 @@ var $author$project$Main$viewSettingsPopUp = function (model) {
 						_List_fromArray(
 							[$mdgriffith$elm_ui$Element$centerY]),
 						$mdgriffith$elm_ui$Element$text('Charge radius (px)')),
-					onChange: $author$project$Main$UpdatePendingSetting('r'),
+					onChange: $author$project$Simulation$UpdatePendingSetting('r'),
 					placeholder: $elm$core$Maybe$Nothing,
 					text: $elm$core$String$fromFloat(settings.r)
 				}),
@@ -16120,7 +16158,7 @@ var $author$project$Main$viewSettingsPopUp = function (model) {
 						_List_fromArray(
 							[$mdgriffith$elm_ui$Element$centerY]),
 						$mdgriffith$elm_ui$Element$text('Field line density')),
-					onChange: $author$project$Main$UpdatePendingSetting('density'),
+					onChange: $author$project$Simulation$UpdatePendingSetting('density'),
 					placeholder: $elm$core$Maybe$Nothing,
 					text: $elm$core$String$fromInt(settings.density)
 				}),
@@ -16133,7 +16171,7 @@ var $author$project$Main$viewSettingsPopUp = function (model) {
 						_List_fromArray(
 							[$mdgriffith$elm_ui$Element$centerY]),
 						$mdgriffith$elm_ui$Element$text('Draw steps')),
-					onChange: $author$project$Main$UpdatePendingSetting('steps'),
+					onChange: $author$project$Simulation$UpdatePendingSetting('steps'),
 					placeholder: $elm$core$Maybe$Nothing,
 					text: $elm$core$String$fromInt(settings.steps)
 				}),
@@ -16146,7 +16184,7 @@ var $author$project$Main$viewSettingsPopUp = function (model) {
 						_List_fromArray(
 							[$mdgriffith$elm_ui$Element$centerY]),
 						$mdgriffith$elm_ui$Element$text('Draw step size (px)')),
-					onChange: $author$project$Main$UpdatePendingSetting('delta'),
+					onChange: $author$project$Simulation$UpdatePendingSetting('delta'),
 					placeholder: $elm$core$Maybe$Nothing,
 					text: $elm$core$String$fromFloat(settings.delta)
 				}),
@@ -16159,7 +16197,7 @@ var $author$project$Main$viewSettingsPopUp = function (model) {
 						_List_fromArray(
 							[$mdgriffith$elm_ui$Element$centerY]),
 						$mdgriffith$elm_ui$Element$text('Charge magnitude')),
-					onChange: $author$project$Main$UpdatePendingSetting('magnitude'),
+					onChange: $author$project$Simulation$UpdatePendingSetting('magnitude'),
 					placeholder: $elm$core$Maybe$Nothing,
 					text: $elm$core$String$fromFloat(settings.magnitude)
 				}),
@@ -16176,35 +16214,35 @@ var $author$project$Main$viewSettingsPopUp = function (model) {
 						A2(
 						$mdgriffith$elm_ui$Element$Input$button,
 						_Utils_ap(
-							$author$project$Main$style.button,
+							$author$project$Utils$styles.button,
 							_List_fromArray(
 								[$mdgriffith$elm_ui$Element$alignLeft])),
 						{
-							label: $author$project$Main$centeredText('Apply'),
-							onPress: $elm$core$Maybe$Just($author$project$Main$ApplyPendingSettings)
+							label: $author$project$Simulation$centeredText('Apply'),
+							onPress: $elm$core$Maybe$Just($author$project$Simulation$ApplyPendingSettings)
 						}),
 						A2(
 						$mdgriffith$elm_ui$Element$Input$button,
 						_Utils_ap(
-							$author$project$Main$style.button,
+							$author$project$Utils$styles.button,
 							_List_fromArray(
 								[$mdgriffith$elm_ui$Element$alignRight])),
 						{
-							label: $author$project$Main$centeredText('Cancel'),
-							onPress: $elm$core$Maybe$Just($author$project$Main$CloseSettingsPopUp)
+							label: $author$project$Simulation$centeredText('Cancel'),
+							onPress: $elm$core$Maybe$Just($author$project$Simulation$CloseSettingsPopUp)
 						})
 					]))
 			]));
 };
-var $author$project$Main$viewPopUp = function (model) {
+var $author$project$Simulation$viewPopUp = function (model) {
 	var _v0 = model.popUp;
 	switch (_v0.$) {
 		case 'HelpPopUp':
-			return $author$project$Main$viewHelpPopUp;
+			return $author$project$Simulation$viewHelpPopUp;
 		case 'SettingsPopUp':
-			return $author$project$Main$viewSettingsPopUp(model);
+			return $author$project$Simulation$viewSettingsPopUp(model);
 		case 'ApplyOptionsPopUp':
-			return $author$project$Main$viewApplyOptions(model);
+			return $author$project$Simulation$viewApplyOptions(model);
 		default:
 			return $mdgriffith$elm_ui$Element$none;
 	}
@@ -16215,14 +16253,14 @@ var $elm_community$typed_svg$TypedSvg$Attributes$width = function (length) {
 		'width',
 		$elm_community$typed_svg$TypedSvg$TypesToStrings$lengthToString(length));
 };
-var $author$project$Main$view = function (model) {
+var $author$project$Simulation$view = function (model) {
 	return A2(
 		$mdgriffith$elm_ui$Element$layout,
 		_List_fromArray(
 			[
 				$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill),
 				$mdgriffith$elm_ui$Element$height($mdgriffith$elm_ui$Element$fill),
-				$mdgriffith$elm_ui$Element$Events$onClick($author$project$Main$ClickedBackground),
+				$mdgriffith$elm_ui$Element$Events$onClick($author$project$Simulation$ClickedBackground),
 				$mdgriffith$elm_ui$Element$Font$size(16),
 				$mdgriffith$elm_ui$Element$Font$family(
 				_List_fromArray(
@@ -16233,12 +16271,10 @@ var $author$project$Main$view = function (model) {
 			_List_fromArray(
 				[
 					$mdgriffith$elm_ui$Element$inFront(
-					$author$project$Main$viewContextMenu(model)),
+					$author$project$Simulation$viewContextMenu(model)),
 					$mdgriffith$elm_ui$Element$inFront(
-					$author$project$Main$viewPopUp(model)),
-					$mdgriffith$elm_ui$Element$below($author$project$Main$viewControlPanel),
-					$mdgriffith$elm_ui$Element$above(
-					$author$project$Main$viewModelTabs(model)),
+					$author$project$Simulation$viewPopUp(model)),
+					$mdgriffith$elm_ui$Element$below($author$project$Simulation$viewControlPanel),
 					$mdgriffith$elm_ui$Element$centerX,
 					$mdgriffith$elm_ui$Element$centerY,
 					A2($mdgriffith$elm_ui$Element$paddingXY, 0, 5)
@@ -16254,17 +16290,86 @@ var $author$project$Main$view = function (model) {
 							$elm_community$typed_svg$TypedSvg$Types$px(model.height)),
 							A4($elm_community$typed_svg$TypedSvg$Attributes$viewBox, 0, 0, model.width, model.height),
 							$elm_community$typed_svg$TypedSvg$Attributes$id('modelSvg'),
-							$mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onContextMenu($author$project$Main$ShowGeneralContextMenu)
+							$mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onContextMenu($author$project$Simulation$ShowGeneralContextMenu)
 						]),
 					_Utils_ap(
-						A2($elm$core$List$map, $author$project$Main$viewFieldLines, model.fields),
+						A2($elm$core$List$map, $author$project$Simulation$viewFieldLines, model.fields),
 						A2(
 							$elm$core$List$map,
-							$author$project$Main$viewFieldSource(model.activeSourceId),
+							$author$project$Simulation$viewFieldSource(model.activeSourceId),
 							model.fields))))));
 };
+var $author$project$Main$ChangeActiveSimulation = function (a) {
+	return {$: 'ChangeActiveSimulation', a: a};
+};
+var $author$project$Main$UpdateActiveSimulationName = function (a) {
+	return {$: 'UpdateActiveSimulationName', a: a};
+};
+var $mdgriffith$elm_ui$Element$Input$HiddenLabel = function (a) {
+	return {$: 'HiddenLabel', a: a};
+};
+var $mdgriffith$elm_ui$Element$Input$labelHidden = $mdgriffith$elm_ui$Element$Input$HiddenLabel;
+var $author$project$Main$viewTabs = function (model) {
+	return A2(
+		$mdgriffith$elm_ui$Element$row,
+		_List_Nil,
+		A2(
+			$elm$core$List$map,
+			function (simulation) {
+				return _Utils_eq(simulation, model.activeSimulation) ? A2(
+					$mdgriffith$elm_ui$Element$Input$text,
+					_List_fromArray(
+						[
+							$mdgriffith$elm_ui$Element$width(
+							$mdgriffith$elm_ui$Element$px(150)),
+							$mdgriffith$elm_ui$Element$Background$color(
+							$author$project$Utils$toElmUiColor($avh4$elm_color$Color$lightGrey))
+						]),
+					{
+						label: $mdgriffith$elm_ui$Element$Input$labelHidden('current simulation name'),
+						onChange: $author$project$Main$UpdateActiveSimulationName,
+						placeholder: $elm$core$Maybe$Nothing,
+						text: simulation.name
+					}) : A2(
+					$mdgriffith$elm_ui$Element$Input$button,
+					$author$project$Utils$styles.button,
+					{
+						label: $mdgriffith$elm_ui$Element$text(simulation.name),
+						onPress: $elm$core$Maybe$Just(
+							$author$project$Main$ChangeActiveSimulation(simulation))
+					});
+			},
+			model.simulations));
+};
+var $author$project$Main$view = function (model) {
+	return A2(
+		$mdgriffith$elm_ui$Element$layout,
+		_List_fromArray(
+			[
+				$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill),
+				$mdgriffith$elm_ui$Element$height($mdgriffith$elm_ui$Element$fill),
+				$mdgriffith$elm_ui$Element$Font$size(16),
+				$mdgriffith$elm_ui$Element$Font$family(
+				_List_fromArray(
+					[$mdgriffith$elm_ui$Element$Font$monospace]))
+			]),
+		A2(
+			$mdgriffith$elm_ui$Element$el,
+			_List_fromArray(
+				[
+					$mdgriffith$elm_ui$Element$above(
+					$author$project$Main$viewTabs(model)),
+					$mdgriffith$elm_ui$Element$centerX,
+					$mdgriffith$elm_ui$Element$centerY
+				]),
+			$mdgriffith$elm_ui$Element$html(
+				A2(
+					$elm$html$Html$map,
+					$author$project$Main$SimulationMsg,
+					$author$project$Simulation$view(model.activeSimulation)))));
+};
 var $author$project$Main$main = $elm$browser$Browser$element(
-	{init: $author$project$Main$initialModel, subscriptions: $author$project$Main$subscriptions, update: $author$project$Main$update, view: $author$project$Main$view});
+	{init: $author$project$Main$init, subscriptions: $author$project$Main$subscriptions, update: $author$project$Main$update, view: $author$project$Main$view});
 _Platform_export({'Main':{'init':$author$project$Main$main(
 	$elm$json$Json$Decode$oneOf(
 		_List_fromArray(
