@@ -20,6 +20,8 @@ import Element.Border as Border
 import Element.Font as Font
 import Element.Events
 import Html.Events.Extra.Mouse as Mouse
+import Process
+import Task
 
 
 type alias Model =
@@ -31,6 +33,8 @@ type alias Model =
   , popUp: PopUp
   , settings : Settings
   , pendingSettings : Settings
+  , isWheeling : Bool
+  , isWheelingTimeOutCleared : Bool
   }
 
 
@@ -154,6 +158,10 @@ initialModel _ =
     defaultSettings
   , pendingSettings =
     defaultSettings
+  , isWheeling =
+    False
+  , isWheelingTimeOutCleared =
+    False
   }
   , Cmd.none
   )
@@ -273,6 +281,7 @@ type Msg
   | ApplySettingsToCurrentAndFutureFields
   | CloseSettingsPopUp
   | CloseHelpPopUp
+  | StopWheelingTimeOut
   | DoNothing
 
 
@@ -305,7 +314,10 @@ update msg model =
       (toggleSourceSign model, Cmd.none)
 
     ScaleSourceMagnitude delta ->
-      (scaleSourceMagnitude delta model, Cmd.none)
+      scaleSourceMagnitude delta model
+
+    StopWheelingTimeOut ->
+      (stopWheelingTimeOut model, Cmd.none)
 
     DragMsg dragMsg ->
       Draggable.update dragConfig dragMsg model
@@ -373,50 +385,53 @@ onDragBy offsetPos model =
 
 startDragging : Id -> Model -> Model
 startDragging id model =
-  let
-    optimizedModel =
-      { model
-        | fields =
-          List.map
-            (\field ->
-              if field.delta <= 7 then
-                { field
-                  | delta =
-                    field.delta * 3
-                  , steps =
-                    round <| toFloat field.steps / 3
-                }
-              else
-                field
-            )
-            model.fields
-      }
-  in
-  setActiveSourceId id optimizedModel
+  setActiveSourceId id <| optimizeModel model
+
+
+optimizeModel : Model -> Model
+optimizeModel model =
+  { model
+    | fields =
+      List.map
+        (\field ->
+          if field.delta <= 7 then
+            { field
+              | delta =
+                field.delta * 3
+              , steps =
+                round <| toFloat field.steps / 3
+            }
+          else
+            field
+        )
+        model.fields
+  }
 
 
 endDragging : Model -> Model
 endDragging model =
-  let
-    deoptimizedModel =
-      { model
-        | fields =
-          calculateFields <| List.map
-            (\field ->
-              if field.delta <= 7 then
-                { field
-                  | delta =
-                    field.delta / 3
-                  , steps =
-                    field.steps * 3
-                }
-              else
-                field
-            )
-            model.fields
-      }
-  in
-  deoptimizedModel
+  deoptimizeModel model
+
+
+deoptimizeModel : Model -> Model
+deoptimizeModel model =
+  { model
+    | fields =
+      calculateFields <| List.map
+        (\field ->
+          if field.delta <= 7 then
+            { field
+              | delta =
+                field.delta / 3
+              , steps =
+                field.steps * 3
+            }
+          else
+            field
+        )
+        model.fields
+  }
+
 
 closeHelpPopUp : Model -> Model
 closeHelpPopUp model =
@@ -571,9 +586,14 @@ toggleSourceSign model =
   }
 
 
-scaleSourceMagnitude : Int -> Model -> Model
+scaleSourceMagnitude : Int -> Model -> (Model, Cmd Msg)
 scaleSourceMagnitude delta model =
   let
+    newModel =
+      if model.isWheeling then
+        model
+      else
+        optimizeModel model
     newFields =
       updateActive
         (\field ->
@@ -589,13 +609,41 @@ scaleSourceMagnitude delta model =
               }
           }
         )
-        model.activeSourceId
-        model.fields
+        newModel.activeSourceId
+        newModel.fields
   in
-  { model |
-    fields =
+  ({ model
+    | fields =
       calculateFields newFields
+    , isWheeling =
+      True
+    , isWheelingTimeOutCleared =
+      True
   }
+  , setTimeOut 200 StopWheelingTimeOut
+  )
+
+
+setTimeOut : Float -> msg -> Cmd msg
+setTimeOut time msg =
+  Process.sleep time
+  |> Task.perform (\_ -> msg)
+
+
+stopWheelingTimeOut : Model -> Model
+stopWheelingTimeOut model =
+  let
+    _ = Debug.log "AL -> model.isWheelingTimeOutCleared" <| model.isWheelingTimeOutCleared
+  in
+  if model.isWheelingTimeOutCleared then
+    { model
+      | isWheelingTimeOutCleared = False
+    }
+  else
+    deoptimizeModel { model
+      | isWheeling = False
+      , isWheelingTimeOutCleared = False
+    }
 
 
 showFieldContextMenu : Model -> Model
