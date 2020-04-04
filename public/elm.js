@@ -5406,6 +5406,10 @@ var _Bitwise_shiftRightZfBy = F2(function(offset, a)
 {
 	return a >>> offset;
 });
+var $elm$core$Maybe$Just = function (a) {
+	return {$: 'Just', a: a};
+};
+var $elm$core$Maybe$Nothing = {$: 'Nothing'};
 var $elm$core$Basics$EQ = {$: 'EQ'};
 var $elm$core$Basics$GT = {$: 'GT'};
 var $elm$core$Basics$LT = {$: 'LT'};
@@ -5509,10 +5513,6 @@ var $elm$json$Json$Decode$OneOf = function (a) {
 };
 var $elm$core$Basics$False = {$: 'False'};
 var $elm$core$Basics$add = _Basics_add;
-var $elm$core$Maybe$Just = function (a) {
-	return {$: 'Just', a: a};
-};
-var $elm$core$Maybe$Nothing = {$: 'Nothing'};
 var $elm$core$String$all = _String_all;
 var $elm$core$Basics$and = _Basics_and;
 var $elm$core$Basics$append = _Utils_append;
@@ -6369,17 +6369,199 @@ var $author$project$Main$calculateFields = F3(
 			},
 			fields);
 	});
+var $elm$json$Json$Decode$andThen = _Json_andThen;
+var $elm$json$Json$Decode$field = _Json_decodeField;
+var $elm$json$Json$Decode$oneOf = _Json_oneOf;
+var $elm$json$Json$Decode$maybe = function (decoder) {
+	return $elm$json$Json$Decode$oneOf(
+		_List_fromArray(
+			[
+				A2($elm$json$Json$Decode$map, $elm$core$Maybe$Just, decoder),
+				$elm$json$Json$Decode$succeed($elm$core$Maybe$Nothing)
+			]));
+};
+var $webbhuset$elm_json_decode$Json$Decode$Field$attempt = F3(
+	function (fieldName, valueDecoder, continuation) {
+		return A2(
+			$elm$json$Json$Decode$andThen,
+			continuation,
+			$elm$json$Json$Decode$maybe(
+				A2($elm$json$Json$Decode$field, fieldName, valueDecoder)));
+	});
+var $author$project$Main$defaultSettings = {delta: 1, density: 30, magnitude: 1.0, r: 10.0, steps: 900};
+var $elm$json$Json$Decode$fail = _Json_fail;
+var $elm$json$Json$Decode$float = _Json_decodeFloat;
 var $zaboco$elm_draggable$Internal$NotDragging = {$: 'NotDragging'};
 var $zaboco$elm_draggable$Draggable$State = function (a) {
 	return {$: 'State', a: a};
 };
 var $zaboco$elm_draggable$Draggable$init = $zaboco$elm_draggable$Draggable$State($zaboco$elm_draggable$Internal$NotDragging);
+var $elm$json$Json$Decode$int = _Json_decodeInt;
+var $elm$json$Json$Decode$list = _Json_decodeList;
+var $webbhuset$elm_json_decode$Json$Decode$Field$require = F3(
+	function (fieldName, valueDecoder, continuation) {
+		return A2(
+			$elm$json$Json$Decode$andThen,
+			continuation,
+			A2($elm$json$Json$Decode$field, fieldName, valueDecoder));
+	});
+var $elm$json$Json$Decode$string = _Json_decodeString;
+var $author$project$Main$decodeModel = function () {
+	var decodeSign = A2(
+		$elm$json$Json$Decode$andThen,
+		function (sign) {
+			switch (sign) {
+				case 'Positive':
+					return $elm$json$Json$Decode$succeed($author$project$Main$Positive);
+				case 'Negative':
+					return $elm$json$Json$Decode$succeed($author$project$Main$Negative);
+				default:
+					return $elm$json$Json$Decode$fail('I can\'t recognize \"' + (sign + '\". It should be either \"Postive\" or \"Negative\"'));
+			}
+		},
+		$elm$json$Json$Decode$string);
+	var decodeSettings = A3(
+		$webbhuset$elm_json_decode$Json$Decode$Field$require,
+		'r',
+		$elm$json$Json$Decode$float,
+		function (r) {
+			return A3(
+				$webbhuset$elm_json_decode$Json$Decode$Field$require,
+				'magnitude',
+				$elm$json$Json$Decode$float,
+				function (magnitude) {
+					return A3(
+						$webbhuset$elm_json_decode$Json$Decode$Field$require,
+						'density',
+						$elm$json$Json$Decode$int,
+						function (density) {
+							return A3(
+								$webbhuset$elm_json_decode$Json$Decode$Field$require,
+								'steps',
+								$elm$json$Json$Decode$int,
+								function (steps) {
+									return A3(
+										$webbhuset$elm_json_decode$Json$Decode$Field$require,
+										'delta',
+										$elm$json$Json$Decode$float,
+										function (delta) {
+											return $elm$json$Json$Decode$succeed(
+												{delta: delta, density: density, magnitude: magnitude, r: r, steps: steps});
+										});
+								});
+						});
+				});
+		});
+	var decodeCharge = A3(
+		$webbhuset$elm_json_decode$Json$Decode$Field$require,
+		'id',
+		$elm$json$Json$Decode$int,
+		function (id) {
+			return A3(
+				$webbhuset$elm_json_decode$Json$Decode$Field$require,
+				'sign',
+				decodeSign,
+				function (sign) {
+					return A3(
+						$webbhuset$elm_json_decode$Json$Decode$Field$require,
+						'magnitude',
+						$elm$json$Json$Decode$float,
+						function (magnitude) {
+							return A3(
+								$webbhuset$elm_json_decode$Json$Decode$Field$require,
+								'x',
+								$elm$json$Json$Decode$float,
+								function (x) {
+									return A3(
+										$webbhuset$elm_json_decode$Json$Decode$Field$require,
+										'y',
+										$elm$json$Json$Decode$float,
+										function (y) {
+											return A3(
+												$webbhuset$elm_json_decode$Json$Decode$Field$require,
+												'r',
+												$elm$json$Json$Decode$float,
+												function (r) {
+													return $elm$json$Json$Decode$succeed(
+														{id: id, magnitude: magnitude, r: r, sign: sign, x: x, y: y});
+												});
+										});
+								});
+						});
+				});
+		});
+	var decodeField = A3(
+		$webbhuset$elm_json_decode$Json$Decode$Field$require,
+		'source',
+		decodeCharge,
+		function (source) {
+			return A3(
+				$webbhuset$elm_json_decode$Json$Decode$Field$require,
+				'density',
+				$elm$json$Json$Decode$int,
+				function (density) {
+					return A3(
+						$webbhuset$elm_json_decode$Json$Decode$Field$require,
+						'steps',
+						$elm$json$Json$Decode$int,
+						function (steps) {
+							return A3(
+								$webbhuset$elm_json_decode$Json$Decode$Field$require,
+								'delta',
+								$elm$json$Json$Decode$float,
+								function (delta) {
+									return $elm$json$Json$Decode$succeed(
+										{delta: delta, density: density, lines: _List_Nil, source: source, steps: steps});
+								});
+						});
+				});
+		});
+	return A3(
+		$webbhuset$elm_json_decode$Json$Decode$Field$require,
+		'fields',
+		$elm$json$Json$Decode$list(decodeField),
+		function (fields) {
+			return A3(
+				$webbhuset$elm_json_decode$Json$Decode$Field$attempt,
+				'activeSourceId',
+				$elm$json$Json$Decode$int,
+				function (activeSourceId) {
+					return A3(
+						$webbhuset$elm_json_decode$Json$Decode$Field$require,
+						'nextId',
+						$elm$json$Json$Decode$int,
+						function (nextId) {
+							return A3(
+								$webbhuset$elm_json_decode$Json$Decode$Field$require,
+								'settings',
+								decodeSettings,
+								function (settings) {
+									return A3(
+										$webbhuset$elm_json_decode$Json$Decode$Field$require,
+										'width',
+										$elm$json$Json$Decode$float,
+										function (width) {
+											return A3(
+												$webbhuset$elm_json_decode$Json$Decode$Field$require,
+												'height',
+												$elm$json$Json$Decode$float,
+												function (height) {
+													return $elm$json$Json$Decode$succeed(
+														{activeSourceId: activeSourceId, contextMenu: $author$project$Main$NoContextMenu, drag: $zaboco$elm_draggable$Draggable$init, fields: fields, height: height, isWheeling: false, isWheelingTimeOutCleared: false, nextId: nextId, pendingSettings: $author$project$Main$defaultSettings, popUp: $author$project$Main$NoPopUp, settings: settings, width: width});
+												});
+										});
+								});
+						});
+				});
+		});
+}();
+var $elm$json$Json$Decode$decodeString = _Json_runOnString;
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
-var $author$project$Main$initialModel = function (_v0) {
-	var width = 1200;
-	var height = 780;
-	var fields = _List_fromArray(
+var $author$project$Main$initialModel = function (savedModel) {
+	var defaultWidth = 1200;
+	var defaultHeight = 780;
+	var defaultFields = _List_fromArray(
 		[
 			{
 			delta: 1,
@@ -6410,30 +6592,47 @@ var $author$project$Main$initialModel = function (_v0) {
 			steps: 900
 		}
 		]);
-	var defaultSettings = {delta: 1, density: 30, magnitude: 1.0, r: 10.0, steps: 900};
+	var defaultModel = {
+		activeSourceId: ($elm$core$List$length(defaultFields) > 0) ? $elm$core$Maybe$Just(0) : $elm$core$Maybe$Nothing,
+		contextMenu: $author$project$Main$NoContextMenu,
+		drag: $zaboco$elm_draggable$Draggable$init,
+		fields: A3($author$project$Main$calculateFields, defaultWidth, defaultHeight, defaultFields),
+		height: defaultHeight,
+		isWheeling: false,
+		isWheelingTimeOutCleared: false,
+		nextId: $elm$core$List$length(defaultFields),
+		pendingSettings: $author$project$Main$defaultSettings,
+		popUp: $author$project$Main$NoPopUp,
+		settings: $author$project$Main$defaultSettings,
+		width: defaultWidth
+	};
 	return _Utils_Tuple2(
-		{
-			activeSourceId: ($elm$core$List$length(fields) > 0) ? $elm$core$Maybe$Just(0) : $elm$core$Maybe$Nothing,
-			contextMenu: $author$project$Main$NoContextMenu,
-			drag: $zaboco$elm_draggable$Draggable$init,
-			fields: A3($author$project$Main$calculateFields, width, height, fields),
-			height: height,
-			isWheeling: false,
-			isWheelingTimeOutCleared: false,
-			nextId: $elm$core$List$length(fields),
-			pendingSettings: defaultSettings,
-			popUp: $author$project$Main$NoPopUp,
-			settings: defaultSettings,
-			width: width
-		},
+		function () {
+			if (savedModel.$ === 'Just') {
+				var modelStr = savedModel.a;
+				var _v1 = A2($elm$json$Json$Decode$decodeString, $author$project$Main$decodeModel, modelStr);
+				if (_v1.$ === 'Ok') {
+					var model = _v1.a;
+					return _Utils_update(
+						model,
+						{
+							fields: A3($author$project$Main$calculateFields, model.width, model.height, model.fields)
+						});
+				} else {
+					return defaultModel;
+				}
+			} else {
+				return defaultModel;
+			}
+		}(),
 		$elm$core$Platform$Cmd$none);
 };
+var $elm$json$Json$Decode$null = _Json_decodeNull;
 var $author$project$Main$DragMsg = function (a) {
 	return {$: 'DragMsg', a: a};
 };
 var $author$project$Main$SaveModel = {$: 'SaveModel'};
 var $elm$core$Platform$Sub$batch = _Platform_batch;
-var $elm$json$Json$Decode$null = _Json_decodeNull;
 var $author$project$Main$pageWillClose = _Platform_incomingPort(
 	'pageWillClose',
 	$elm$json$Json$Decode$null(_Utils_Tuple0));
@@ -6857,8 +7056,6 @@ var $zaboco$elm_draggable$Internal$Position = F2(
 	function (x, y) {
 		return {x: x, y: y};
 	});
-var $elm$json$Json$Decode$field = _Json_decodeField;
-var $elm$json$Json$Decode$float = _Json_decodeFloat;
 var $elm$core$Basics$truncate = _Basics_truncate;
 var $zaboco$elm_draggable$Draggable$positionDecoder = A3(
 	$elm$json$Json$Decode$map2,
@@ -13600,7 +13797,6 @@ var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$buttonFromId = functi
 			return $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$ErrorButton;
 	}
 };
-var $elm$json$Json$Decode$int = _Json_decodeInt;
 var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$buttonDecoder = A2(
 	$elm$json$Json$Decode$map,
 	$mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$buttonFromId,
@@ -13980,8 +14176,6 @@ var $mdgriffith$elm_ui$Element$Input$focusDefault = function (attrs) {
 	return A2($elm$core$List$any, $mdgriffith$elm_ui$Element$Input$hasFocusStyle, attrs) ? $mdgriffith$elm_ui$Internal$Model$NoAttribute : $mdgriffith$elm_ui$Internal$Model$htmlClass('focusable');
 };
 var $mdgriffith$elm_ui$Element$Input$enter = 'Enter';
-var $elm$json$Json$Decode$andThen = _Json_andThen;
-var $elm$json$Json$Decode$fail = _Json_fail;
 var $elm$virtual_dom$VirtualDom$MayPreventDefault = function (a) {
 	return {$: 'MayPreventDefault', a: a};
 };
@@ -13992,7 +14186,6 @@ var $elm$html$Html$Events$preventDefaultOn = F2(
 			event,
 			$elm$virtual_dom$VirtualDom$MayPreventDefault(decoder));
 	});
-var $elm$json$Json$Decode$string = _Json_decodeString;
 var $mdgriffith$elm_ui$Element$Input$onKey = F2(
 	function (desiredCode, msg) {
 		var decode = function (code) {
@@ -16013,7 +16206,12 @@ var $author$project$Main$view = function (model) {
 var $author$project$Main$main = $elm$browser$Browser$element(
 	{init: $author$project$Main$initialModel, subscriptions: $author$project$Main$subscriptions, update: $author$project$Main$update, view: $author$project$Main$view});
 _Platform_export({'Main':{'init':$author$project$Main$main(
-	$elm$json$Json$Decode$succeed(_Utils_Tuple0))(0)}});
+	$elm$json$Json$Decode$oneOf(
+		_List_fromArray(
+			[
+				$elm$json$Json$Decode$null($elm$core$Maybe$Nothing),
+				A2($elm$json$Json$Decode$map, $elm$core$Maybe$Just, $elm$json$Json$Decode$string)
+			])))(0)}});
 
 //////////////////// HMR BEGIN ////////////////////
 

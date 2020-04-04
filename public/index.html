@@ -8,7 +8,13 @@
   <script src="elm.js"></script>
   <main></main>
   <script>
-    var app = Elm.Main.init({ node: document.querySelector('main') });
+    const localStorageKey = "electric-field-simulator-model";
+
+    // load saved model from localStorage
+    var savedModel = localStorage.getItem(localStorageKey);
+
+    // initiate elm app
+    var app = Elm.Main.init({ node: document.querySelector('main'), flags: savedModel });
 
     // downloadMovel
     app.ports.downloadModel.subscribe(function() {
@@ -36,7 +42,7 @@
     // saveMovel
     app.ports.saveModel.subscribe(function(model) {
       var modelJson = JSON.stringify(model);
-      localStorage.setItem('electric-field-simulator-model', modelJson);
+      localStorage.setItem(localStorageKey, modelJson);
     });
 
     window.addEventListener("beforeunload", function() {

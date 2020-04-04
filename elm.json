@@ -15,6 +15,7 @@
             "elm-explorations/linear-algebra": "1.0.3",
             "mdgriffith/elm-ui": "1.1.5",
             "mpizenberg/elm-pointer-events": "4.0.1",
+            "webbhuset/elm-json-decode": "1.1.0",
             "zaboco/elm-draggable": "4.0.5"
         },
         "indirect": {

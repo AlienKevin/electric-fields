@@ -12,7 +12,8 @@ import TypedSvg.Types exposing (px, Paint(..))
 import Math.Vector2 as Vector2
 import Draggable
 import Draggable.Events
-import Json.Decode as Decode
+import Json.Decode as Decode exposing (Decoder)
+import Json.Decode.Field as Field
 import Json.Encode as Encode
 import Element as E
 import Element.Input as Input
@@ -118,10 +119,20 @@ style =
   }
 
 
-initialModel : () -> (Model, Cmd Msg)
-initialModel _ =
+defaultSettings : Settings
+defaultSettings =
+  { r = 10.0
+  , density = 30
+  , steps = 900
+  , delta = 1
+  , magnitude = 1.0
+  }
+
+
+initialModel : Maybe String -> (Model, Cmd Msg)
+initialModel savedModel =
   let
-    fields =
+    defaultFields =
       [{ source = { id = 0, sign = Negative, magnitude = 3.0, x = 465.0, y = 270.0, r = 10.0 }
       , density = 30
       , steps = 900
@@ -147,30 +158,39 @@ initialModel _ =
       , lines = []
       }
       ]
-    defaultSettings =
-      { r = 10.0
-      , density = 30
-      , steps = 900
-      , delta = 1
-      , magnitude = 1.0
+
+    defaultWidth = 1200
+
+    defaultHeight = 780
+
+    defaultModel =
+      { fields =
+        calculateFields defaultWidth defaultHeight defaultFields
+      , activeSourceId = if List.length defaultFields > 0 then Just 0 else Nothing
+      , nextId = List.length defaultFields
+      , drag = Draggable.init
+      , contextMenu = NoContextMenu
+      , popUp = NoPopUp
+      , settings = defaultSettings
+      , pendingSettings = defaultSettings
+      , isWheeling = False
+      , isWheelingTimeOutCleared = False
+      , width = defaultWidth
+      , height = defaultHeight
       }
-    width = 1200
-    height = 780
   in
-  ({ fields =
-    calculateFields width height fields
-  , activeSourceId = if List.length fields > 0 then Just 0 else Nothing
-  , nextId = List.length fields
-  , drag = Draggable.init
-  , contextMenu = NoContextMenu
-  , popUp = NoPopUp
-  , settings = defaultSettings
-  , pendingSettings = defaultSettings
-  , isWheeling = False
-  , isWheelingTimeOutCleared = False
-  , width = width
-  , height = height
-  }
+  ( case savedModel of
+    Just modelStr ->
+      case Decode.decodeString decodeModel modelStr of
+        Ok model ->
+          { model
+            | fields =
+              calculateFields model.width model.height model.fields
+          }
+        Err _ ->
+          defaultModel
+    Nothing ->
+      defaultModel
   , Cmd.none
   )
 
@@ -538,6 +558,93 @@ encodeModel { fields, activeSourceId, nextId, settings, width, height } =
     , ("width", Encode.float width)
     , ("height", Encode.float height)
     ]
+
+
+decodeModel : Decoder Model
+decodeModel =
+  let
+    decodeSign =
+      Decode.string
+        |> Decode.andThen
+        (\sign ->
+          case sign of
+            "Positive" ->
+              Decode.succeed Positive
+            "Negative" ->
+              Decode.succeed Negative
+            _ ->
+              Decode.fail ("I can't recognize \"" ++ sign ++ "\". It should be either \"Postive\" or \"Negative\"")
+        )
+
+    decodeCharge =
+      Field.require "id" Decode.int <| \id ->
+      Field.require "sign" decodeSign <| \sign ->
+      Field.require "magnitude" Decode.float <| \magnitude ->
+      Field.require "x" Decode.float <| \x ->
+      Field.require "y" Decode.float <| \y ->
+      Field.require "r" Decode.float <| \r ->
+
+      Decode.succeed
+        { id = id
+        , sign = sign
+        , magnitude = magnitude
+        , x = x
+        , y = y
+        , r = r
+        }
+
+    decodeField =
+      Field.require "source" decodeCharge <| \source ->
+      Field.require "density" Decode.int <| \density ->
+      Field.require "steps" Decode.int <| \steps ->
+      Field.require "delta" Decode.float <| \delta ->
+
+      Decode.succeed
+        { source = source
+        , density = density
+        , steps = steps
+        , delta = delta
+        , lines = []
+        }
+
+    decodeSettings =
+      Field.require "r" Decode.float <| \r ->
+      Field.require "magnitude" Decode.float <| \magnitude ->
+      Field.require "density" Decode.int <| \density ->
+      Field.require "steps" Decode.int <| \steps ->
+      Field.require "delta" Decode.float <| \delta ->
+
+      Decode.succeed
+        { r = r
+        , magnitude = magnitude
+        , density = density
+        , steps = steps
+        , delta = delta
+        }
+    
+  in
+  Field.require "fields" (Decode.list decodeField) <| \fields ->
+  Field.attempt "activeSourceId" Decode.int <| \activeSourceId ->
+  Field.require "nextId" Decode.int <| \nextId ->
+  Field.require "settings" decodeSettings <| \settings ->
+  Field.require "width" Decode.float <| \width ->
+  Field.require "height" Decode.float <| \height ->
+
+  Decode.succeed
+    { fields = fields
+    , activeSourceId = activeSourceId
+    , nextId = nextId
+    , settings = settings
+    , pendingSettings = defaultSettings
+    , width = width
+    , height = height
+    , drag = Draggable.init
+    , contextMenu = NoContextMenu
+    , popUp = NoPopUp
+    , isWheeling = False
+    , isWheelingTimeOutCleared = False
+    }
+
 
 closeSettingsPopUp : Model -> Model
 closeSettingsPopUp model =
@@ -1356,7 +1463,7 @@ subscriptions { drag } =
     ]
 
 
-main : Program () Model Msg
+main : Program (Maybe String) Model Msg
 main =
   Browser.element
     { init = initialModel
