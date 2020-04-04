@@ -66,5 +66,17 @@ The electric field simulation is fairly intense in calculations. Each point on t
 
 Like what you are seeing? Create some cool electric field art yourself @ https://alienkevin.github.io/electric-fields/
 
+# Development
+Install [elm-live](https://github.com/wking-io/elm-live) and run:
+```
+elm-live src/Main.elm --start-page public/index.html --hot --host 0.0.0.0 -- --output=public/elm.js
+```
+
+# Deployment
+Run `build.sh` to create an optimized and minimized build:
+```
+./build.sh
+```
+
 # License
 MIT
