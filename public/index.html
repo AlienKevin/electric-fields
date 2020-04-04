@@ -5,10 +5,31 @@
   <title>Electric Field Simulation</title>
 </head>
 <body>
-  <script src="elm.min.js"></script>
+  <script src="/public/elm.js"></script>
   <main></main>
   <script>
-    var app = Elm.Main.init({ node: document.querySelector('main') })
+    var app = Elm.Main.init({ node: document.querySelector('main') });
+    app.ports.downloadModel.subscribe(function() {
+      var activeSource = document.getElementById("activeSource");
+      if (activeSource !== null) {
+        var strokeWidth = activeSource.getAttribute("stroke-width");
+        activeSource.setAttribute("stroke-width", "0px");
+      }
+      var svgData = document.getElementById("modelSvg")
+        .outerHTML
+        .replace(/^<svg/, `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"`);
+      if (activeSource !== null) {
+        activeSource.setAttribute("stroke-width", strokeWidth);
+      }
+      var svgBlob = new Blob([svgData], {type:"image/svg+xml;charset=utf-8"});
+      var svgUrl = URL.createObjectURL(svgBlob);
+      var downloadLink = document.createElement("a");
+      downloadLink.href = svgUrl;
+      downloadLink.download = "model.svg";
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+    })
   </script>
 </body>
 </html>

@@ -1,4 +1,4 @@
-module Main exposing (main)
+port module Main exposing (main)
 
 import Browser
 import Html exposing (Html)
@@ -22,6 +22,9 @@ import Element.Events
 import Html.Events.Extra.Mouse as Mouse
 import Process
 import Task
+
+
+port downloadModel : () -> Cmd msg
 
 
 type alias Model =
@@ -308,6 +311,7 @@ type Msg
   | CloseSettingsPopUp
   | CloseHelpPopUp
   | StopWheelingTimeOut
+  | DownloadModel
   | DoNothing
 
 
@@ -392,6 +396,9 @@ update msg model =
 
     CloseHelpPopUp ->
       (closeHelpPopUp model, Cmd.none)
+
+    DownloadModel ->
+      (model, downloadModel ())
 
     DoNothing ->
       (model, Cmd.none)
@@ -842,7 +849,7 @@ view model =
     E.el
       [ E.inFront <| viewContextMenu model
       , E.inFront <| viewPopUp model
-      , E.below <| viewPopUpSelector
+      , E.below <| viewControlPanel
       , E.centerX
       , E.centerY
       ]
@@ -850,20 +857,22 @@ view model =
         [ Attributes.width (px model.width)
         , Attributes.height (px model.height)
         , Attributes.viewBox 0 0 model.width model.height
+        , Attributes.id "modelSvg"
         ] <|
         List.map viewFieldLines model.fields
         ++ List.map (viewFieldSource model.activeSourceId) model.fields
       )
 
 
-viewPopUpSelector : E.Element Msg
-viewPopUpSelector =
+viewControlPanel : E.Element Msg
+viewControlPanel =
   E.row
     [ E.centerX
     , E.spacing 10
     ]
     [ viewButtonNoProp "Help" <| ShowPopUp HelpPopUp
     , viewButtonNoProp "Settings" <| ShowPopUp SettingsPopUp
+    , viewButtonNoProp "Download" <| DownloadModel
     ]
 
 
@@ -1145,7 +1154,8 @@ viewFieldSource activeSourceId field =
     ++ case activeSourceId of
       Just id ->
         if field.source.id == id then
-          [ Attributes.stroke <| Paint Color.lightGreen
+          [ Attributes.id "activeSource"
+          , Attributes.stroke <| Paint Color.lightGreen
           , Attributes.strokeWidth <| px 2.5
           ]
         else
