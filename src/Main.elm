@@ -632,9 +632,6 @@ setTimeOut time msg =
 
 stopWheelingTimeOut : Model -> Model
 stopWheelingTimeOut model =
-  let
-    _ = Debug.log "AL -> model.isWheelingTimeOutCleared" <| model.isWheelingTimeOutCleared
-  in
   if model.isWheelingTimeOutCleared then
     { model
       | isWheelingTimeOutCleared = False
@@ -953,12 +950,14 @@ viewHelpPopUp =
     [ textHeader "When you mouse over a charge and ..."
     , E.text "  Single click: select charge"
     , E.text "  Double click: negate charge"
-    , E.text "  Right click: * delete charge"
-    , E.text "               * duplicate charge"
-    , E.text "               * deselect charge"
+    , E.text "  Right click:  * delete charge"
+    , E.text "                * duplicate charge"
+    , E.text "                * deselect charge"
+    , E.text "  Scroll up:    increase charge magnitude"
+    , E.text "  Scroll down:  decrease charge magnitude"
     , textHeader "When you mouse over background and ..."
-    , E.text "  Right Click: * add + charge"
-    , E.text "               * add - charge"
+    , E.text "  Right Click:  * add + charge"
+    , E.text "                * add - charge"
     , E.el [ E.paddingEach { top = 20, right = 0, bottom = 0, left = 0 } ] <|
       Input.button
         style.button
