@@ -35,6 +35,8 @@ type alias Model =
   , pendingSettings : Settings
   , isWheeling : Bool
   , isWheelingTimeOutCleared : Bool
+  , width : Float
+  , height : Float
   }
 
 
@@ -146,29 +148,29 @@ initialModel _ =
       , delta = 1
       , magnitude = 1.0
       }
+    width = 1200
+    height = 780
   in
   ({ fields =
-    calculateFields fields
+    calculateFields width height fields
   , activeSourceId = if List.length fields > 0 then Just 0 else Nothing
   , nextId = List.length fields
   , drag = Draggable.init
   , contextMenu = NoContextMenu
   , popUp = NoPopUp
-  , settings =
-    defaultSettings
-  , pendingSettings =
-    defaultSettings
-  , isWheeling =
-    False
-  , isWheelingTimeOutCleared =
-    False
+  , settings = defaultSettings
+  , pendingSettings = defaultSettings
+  , isWheeling = False
+  , isWheelingTimeOutCleared = False
+  , width = width
+  , height = height
   }
   , Cmd.none
   )
 
 
-calculateFields : List Field -> List Field
-calculateFields fields =
+calculateFields : Float -> Float -> List Field -> List Field
+calculateFields width height fields =
   List.map
     (\field ->
       let
@@ -185,7 +187,15 @@ calculateFields fields =
                 y =
                   field.source.y + field.source.r * sin angle
               in
-              calculateFieldLine (List.map .source fields) field.steps field.delta field.source.sign (x, y)
+              calculateFieldLine
+                { charges = List.map .source fields
+                , steps = field.steps
+                , delta = field.delta
+                , sourceSign = field.source.sign
+                , start = (x, y)
+                , xBound = width
+                , yBound = height
+                }
             )
             (List.map toFloat <| List.range 0 (field.density - 1))
       in
@@ -196,9 +206,17 @@ calculateFields fields =
     fields
 
 
-calculateFieldLine : List Charge -> Int -> Float -> Sign -> Point -> Line
-calculateFieldLine charges steps delta sourceSign start =
-  List.foldl
+calculateFieldLine :
+  { charges : List Charge
+  , steps : Int
+  , delta : Float
+  , sourceSign : Sign
+  , start : Point
+  , xBound : Float
+  , yBound : Float
+  } -> Line
+calculateFieldLine { charges, steps, delta, sourceSign, start, xBound, yBound } =
+  foldlWhile
     (\_ line ->
       let
         (x, y) =
@@ -207,47 +225,55 @@ calculateFieldLine charges steps delta sourceSign start =
               prev
             _ ->
               (0, 0) -- impossible
+        outOfBounds =
+          x > xBound || x < 0 || y > yBound || y < 0
         netField =
-          List.foldl
-          (\charge sum ->
-            let
-              d =
-                distance (x, y) (charge.x, charge.y) / 100
-              magnitude =
-                charge.magnitude / (d ^ 2)
-              sign =
-                case charge.sign of
-                  Positive ->
-                    1
-                  Negative ->
-                    -1
-              field =
-                Vector2.scale (sign * magnitude) <|
-                  Vector2.normalize <|
-                    Vector2.vec2 (x - charge.x) (y - charge.y)
-            in
-            Vector2.add sum field
-          )
-          (Vector2.vec2 0 0)
-          charges
+          if outOfBounds then
+            Vector2.vec2 0 0
+          else
+            List.foldl
+            (\charge sum ->
+              let
+                d =
+                  distance (x, y) (charge.x, charge.y) / 100
+                magnitude =
+                  charge.magnitude / (d ^ 2)
+                sign =
+                  case charge.sign of
+                    Positive ->
+                      1
+                    Negative ->
+                      -1
+                field =
+                  Vector2.scale (sign * magnitude) <|
+                    Vector2.normalize <|
+                      Vector2.vec2 (x - charge.x) (y - charge.y)
+              in
+              Vector2.add sum field
+            )
+            (Vector2.vec2 0 0)
+            charges
         next =
-          let
-            vec =
-              Vector2.add
-                (Vector2.vec2 x y)
-                ((case sourceSign of
-                  Positive ->
-                    identity
-                  Negative ->
-                    Vector2.negate
-                )<|
-                  Vector2.scale delta <|
-                    Vector2.normalize netField
-                )
-          in
-          (Vector2.getX vec, Vector2.getY vec)
+          if outOfBounds then
+            (x, y)
+          else
+            let
+              vec =
+                Vector2.add
+                  (Vector2.vec2 x y)
+                  ((case sourceSign of
+                    Positive ->
+                      identity
+                    Negative ->
+                      Vector2.negate
+                  )<|
+                    Vector2.scale delta <|
+                      Vector2.normalize netField
+                  )
+            in
+            (Vector2.getX vec, Vector2.getY vec)
       in
-      next :: line
+      (next :: line, outOfBounds)
   )
   [ start ]
   (List.range 0 (steps - 1))
@@ -379,7 +405,7 @@ onDragBy offsetPos model =
   in
   { model |
     fields =
-      calculateFields newFields
+      calculateFields model.width model.height newFields
   }
 
 
@@ -417,7 +443,8 @@ deoptimizeModel : Model -> Model
 deoptimizeModel model =
   { model
     | fields =
-      calculateFields <| List.map
+      calculateFields model.width model.height <|
+      List.map
         (\field ->
           if field.delta <= 7 then
             { field
@@ -500,7 +527,7 @@ applySettingsToCurrentAndFutureFields model =
   in
   { model
     | fields =
-      calculateFields newFields
+      calculateFields model.width model.height newFields
     , settings =
       newSettings
     , popUp =
@@ -582,7 +609,7 @@ toggleSourceSign model =
   in
   { model
     | fields =
-      calculateFields newFields
+      calculateFields model.width model.height newFields
   }
 
 
@@ -614,7 +641,7 @@ scaleSourceMagnitude delta model =
   in
   ({ model
     | fields =
-      calculateFields newFields
+      calculateFields model.width model.height newFields
     , isWheeling =
       True
     , isWheelingTimeOutCleared =
@@ -679,7 +706,7 @@ deleteActiveField model =
   in
   { model |
     fields =
-      calculateFields newFields
+      calculateFields model.width model.height newFields
     , contextMenu =
       NoContextMenu
     , activeSourceId =
@@ -713,7 +740,7 @@ addCharge sign (x, y) model =
   in
   { model
     | fields =
-      calculateFields newFields
+      calculateFields model.width model.height newFields
     , nextId =
       model.nextId + 1
   }
@@ -745,7 +772,7 @@ duplicateActiveField model =
   in
   { model
     | fields =
-      calculateFields newFields
+      calculateFields model.width model.height newFields
     , nextId =
       model.nextId + List.length duplicatedFields
   }
@@ -820,9 +847,9 @@ view model =
       , E.centerY
       ]
       ( E.html <| Svg.svg
-        [ Attributes.width (px 1200)
-        , Attributes.height (px 780)
-        , Attributes.viewBox 0 0 1200 780
+        [ Attributes.width (px model.width)
+        , Attributes.height (px model.height)
+        , Attributes.viewBox 0 0 model.width model.height
         ] <|
         List.map viewFieldLines model.fields
         ++ List.map (viewFieldSource model.activeSourceId) model.fields
@@ -1226,6 +1253,25 @@ toElmUiColor color =
             Color.toRgba color
     in
     E.rgba red green blue alpha
+
+
+foldlWhile : (a -> b -> (b, Bool)) -> b -> List a -> b
+foldlWhile accumulate initial list =
+  let
+    foldlHelper accumulated aList =
+      case aList of
+        head :: tail ->
+          let
+            (nextAccumulated, break) = accumulate head accumulated
+          in
+          if break then
+            nextAccumulated
+          else
+            foldlHelper nextAccumulated tail
+        [] ->
+          accumulated
+  in
+  foldlHelper initial list
 
 
 subscriptions : Model -> Sub Msg
