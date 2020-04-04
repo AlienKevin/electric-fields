@@ -32,7 +32,8 @@ port pageWillClose : (() -> msg) -> Sub msg
 
 
 type alias Model =
-  { fields : List Field
+  { name : String
+  , fields : List Field
   , activeSourceId : Maybe Id
   , nextId : Id
   , drag : Draggable.State Id
@@ -128,6 +129,10 @@ defaultSettings =
   , magnitude = 1.0
   }
 
+defaultName : String
+defaultName =
+  "Untitled Model"
+
 
 initialModel : Maybe String -> (Model, Cmd Msg)
 initialModel savedModel =
@@ -161,10 +166,11 @@ initialModel savedModel =
 
     defaultWidth = 1200
 
-    defaultHeight = 780
+    defaultHeight = 750
 
     defaultModel =
-      { fields =
+      { name = defaultName
+      , fields =
         calculateFields defaultWidth defaultHeight defaultFields
       , activeSourceId = if List.length defaultFields > 0 then Just 0 else Nothing
       , nextId = List.length defaultFields
@@ -336,6 +342,7 @@ type Msg
   | StopWheelingTimeOut
   | DownloadModel
   | SaveModel
+  | UpdateModelName String
   | DoNothing
 
 
@@ -427,6 +434,9 @@ update msg model =
     SaveModel ->
       (model, saveModel <| encodeModel model)
 
+    UpdateModelName newName ->
+      (updateModelName newName model, Cmd.none)
+
     DoNothing ->
       (model, Cmd.none)
 
@@ -502,8 +512,19 @@ closeHelpPopUp model =
   }
 
 
+updateModelName : String -> Model -> Model
+updateModelName newName model =
+  { model
+    | name =
+      if newName == "" then
+        defaultName
+      else
+        newName
+  }
+
+
 encodeModel : Model -> Encode.Value
-encodeModel { fields, activeSourceId, nextId, settings, width, height } =
+encodeModel { name, fields, activeSourceId, nextId, settings, width, height } =
   let
     encodeSign : Sign -> Encode.Value
     encodeSign sign =
@@ -551,7 +572,8 @@ encodeModel { fields, activeSourceId, nextId, settings, width, height } =
           Encode.null
   in
   Encode.object
-    [ ("fields", Encode.list encodeField fields)
+    [ ("name", Encode.string name)
+    , ("fields", Encode.list encodeField fields)
     , ("activeSourceId", encodeMaybeId activeSourceId)
     , ("nextId", Encode.int nextId)
     , ("settings", encodeSettings settings)
@@ -623,6 +645,7 @@ decodeModel =
         }
     
   in
+  Field.require "name" Decode.string <| \name ->
   Field.require "fields" (Decode.list decodeField) <| \fields ->
   Field.attempt "activeSourceId" Decode.int <| \activeSourceId ->
   Field.require "nextId" Decode.int <| \nextId ->
@@ -631,7 +654,8 @@ decodeModel =
   Field.require "height" Decode.float <| \height ->
 
   Decode.succeed
-    { fields = fields
+    { name = name
+    , fields = fields
     , activeSourceId = activeSourceId
     , nextId = nextId
     , settings = settings
@@ -1010,7 +1034,6 @@ view model =
     [ E.width E.fill
     , E.height E.fill
     , Element.Events.onClick ClickedBackground
-    , E.htmlAttribute <| Mouse.onContextMenu ShowGeneralContextMenu
     , Font.size 16
     , Font.family
       [ Font.monospace
@@ -1020,18 +1043,37 @@ view model =
       [ E.inFront <| viewContextMenu model
       , E.inFront <| viewPopUp model
       , E.below <| viewControlPanel
+      , E.above <| viewModelTabs model
       , E.centerX
       , E.centerY
+      , E.paddingXY 0 5
       ]
       ( E.html <| Svg.svg
         [ Attributes.width (px model.width)
         , Attributes.height (px model.height)
         , Attributes.viewBox 0 0 model.width model.height
         , Attributes.id "modelSvg"
+        , Mouse.onContextMenu ShowGeneralContextMenu
         ] <|
         List.map viewFieldLines model.fields
         ++ List.map (viewFieldSource model.activeSourceId) model.fields
       )
+
+
+viewModelTabs : Model -> E.Element Msg
+viewModelTabs model =
+  E.row
+    []
+    [ Input.text
+      [ E.width <| E.px 150
+      , Background.color <| toElmUiColor Color.grey
+      ]
+      { label = Input.labelHidden "current model name"
+      , onChange = UpdateModelName
+      , placeholder = Nothing
+      , text = model.name
+      }
+    ]
 
 
 viewControlPanel : E.Element Msg
