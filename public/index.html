@@ -9,6 +9,8 @@
   <main></main>
   <script>
     var app = Elm.Main.init({ node: document.querySelector('main') });
+
+    // downloadMovel
     app.ports.downloadModel.subscribe(function() {
       var activeSource = document.getElementById("activeSource");
       if (activeSource !== null) {
@@ -29,7 +31,17 @@
       document.body.appendChild(downloadLink);
       downloadLink.click();
       document.body.removeChild(downloadLink);
-    })
+    });
+
+    // saveMovel
+    app.ports.saveModel.subscribe(function(model) {
+      var modelJson = JSON.stringify(model);
+      localStorage.setItem('electric-field-simulator-model', modelJson);
+    });
+
+    window.addEventListener("beforeunload", function() {
+      app.ports.pageWillClose.send(null);
+    });
   </script>
 </body>
 </html>

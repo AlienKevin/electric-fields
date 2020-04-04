@@ -12,7 +12,8 @@ import TypedSvg.Types exposing (px, Paint(..))
 import Math.Vector2 as Vector2
 import Draggable
 import Draggable.Events
-import Json.Decode as Json
+import Json.Decode as Decode
+import Json.Encode as Encode
 import Element as E
 import Element.Input as Input
 import Element.Background as Background
@@ -25,6 +26,8 @@ import Task
 
 
 port downloadModel : () -> Cmd msg
+port saveModel : Encode.Value -> Cmd msg
+port pageWillClose : (() -> msg) -> Sub msg
 
 
 type alias Model =
@@ -312,6 +315,7 @@ type Msg
   | CloseHelpPopUp
   | StopWheelingTimeOut
   | DownloadModel
+  | SaveModel
   | DoNothing
 
 
@@ -400,6 +404,9 @@ update msg model =
     DownloadModel ->
       (model, downloadModel ())
 
+    SaveModel ->
+      (model, saveModel <| encodeModel model)
+
     DoNothing ->
       (model, Cmd.none)
 
@@ -475,6 +482,62 @@ closeHelpPopUp model =
   }
 
 
+encodeModel : Model -> Encode.Value
+encodeModel { fields, activeSourceId, nextId, settings, width, height } =
+  let
+    encodeSign : Sign -> Encode.Value
+    encodeSign sign =
+      case sign of
+        Positive ->
+          Encode.string "Positive"
+        Negative ->
+          Encode.string "Negative"
+
+    encodeCharge : Charge -> Encode.Value
+    encodeCharge { id, sign, magnitude, x, y, r } =
+      Encode.object
+        [ ("id", Encode.int id)
+        , ("sign", encodeSign sign)
+        , ("magnitude", Encode.float magnitude)
+        , ("x", Encode.float x)
+        , ("y", Encode.float y)
+        , ("r", Encode.float r)
+        ]
+    
+    encodeField : Field -> Encode.Value
+    encodeField { source, density, steps, delta } =
+      Encode.object
+      [ ("source", encodeCharge source)
+      , ("density", Encode.int density)
+      , ("steps", Encode.int steps)
+      , ("delta", Encode.float delta)
+      ]
+
+    encodeSettings : Settings -> Encode.Value
+    encodeSettings { magnitude, r, density, steps, delta} =
+      Encode.object
+      [ ("magnitude", Encode.float magnitude)
+      , ("r", Encode.float r)
+      , ("density", Encode.int density)
+      , ("steps", Encode.int steps)
+      , ("delta", Encode.float delta)
+      ]
+    encodeMaybeId : Maybe Id -> Encode.Value
+    encodeMaybeId maybeId =
+      case maybeId of
+        Just id ->
+          Encode.int id
+        Nothing ->
+          Encode.null
+  in
+  Encode.object
+    [ ("fields", Encode.list encodeField fields)
+    , ("activeSourceId", encodeMaybeId activeSourceId)
+    , ("nextId", Encode.int nextId)
+    , ("settings", encodeSettings settings)
+    , ("width", Encode.float width)
+    , ("height", Encode.float height)
+    ]
 
 closeSettingsPopUp : Model -> Model
 closeSettingsPopUp model =
@@ -873,6 +936,7 @@ viewControlPanel =
     [ viewButtonNoProp "Help" <| ShowPopUp HelpPopUp
     , viewButtonNoProp "Settings" <| ShowPopUp SettingsPopUp
     , viewButtonNoProp "Download" <| DownloadModel
+    , viewButtonNoProp "Save" <| SaveModel
     ]
 
 
@@ -1186,13 +1250,13 @@ viewFieldLines field =
 
 onWheel : (Int -> msg) -> Html.Attribute msg
 onWheel message =
-  Html.Events.on "wheel" (Json.map message (Json.at ["deltaY"] Json.int ))
+  Html.Events.on "wheel" (Decode.map message (Decode.at ["deltaY"] Decode.int ))
 
 
 onRightClick : msg -> Html.Attribute msg
 onRightClick msg =
   Html.Events.custom "contextmenu"
-    (Json.succeed
+    (Decode.succeed
       { message = msg
       , stopPropagation = True
       , preventDefault = True
@@ -1203,7 +1267,7 @@ onRightClick msg =
 onClickNoProp : Msg -> Html.Attribute Msg
 onClickNoProp msg =
   Html.Events.custom "click"
-    (Json.succeed
+    (Decode.succeed
     { message = msg
     , stopPropagation = True
     , preventDefault = False
@@ -1286,7 +1350,10 @@ foldlWhile accumulate initial list =
 
 subscriptions : Model -> Sub Msg
 subscriptions { drag } =
-  Draggable.subscriptions DragMsg drag
+  Sub.batch
+    [ Draggable.subscriptions DragMsg drag
+    , pageWillClose (\_ -> SaveModel)
+    ]
 
 
 main : Program () Model Msg
