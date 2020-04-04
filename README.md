@@ -79,19 +79,14 @@ Like what you are seeing? Create some cool electric field art yourself @ https:/
 # Development
 1. Install [elm-live](https://github.com/wking-io/elm-live).
 
-2. Navigate to `public/` directory
-
+2. At the project root directory, start elm-live server
 ```
-cd public
-```
-
-3. Start elm-live server
-```
-elm-live ../src/Main.elm --start-page index.html --hot --host 0.0.0.0 -- --output=elm.js
+sed -i 's+elm.js+/public/elm.js+' public/index.html
+elm-live src/Main.elm --start-page public/index.html --host 0.0.0.0 -- --output=public/elm.js
 ```
 
 # Deployment
-Run `build.sh` to create an optimized and minimized build:
+At the project root directory, run `build.sh` to create an optimized and minimized build:
 ```
 ./build.sh
 ```
