@@ -1,4 +1,4 @@
-port module Simulation exposing (Model, Msg, init, view, update, subscriptions, encodeModel, decodeModel, defaultName)
+module Simulation exposing (Model, Msg, Settings, init, view, update, subscriptions, encodeModel, decodeModel, calculateFields, defaultName, defaultSettings)
 
 import Html exposing (Html)
 import Html.Attributes
@@ -16,20 +16,12 @@ import Json.Decode.Field as Field
 import Json.Encode as Encode
 import Element as E
 import Element.Input as Input
-import Element.Background as Background
-import Element.Border as Border
 import Element.Font as Font
 import Element.Events
 import Html.Events.Extra.Mouse as Mouse
 import Process
 import Task
-import File exposing (File)
-import File.Select
-import Utils exposing (styles, colors, centeredText)
-
-
-port downloadModelAsSvg : String -> Cmd msg
-port downloadModelAsJson : (String, Encode.Value) -> Cmd msg
+import Utils exposing (styles)
 
 
 type alias Model =
@@ -39,12 +31,9 @@ type alias Model =
   , nextId : Id
   , drag : Draggable.State Id
   , contextMenu : ContextMenu
-  , popUp: PopUp
   , settings : Settings
-  , pendingSettings : Settings
   , isWheeling : Bool
   , isWheelingTimeOutCleared : Bool
-  , uploadResult : UploadResult
   , width : Float
   , height : Float
   }
@@ -63,15 +52,6 @@ type ContextMenu
   = FieldContextMenu
   | GeneralContextMenu Position
   | NoContextMenu
-
-
-type PopUp
-  = HelpPopUp
-  | SettingsPopUp
-  | ApplyOptionsPopUp
-  | DownloadPopUp
-  | UploadPopUp
-  | NoPopUp
 
 
 type alias Field =
@@ -106,12 +86,6 @@ type alias Charge =
   , y: Float
   , r: Float
   }
-
-
-type UploadResult
-  = UploadSuccess
-  | UploadFailure Decode.Error
-  | UploadPending
 
 
 defaultSettings : Settings
@@ -170,12 +144,9 @@ init =
       , nextId = List.length defaultFields
       , drag = Draggable.init
       , contextMenu = NoContextMenu
-      , popUp = NoPopUp
       , settings = defaultSettings
-      , pendingSettings = defaultSettings
       , isWheeling = False
       , isWheelingTimeOutCleared = False
-      , uploadResult = UploadPending
       , width = defaultWidth
       , height = defaultHeight
       }
@@ -314,22 +285,7 @@ type Msg
   | DeselectActiveField
   | AddPositiveCharge Position
   | AddNegativeCharge Position
-  | ShowPopUp PopUp
-  | UpdatePendingSetting String String
-  | ApplyPendingSettings
-  | ApplySettingsToFutureFields
-  | ApplySettingsToCurrentAndFutureFields
-  | CloseSettingsPopUp
-  | CloseHelpPopUp
   | StopWheelingTimeOut
-  | DownloadModelAsSvg
-  | DownloadModelAsJson
-  | CloseDownloadPopUp
-  | JsonRequested
-  | JsonSelected File
-  | JsonLoaded String
-  | CloseUploadPopUp
-  | DoNothing
 
 
 dragConfig : Draggable.Config Id Msg
@@ -393,51 +349,6 @@ update msg model =
     AddNegativeCharge position ->
       (addCharge Negative position model, Cmd.none)
 
-    ShowPopUp popUp ->
-      (showPopUp popUp model, Cmd.none)
-
-    UpdatePendingSetting field value ->
-      (updatePendingSetting field value model, Cmd.none)
-
-    ApplyPendingSettings ->
-      (applyPendingSettings model, Cmd.none)
-
-    ApplySettingsToFutureFields ->
-      (applySettingsToFutureFields model, Cmd.none)
-
-    ApplySettingsToCurrentAndFutureFields ->
-      (applySettingsToCurrentAndFutureFields model, Cmd.none)
-
-    CloseSettingsPopUp ->
-      (closeSettingsPopUp model, Cmd.none)
-
-    CloseHelpPopUp ->
-      (closeHelpPopUp model, Cmd.none)
-
-    DownloadModelAsSvg ->
-      (closeDownloadPopUp model, downloadModelAsSvg model.name)
-
-    DownloadModelAsJson ->
-      (closeDownloadPopUp model, downloadModelAsJson (model.name, encodeModel model))
-
-    CloseDownloadPopUp ->
-      (closeDownloadPopUp model, Cmd.none)
-
-    JsonRequested ->
-      ( model, File.Select.file ["application/json"] JsonSelected)
-
-    JsonSelected file ->
-      ( model, Task.perform JsonLoaded (File.toString file))
-
-    JsonLoaded jsonString ->
-      (loadModel jsonString model, Cmd.none)
-
-    CloseUploadPopUp ->
-      (closeUploadPopUp model, Cmd.none)
-
-    DoNothing ->
-      (model, Cmd.none)
-
 
 onDragBy : Position -> Model -> Model
 onDragBy offsetPos model =
@@ -499,49 +410,6 @@ deoptimizeModel model =
             field
         )
         model.fields
-  }
-
-
-closeHelpPopUp : Model -> Model
-closeHelpPopUp model =
-  { model
-    | popUp =
-      NoPopUp
-  }
-
-
-closeDownloadPopUp : Model -> Model
-closeDownloadPopUp model =
-  { model
-    | popUp =
-      NoPopUp
-  }
-
-
-loadModel : String -> Model -> Model
-loadModel jsonString model =
-  case Decode.decodeString decodeModel jsonString of
-    Ok uploadedModel ->
-      { uploadedModel
-        | popUp =
-          UploadPopUp
-        , uploadResult =
-          UploadSuccess
-      }
-    Err err ->
-      { model
-        | uploadResult =
-          UploadFailure err
-      }
-          
-
-closeUploadPopUp : Model -> Model
-closeUploadPopUp model =
-  { model
-    | popUp =
-      NoPopUp
-    , uploadResult =
-      UploadPending
   }
 
 
@@ -681,126 +549,13 @@ decodeModel =
     , activeSourceId = activeSourceId
     , nextId = nextId
     , settings = settings
-    , pendingSettings = defaultSettings
     , width = width
     , height = height
     , drag = Draggable.init
     , contextMenu = NoContextMenu
-    , popUp = NoPopUp
     , isWheeling = False
     , isWheelingTimeOutCleared = False
-    , uploadResult = UploadPending
     }
-
-
-closeSettingsPopUp : Model -> Model
-closeSettingsPopUp model =
-  { model
-    | popUp =
-      NoPopUp
-    , pendingSettings =
-      model.settings
-  }
-
-
-applyPendingSettings : Model -> Model
-applyPendingSettings model =
-  { model |
-    popUp =
-      ApplyOptionsPopUp
-  }
-
-
-applySettingsToFutureFields : Model -> Model
-applySettingsToFutureFields model =
-  { model
-    | settings =
-      model.pendingSettings
-    , popUp =
-      NoPopUp
-  }
-
-
-applySettingsToCurrentAndFutureFields : Model -> Model
-applySettingsToCurrentAndFutureFields model =
-  let
-    newSettings =
-      model.pendingSettings
-    newFields =
-      List.map
-        (\field ->
-          let
-            source =
-              field.source
-          in
-          { field
-            | source =
-              { source
-                | r = newSettings.r
-                , magnitude = newSettings.magnitude
-              }
-            , density =
-              newSettings.density
-            , steps =
-              newSettings.steps
-            , delta =
-              newSettings.delta
-          }
-        )
-        model.fields
-  in
-  { model
-    | fields =
-      calculateFields model.width model.height newFields
-    , settings =
-      newSettings
-    , popUp =
-      NoPopUp
-  }
-
-
-updatePendingSetting : String -> String -> Model -> Model
-updatePendingSetting field value model =
-  let
-    settings =
-      model.pendingSettings
-    newSettings =
-      case field of
-        "r" ->
-          case String.toFloat value of
-            Just v -> { settings | r = v }
-            Nothing -> settings
-        "density" ->
-          case String.toInt value of
-            Just v -> { settings | density = v }
-            Nothing -> settings
-        "steps" ->
-          case String.toInt value of
-            Just v -> { settings | steps = v }
-            Nothing -> settings
-        "delta" ->
-          case String.toFloat value of
-            Just v -> { settings | delta = v }
-            Nothing -> settings
-        "magnitude" ->
-          case String.toFloat value of
-            Just v -> { settings | magnitude = v }
-            Nothing -> settings
-        _ ->
-          settings
-  in
-  { model |
-    pendingSettings =
-      newSettings
-  }
-
-
-showPopUp : PopUp -> Model -> Model
-showPopUp popUp model =
-  { model |
-    popUp =
-      popUp
-  }
 
 
 setActiveSourceId : Id -> Model -> Model
@@ -1012,12 +767,10 @@ deselectActiveField model =
 
 resetState : Model -> Model
 resetState model =
-  closeHelpPopUp <|
-  closeSettingsPopUp <|
-    { model
-      | contextMenu =
-        NoContextMenu
-    }
+  { model
+    | contextMenu =
+      NoContextMenu
+  }
 
 
 updateActive : (Field -> Field) -> Maybe Id -> List Field -> List Field
@@ -1064,8 +817,6 @@ view model =
     ] <|
     E.el
       [ E.inFront <| viewContextMenu model
-      , E.inFront <| viewPopUp model
-      , E.below <| viewControlPanel
       , E.centerX
       , E.centerY
       , E.paddingXY 0 5
@@ -1080,245 +831,6 @@ view model =
         List.map viewFieldLines model.fields
         ++ List.map (viewFieldSource model.activeSourceId) model.fields
       )
-
-
-viewControlPanel : E.Element Msg
-viewControlPanel =
-  E.row
-    [ E.centerX
-    , E.spacing 10
-    ]
-    [ viewButtonNoProp "Help" <| ShowPopUp HelpPopUp
-    , viewButtonNoProp "Settings" <| ShowPopUp SettingsPopUp
-    , viewButtonNoProp "Download" <| ShowPopUp DownloadPopUp
-    , viewButtonNoProp "Upload" <| ShowPopUp UploadPopUp
-    ]
-
-
-viewButtonNoProp : String -> Msg -> E.Element Msg
-viewButtonNoProp text msg =
-  Input.button (styles.button ++ [
-    E.htmlAttribute <| onClickNoProp msg
-  ]) <|
-    { onPress =
-      Nothing
-    , label = centeredText text
-    }
-
-
-viewPopUp : Model -> E.Element Msg
-viewPopUp model =
-  case model.popUp of
-    HelpPopUp ->
-      viewHelpPopUp
-    SettingsPopUp ->
-      viewSettingsPopUp model
-    ApplyOptionsPopUp ->
-      viewApplyOptions model
-    DownloadPopUp ->
-      viewDownloadPopUp
-    UploadPopUp ->
-      viewUploadPopUp model
-    NoPopUp ->
-      E.none
-
-
-viewSettingsPopUp : Model -> E.Element Msg
-viewSettingsPopUp model =
-  let
-    settings =
-      model.pendingSettings
-  in
-  viewPopUpOf "Settings"
-    [ E.inFront <| viewApplyOptions model
-    ]
-    [ Input.text []
-      { onChange = UpdatePendingSetting "r"
-       , text = String.fromFloat settings.r
-       , placeholder = Nothing
-       , label = Input.labelLeft [ E.centerY ] <| E.text "Charge radius (px)"
-       }
-    , Input.text []
-      { onChange = UpdatePendingSetting "density"
-       , text = String.fromInt settings.density
-       , placeholder = Nothing
-       , label = Input.labelLeft [ E.centerY ] <| E.text "Field line density"
-       }
-    , Input.text []
-      { onChange = UpdatePendingSetting "steps"
-      , text = String.fromInt settings.steps
-      , placeholder = Nothing
-      , label = Input.labelLeft [ E.centerY ] <| E.text "Draw steps"
-      }
-  , Input.text []
-    { onChange = UpdatePendingSetting "delta"
-    , text = String.fromFloat settings.delta
-    , placeholder = Nothing
-    , label = Input.labelLeft [ E.centerY ] <| E.text "Draw step size (px)"
-    }
-  , Input.text []
-    { onChange = UpdatePendingSetting "magnitude"
-    , text = String.fromFloat settings.magnitude
-    , placeholder = Nothing
-    , label = Input.labelLeft [ E.centerY ] <| E.text "Charge magnitude"
-    }
-  , E.row
-    [ E.width E.fill
-    , E.paddingEach
-      { top = 20, right = 0, bottom = 0, left = 0 }
-    ]
-    [ Input.button (styles.button ++ [E.alignLeft])
-      { onPress =
-        Just ApplyPendingSettings
-      , label =
-        centeredText "Apply"
-      }
-      , Input.button (styles.button ++ [E.alignRight])
-      { onPress =
-        Just CloseSettingsPopUp
-      , label =
-        centeredText "Cancel"
-      }
-    ]
-  ]
-
-
-viewApplyOptions : Model -> E.Element Msg
-viewApplyOptions model =
-  case model.popUp of
-    ApplyOptionsPopUp ->
-      viewPopUpOf "Which fields do you want to apply to?" []
-        [ Input.button
-          (styles.button ++ [ E.width <| E.fill ] )
-          { onPress = Just ApplySettingsToFutureFields
-          , label = centeredText "Apply to future fields"
-          }
-        , Input.button
-          (styles.button ++ [ E.width <| E.fill ] )
-          { onPress = Just ApplySettingsToCurrentAndFutureFields
-          , label = centeredText "Apply to current and future fields"
-          }
-        ]
-    _ ->
-      E.none
-
-
-viewHelpPopUp : E.Element Msg
-viewHelpPopUp =
-  viewPopUpOf "Help" []
-    [ textHeader "When you mouse over a charge and ..."
-    , E.text "  Single click: select charge"
-    , E.text "  Double click: negate charge"
-    , E.text "  Right click:  * delete charge"
-    , E.text "                * duplicate charge"
-    , E.text "                * deselect charge"
-    , E.text "  Scroll up:    increase charge magnitude"
-    , E.text "  Scroll down:  decrease charge magnitude"
-    , textHeader "When you mouse over background and ..."
-    , E.text "  Right Click:  * add + charge"
-    , E.text "                * add - charge"
-    , E.el [ E.paddingEach { top = 20, right = 0, bottom = 0, left = 0 }, E.alignRight ] <|
-      Input.button
-        styles.button
-        { onPress = Just CloseHelpPopUp
-        , label = centeredText "Close"
-        }
-      ]
-
-
-viewDownloadPopUp : E.Element Msg
-viewDownloadPopUp =
-  viewPopUpOf "Download" [ E.spacing 12 ]
-    [ textHeader "Which format do you want to download in?"
-    , E.text "Pick SVG if you want to share or display the model."
-    , Input.button
-        (styles.button ++ [ E.width <| E.fill ] )
-        { onPress = Just DownloadModelAsSvg
-        , label = centeredText "Download as SVG"
-        }
-    , E.text "Pick JSON if you want to save the model for editing later."
-    , Input.button
-      (styles.button ++ [ E.width <| E.fill ] )
-      { onPress = Just DownloadModelAsJson
-      , label = centeredText "Downloas as JSON"
-      }
-    , E.el
-      [ E.paddingEach
-        { top = 20, right = 0, bottom = 0, left = 0 }
-      , E.alignRight
-      ] <|
-      Input.button styles.button
-      { onPress =
-        Just CloseDownloadPopUp
-      , label =
-        centeredText "Cancel"
-      }
-    ]
-
-
-viewUploadPopUp : Model -> E.Element Msg
-viewUploadPopUp model =
-  viewPopUpOf "Upload" [ E.spacing 12 ]
-    [ textHeader "Load a simulation from a local JSON file."
-    , Input.button
-      (styles.button ++ [ E.width <| E.fill ] )
-      { onPress = Just JsonRequested
-      , label = centeredText "Upload from my computer"
-      }
-    , case model.uploadResult of
-      UploadSuccess ->
-        E.text "Upload succeeds!"
-      UploadFailure error ->
-        E.html <|
-          Html.pre []
-            [ Html.text
-              ( Decode.errorToString error
-                |> String.replace "\\\"" "\""
-                |> String.replace "\\n" "\n"
-              )
-            ]
-      UploadPending ->
-        E.none
-    , Input.button (styles.button ++ [E.alignRight])
-      { onPress =
-        Just CloseUploadPopUp
-      , label =
-        centeredText "Close"
-      }
-    ]
-
-
-viewPopUpOf : String -> List (E.Attribute Msg) -> List (E.Element Msg) -> E.Element Msg
-viewPopUpOf title attributes content =
-  E.column
-    ([ E.centerX
-    , E.centerY
-    , E.padding 20
-    , E.spacing 6
-    , Background.color <| colors.lightGrey
-    , Border.width 2
-    , Border.color <| colors.black
-    , E.htmlAttribute <| onClickNoProp DoNothing
-    ] ++ attributes) <|
-    [ E.el
-      [ Font.size 18
-      , E.paddingEach
-        { left = 0
-        , right = 0
-        , top = 0
-        , bottom = 10
-        }
-      ] <|
-      E.text title
-    ] ++ content
-
-
-textHeader : String -> E.Element Msg
-textHeader text =
-  E.el
-    [ E.paddingXY 0 6
-    ] <|
-    E.text text
 
 
 viewContextMenu : Model -> E.Element Msg
@@ -1483,17 +995,6 @@ onRightClick msg =
       , preventDefault = True
       }
     )
-
-
-onClickNoProp : Msg -> Html.Attribute Msg
-onClickNoProp msg =
-  Html.Events.custom "click"
-    (Decode.succeed
-    { message = msg
-    , stopPropagation = True
-    , preventDefault = False
-    }
-  )
 
 
 signToColor : Sign -> Color
