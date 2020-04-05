@@ -52,6 +52,10 @@ The electric field simulation is fairly intense in calculations. Each point on t
 2. I tested this on Chrome, Firefox, and Edge and discovered that dragging and other controls are only workable on Chrome as they are too slow on Firefox and Edge. Does anyone have some ideas as to why this happens? Is it because Firefox and Edge don't optimize for SVG graphics enough?
 3. This simulator shows a blank screen on android but seems to work on iOS. Does anyone know why and how to fix?
 
+# Demo
+## How to make cherry blossoms?
+![cherry blossoms demo](./media/cherry_blossoms_demo.gif)
+
 # More art works
 
 ## Titled works
