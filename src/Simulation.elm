@@ -23,6 +23,8 @@ import Element.Events
 import Html.Events.Extra.Mouse as Mouse
 import Process
 import Task
+import File exposing (File)
+import File.Select
 import Utils exposing (styles, colors, centeredText)
 
 
@@ -42,6 +44,7 @@ type alias Model =
   , pendingSettings : Settings
   , isWheeling : Bool
   , isWheelingTimeOutCleared : Bool
+  , uploadResult : UploadResult
   , width : Float
   , height : Float
   }
@@ -67,6 +70,7 @@ type PopUp
   | SettingsPopUp
   | ApplyOptionsPopUp
   | DownloadPopUp
+  | UploadPopUp
   | NoPopUp
 
 
@@ -102,6 +106,12 @@ type alias Charge =
   , y: Float
   , r: Float
   }
+
+
+type UploadResult
+  = UploadSuccess
+  | UploadFailure Decode.Error
+  | UploadPending
 
 
 defaultSettings : Settings
@@ -165,6 +175,7 @@ init =
       , pendingSettings = defaultSettings
       , isWheeling = False
       , isWheelingTimeOutCleared = False
+      , uploadResult = UploadPending
       , width = defaultWidth
       , height = defaultHeight
       }
@@ -314,6 +325,10 @@ type Msg
   | DownloadModelAsSvg
   | DownloadModelAsJson
   | CloseDownloadPopUp
+  | JsonRequested
+  | JsonSelected File
+  | JsonLoaded String
+  | CloseUploadPopUp
   | DoNothing
 
 
@@ -408,6 +423,18 @@ update msg model =
     CloseDownloadPopUp ->
       (closeDownloadPopUp model, Cmd.none)
 
+    JsonRequested ->
+      ( model, File.Select.file ["application/json"] JsonSelected)
+
+    JsonSelected file ->
+      ( model, Task.perform JsonLoaded (File.toString file))
+
+    JsonLoaded jsonString ->
+      (loadModel jsonString model, Cmd.none)
+
+    CloseUploadPopUp ->
+      (closeUploadPopUp model, Cmd.none)
+
     DoNothing ->
       (model, Cmd.none)
 
@@ -488,6 +515,33 @@ closeDownloadPopUp model =
   { model
     | popUp =
       NoPopUp
+  }
+
+
+loadModel : String -> Model -> Model
+loadModel jsonString model =
+  case Decode.decodeString decodeModel jsonString of
+    Ok uploadedModel ->
+      { uploadedModel
+        | popUp =
+          UploadPopUp
+        , uploadResult =
+          UploadSuccess
+      }
+    Err err ->
+      { model
+        | uploadResult =
+          UploadFailure err
+      }
+          
+
+closeUploadPopUp : Model -> Model
+closeUploadPopUp model =
+  { model
+    | popUp =
+      NoPopUp
+    , uploadResult =
+      UploadPending
   }
 
 
@@ -635,6 +689,7 @@ decodeModel =
     , popUp = NoPopUp
     , isWheeling = False
     , isWheelingTimeOutCleared = False
+    , uploadResult = UploadPending
     }
 
 
@@ -1036,6 +1091,7 @@ viewControlPanel =
     [ viewButtonNoProp "Help" <| ShowPopUp HelpPopUp
     , viewButtonNoProp "Settings" <| ShowPopUp SettingsPopUp
     , viewButtonNoProp "Download" <| ShowPopUp DownloadPopUp
+    , viewButtonNoProp "Upload" <| ShowPopUp UploadPopUp
     ]
 
 
@@ -1061,6 +1117,8 @@ viewPopUp model =
       viewApplyOptions model
     DownloadPopUp ->
       viewDownloadPopUp
+    UploadPopUp ->
+      viewUploadPopUp model
     NoPopUp ->
       E.none
 
@@ -1185,16 +1243,48 @@ viewDownloadPopUp =
       , label = centeredText "Downloas as JSON"
       }
     , E.el
-        [ E.paddingEach
-          { top = 20, right = 0, bottom = 0, left = 0 }
-        , E.alignRight
-        ] <|
-        Input.button styles.button
-        { onPress =
-          Just CloseDownloadPopUp
-        , label =
-          centeredText "Cancel"
-        }
+      [ E.paddingEach
+        { top = 20, right = 0, bottom = 0, left = 0 }
+      , E.alignRight
+      ] <|
+      Input.button styles.button
+      { onPress =
+        Just CloseDownloadPopUp
+      , label =
+        centeredText "Cancel"
+      }
+    ]
+
+
+viewUploadPopUp : Model -> E.Element Msg
+viewUploadPopUp model =
+  viewPopUpOf "Upload" [ E.spacing 12 ]
+    [ textHeader "Load a simulation from a local JSON file."
+    , Input.button
+      (styles.button ++ [ E.width <| E.fill ] )
+      { onPress = Just JsonRequested
+      , label = centeredText "Upload from my computer"
+      }
+    , case model.uploadResult of
+      UploadSuccess ->
+        E.text "Upload succeeds!"
+      UploadFailure error ->
+        E.html <|
+          Html.pre []
+            [ Html.text
+              ( Decode.errorToString error
+                |> String.replace "\\\"" "\""
+                |> String.replace "\\n" "\n"
+              )
+            ]
+      UploadPending ->
+        E.none
+    , Input.button (styles.button ++ [E.alignRight])
+      { onPress =
+        Just CloseUploadPopUp
+      , label =
+        centeredText "Close"
+      }
     ]
 
 
