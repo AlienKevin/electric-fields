@@ -18,7 +18,7 @@
     var app = Elm.Main.init({ node: document.querySelector('main'), flags: savedProject });
 
     // download model as svg
-    app.ports.downloadModelAsSvg.subscribe(function() {
+    app.ports.downloadModelAsSvg.subscribe(function(modelName) {
       var activeSource = document.getElementById("activeSource");
       if (activeSource !== null) {
         var strokeWidth = activeSource.getAttribute("stroke-width");
@@ -30,12 +30,12 @@
       if (activeSource !== null) {
         activeSource.setAttribute("stroke-width", strokeWidth);
       }
-      download("model.svg", "image/svg+xml;charset=utf-8", svgData);
+      download(modelName + ".svg", "image/svg+xml;charset=utf-8", svgData);
     });
 
     // download model as json
-    app.ports.downloadModelAsJson.subscribe(function(json) {
-      download("model.json", "application/json", JSON.stringify(json,undefined,2));
+    app.ports.downloadModelAsJson.subscribe(function([modelName, json]) {
+      download(modelName + ".json", "application/json", JSON.stringify(json,undefined,2));
     });
 
     function download(fileName, type, data) {
