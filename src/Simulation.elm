@@ -26,7 +26,8 @@ import Task
 import Utils exposing (styles, colors, centeredText)
 
 
-port downloadModel : () -> Cmd msg
+port downloadModelAsSvg : () -> Cmd msg
+port downloadModelAsJson : Encode.Value -> Cmd msg
 
 
 type alias Model =
@@ -65,6 +66,7 @@ type PopUp
   = HelpPopUp
   | SettingsPopUp
   | ApplyOptionsPopUp
+  | DownloadPopUp
   | NoPopUp
 
 
@@ -309,7 +311,8 @@ type Msg
   | CloseSettingsPopUp
   | CloseHelpPopUp
   | StopWheelingTimeOut
-  | DownloadModel
+  | DownloadModelAsSvg
+  | DownloadModelAsJson
   | DoNothing
 
 
@@ -395,8 +398,11 @@ update msg model =
     CloseHelpPopUp ->
       (closeHelpPopUp model, Cmd.none)
 
-    DownloadModel ->
-      (model, downloadModel ())
+    DownloadModelAsSvg ->
+      ({ model | popUp = NoPopUp}, downloadModelAsSvg ())
+
+    DownloadModelAsJson ->
+      ({ model | popUp = NoPopUp}, downloadModelAsJson <| encodeModel model)
 
     DoNothing ->
       (model, Cmd.none)
@@ -1017,7 +1023,7 @@ viewControlPanel =
     ]
     [ viewButtonNoProp "Help" <| ShowPopUp HelpPopUp
     , viewButtonNoProp "Settings" <| ShowPopUp SettingsPopUp
-    , viewButtonNoProp "Download" <| DownloadModel
+    , viewButtonNoProp "Download" <| ShowPopUp DownloadPopUp
     ]
 
 
@@ -1041,6 +1047,8 @@ viewPopUp model =
       viewSettingsPopUp model
     ApplyOptionsPopUp ->
       viewApplyOptions model
+    DownloadPopUp ->
+      viewDownloadPopUp
     NoPopUp ->
       E.none
 
@@ -1146,6 +1154,24 @@ viewHelpPopUp =
         , label = centeredText "Close"
         }
       ]
+
+
+viewDownloadPopUp =
+  viewPopUpOf "Download" []
+    [ textHeader "Which format do you want to download in?"
+    , E.text "Pick SVG if you want to share or display the model."
+    , Input.button
+        (styles.button ++ [ E.width <| E.fill ] )
+        { onPress = Just DownloadModelAsSvg
+        , label = centeredText "Download as SVG"
+        }
+    , E.text "Pick JSON if you want to save the model for editing later."
+    , Input.button
+      (styles.button ++ [ E.width <| E.fill ] )
+      { onPress = Just DownloadModelAsJson
+      , label = centeredText "Downloas as JSON"
+      }
+    ]
 
 
 viewPopUpOf : String -> List (E.Attribute Msg) -> List (E.Element Msg) -> E.Element Msg
