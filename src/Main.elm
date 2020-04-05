@@ -9,11 +9,11 @@ import Element.Input as Input
 import Element.Background as Background
 import Element.Font as Font
 import Element.Border as Border
-import Color
 import Json.Encode as Encode
 import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Field as Field
-import Utils exposing (toElmUiColor, styles, centeredText)
+import List.Extra
+import Utils exposing (styles, colors, centeredText)
 
 
 port pageWillClose : (() -> msg) -> Sub msg
@@ -32,6 +32,7 @@ type Msg
   | ChangeActiveSimulation Simulation.Model
   | SimulationMsg Simulation.Msg
   | AddSimulation
+  | RemoveSimulation Simulation.Model
   | SaveProject
 
 
@@ -103,8 +104,9 @@ viewTabs model =
         if simulation == model.activeSimulation then
           Input.text
             ( styles.tab
-              ++ [ Background.color <| toElmUiColor Color.grey
-              , E.padding 15, E.htmlAttribute <| Html.Attributes.style "text-align" "center"
+              ++ [ Background.color colors.white
+              , E.padding 15
+              , E.inFront <| viewCloseTabButton simulation
               ]
             )
             { label = Input.labelHidden "current simulation name"
@@ -115,11 +117,27 @@ viewTabs model =
         else
           Input.button styles.tab
             { onPress = Just <| ChangeActiveSimulation simulation
-            , label = E.el [ E.padding 15 ] <| centeredText simulation.name
+            , label = E.el [ E.padding 15, E.inFront <| viewCloseTabButton simulation, E.alignLeft ] <| E.text simulation.name
             }
       )
       model.simulations
     ++ [ viewAddTab ]
+
+
+viewCloseTabButton : Simulation.Model -> E.Element Msg
+viewCloseTabButton target =
+  Input.button
+    [ E.mouseOver
+      [ Background.color colors.lightGrey ]
+    , E.paddingXY 3 3
+    , E.centerY, E.alignRight
+    , Border.rounded 10
+    ]
+    { onPress =
+      Just <| RemoveSimulation target
+    , label =
+      centeredText "x"
+    }
 
 
 viewAddTab : E.Element Msg
@@ -146,6 +164,9 @@ update message model =
 
     AddSimulation ->
       (addSimulation model, Cmd.none)
+
+    RemoveSimulation target ->
+      (removeSimulation target model, Cmd.none)
 
     SaveProject ->
       ( model
@@ -238,6 +259,53 @@ addSimulation model =
     , defaultSimulationIndex =
       newDefaultSimulationIndex
   }
+
+
+removeSimulation : Simulation.Model -> Model -> Model
+removeSimulation target model =
+  if List.length model.simulations == 1 then
+    model
+  else
+    let
+      simulations =
+        List.filter
+          (\simulation ->
+            simulation /= target
+          )
+          model.simulations
+    in
+    if target == model.activeSimulation then
+      { model
+        | simulations =
+          simulations
+        , activeSimulation =
+          getNextSimulation target model.simulations
+      }
+    else
+      { model
+        | simulations =
+          simulations
+      }
+
+
+getNextSimulation : Simulation.Model -> List Simulation.Model -> Simulation.Model
+getNextSimulation current simulations =
+  let
+    splits =
+      List.Extra.splitWhen ((==) current) simulations
+    next =
+      case splits of
+        Just (firstToPrevious, currentToLast) ->
+          if List.length currentToLast == 1 then -- current is the last simulation
+            -- try getting the previous simulation
+            Maybe.withDefault current <| List.Extra.last <| firstToPrevious
+          else
+          -- try getting the next simulation
+            Maybe.withDefault current <| List.head <| List.Extra.removeAt 0 currentToLast
+        Nothing ->
+          current -- impossible
+  in
+  next
 
 
 encodeProject : Model -> Encode.Value

@@ -1,4 +1,4 @@
-module Utils exposing (toElmUiColor, styles, centeredText)
+module Utils exposing (styles, colors, centeredText)
 
 import Color
 import Element as E
@@ -14,31 +14,43 @@ toElmUiColor color =
     E.rgba red green blue alpha
 
 
+colors =
+  { white =
+    E.rgb 0.97 0.97 0.97
+  , lightGrey =
+    E.rgb 0.87 0.87 0.87
+  , darkGrey =
+    toElmUiColor Color.darkGrey
+  , black =
+    toElmUiColor Color.black
+  }
+
+
 styles :
   { button : List (E.Attribute msg)
   , tab : List (E.Attribute msg)
   }
 styles =
   { button =
-    [ Background.color <| toElmUiColor Color.lightGrey
+    [ Background.color colors.lightGrey
     , E.mouseOver
-        [ Background.color <| toElmUiColor Color.grey ]
+        [ Background.color colors.white ]
     , E.paddingXY 10 5
     , E.width <| E.px 150
     , Border.widthXY 2 1
-    , Border.color <| toElmUiColor Color.darkGrey
+    , Border.color colors.darkGrey
     ]
   , tab =
-    [ Background.color <| toElmUiColor Color.lightGrey
+    [ Background.color colors.lightGrey
     , E.mouseOver
-        [ Background.color <| toElmUiColor Color.grey ]
+        [ Background.color colors.white ]
     , Border.widthEach
       { top = 1
       , left = 1
       , bottom = 0
       , right = 1
       }
-    , Border.color <| toElmUiColor Color.darkGrey
+    , Border.color colors.darkGrey
     , Border.roundEach
       { topLeft = 10
       , topRight = 10

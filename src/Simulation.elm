@@ -23,7 +23,7 @@ import Element.Events
 import Html.Events.Extra.Mouse as Mouse
 import Process
 import Task
-import Utils exposing (toElmUiColor, styles, centeredText)
+import Utils exposing (styles, colors, centeredText)
 
 
 port downloadModel : () -> Cmd msg
@@ -1155,9 +1155,9 @@ viewPopUpOf title attributes content =
     , E.centerY
     , E.padding 20
     , E.spacing 6
-    , Background.color <| toElmUiColor Color.lightGrey
+    , Background.color <| colors.lightGrey
     , Border.width 2
-    , Border.color <| toElmUiColor Color.black
+    , Border.color <| colors.black
     , E.htmlAttribute <| onClickNoProp DoNothing
     ] ++ attributes) <|
     [ E.el
