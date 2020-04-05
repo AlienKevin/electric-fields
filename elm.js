@@ -7362,6 +7362,329 @@ var $author$project$Main$encodeProject = function (model) {
 				$elm$json$Json$Encode$int(model.defaultSimulationIndex))
 			]));
 };
+var $elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
+	});
+var $elm$core$List$head = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(x);
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
+var $elm_community$list_extra$List$Extra$last = function (items) {
+	last:
+	while (true) {
+		if (!items.b) {
+			return $elm$core$Maybe$Nothing;
+		} else {
+			if (!items.b.b) {
+				var x = items.a;
+				return $elm$core$Maybe$Just(x);
+			} else {
+				var rest = items.b;
+				var $temp$items = rest;
+				items = $temp$items;
+				continue last;
+			}
+		}
+	}
+};
+var $elm$core$List$append = F2(
+	function (xs, ys) {
+		if (!ys.b) {
+			return xs;
+		} else {
+			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
+		}
+	});
+var $elm$core$List$drop = F2(
+	function (n, list) {
+		drop:
+		while (true) {
+			if (n <= 0) {
+				return list;
+			} else {
+				if (!list.b) {
+					return list;
+				} else {
+					var x = list.a;
+					var xs = list.b;
+					var $temp$n = n - 1,
+						$temp$list = xs;
+					n = $temp$n;
+					list = $temp$list;
+					continue drop;
+				}
+			}
+		}
+	});
+var $elm$core$List$tail = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(xs);
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
+var $elm$core$List$takeReverse = F3(
+	function (n, list, kept) {
+		takeReverse:
+		while (true) {
+			if (n <= 0) {
+				return kept;
+			} else {
+				if (!list.b) {
+					return kept;
+				} else {
+					var x = list.a;
+					var xs = list.b;
+					var $temp$n = n - 1,
+						$temp$list = xs,
+						$temp$kept = A2($elm$core$List$cons, x, kept);
+					n = $temp$n;
+					list = $temp$list;
+					kept = $temp$kept;
+					continue takeReverse;
+				}
+			}
+		}
+	});
+var $elm$core$List$takeTailRec = F2(
+	function (n, list) {
+		return $elm$core$List$reverse(
+			A3($elm$core$List$takeReverse, n, list, _List_Nil));
+	});
+var $elm$core$List$takeFast = F3(
+	function (ctr, n, list) {
+		if (n <= 0) {
+			return _List_Nil;
+		} else {
+			var _v0 = _Utils_Tuple2(n, list);
+			_v0$1:
+			while (true) {
+				_v0$5:
+				while (true) {
+					if (!_v0.b.b) {
+						return list;
+					} else {
+						if (_v0.b.b.b) {
+							switch (_v0.a) {
+								case 1:
+									break _v0$1;
+								case 2:
+									var _v2 = _v0.b;
+									var x = _v2.a;
+									var _v3 = _v2.b;
+									var y = _v3.a;
+									return _List_fromArray(
+										[x, y]);
+								case 3:
+									if (_v0.b.b.b.b) {
+										var _v4 = _v0.b;
+										var x = _v4.a;
+										var _v5 = _v4.b;
+										var y = _v5.a;
+										var _v6 = _v5.b;
+										var z = _v6.a;
+										return _List_fromArray(
+											[x, y, z]);
+									} else {
+										break _v0$5;
+									}
+								default:
+									if (_v0.b.b.b.b && _v0.b.b.b.b.b) {
+										var _v7 = _v0.b;
+										var x = _v7.a;
+										var _v8 = _v7.b;
+										var y = _v8.a;
+										var _v9 = _v8.b;
+										var z = _v9.a;
+										var _v10 = _v9.b;
+										var w = _v10.a;
+										var tl = _v10.b;
+										return (ctr > 1000) ? A2(
+											$elm$core$List$cons,
+											x,
+											A2(
+												$elm$core$List$cons,
+												y,
+												A2(
+													$elm$core$List$cons,
+													z,
+													A2(
+														$elm$core$List$cons,
+														w,
+														A2($elm$core$List$takeTailRec, n - 4, tl))))) : A2(
+											$elm$core$List$cons,
+											x,
+											A2(
+												$elm$core$List$cons,
+												y,
+												A2(
+													$elm$core$List$cons,
+													z,
+													A2(
+														$elm$core$List$cons,
+														w,
+														A3($elm$core$List$takeFast, ctr + 1, n - 4, tl)))));
+									} else {
+										break _v0$5;
+									}
+							}
+						} else {
+							if (_v0.a === 1) {
+								break _v0$1;
+							} else {
+								break _v0$5;
+							}
+						}
+					}
+				}
+				return list;
+			}
+			var _v1 = _v0.b;
+			var x = _v1.a;
+			return _List_fromArray(
+				[x]);
+		}
+	});
+var $elm$core$List$take = F2(
+	function (n, list) {
+		return A3($elm$core$List$takeFast, 0, n, list);
+	});
+var $elm_community$list_extra$List$Extra$removeAt = F2(
+	function (index, l) {
+		if (index < 0) {
+			return l;
+		} else {
+			var tail = $elm$core$List$tail(
+				A2($elm$core$List$drop, index, l));
+			var head = A2($elm$core$List$take, index, l);
+			if (tail.$ === 'Nothing') {
+				return l;
+			} else {
+				var t = tail.a;
+				return A2($elm$core$List$append, head, t);
+			}
+		}
+	});
+var $elm_community$list_extra$List$Extra$findIndexHelp = F3(
+	function (index, predicate, list) {
+		findIndexHelp:
+		while (true) {
+			if (!list.b) {
+				return $elm$core$Maybe$Nothing;
+			} else {
+				var x = list.a;
+				var xs = list.b;
+				if (predicate(x)) {
+					return $elm$core$Maybe$Just(index);
+				} else {
+					var $temp$index = index + 1,
+						$temp$predicate = predicate,
+						$temp$list = xs;
+					index = $temp$index;
+					predicate = $temp$predicate;
+					list = $temp$list;
+					continue findIndexHelp;
+				}
+			}
+		}
+	});
+var $elm_community$list_extra$List$Extra$findIndex = $elm_community$list_extra$List$Extra$findIndexHelp(0);
+var $elm$core$Maybe$map = F2(
+	function (f, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return $elm$core$Maybe$Just(
+				f(value));
+		} else {
+			return $elm$core$Maybe$Nothing;
+		}
+	});
+var $elm_community$list_extra$List$Extra$splitAt = F2(
+	function (n, xs) {
+		return _Utils_Tuple2(
+			A2($elm$core$List$take, n, xs),
+			A2($elm$core$List$drop, n, xs));
+	});
+var $elm_community$list_extra$List$Extra$splitWhen = F2(
+	function (predicate, list) {
+		return A2(
+			$elm$core$Maybe$map,
+			function (i) {
+				return A2($elm_community$list_extra$List$Extra$splitAt, i, list);
+			},
+			A2($elm_community$list_extra$List$Extra$findIndex, predicate, list));
+	});
+var $elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return value;
+		} else {
+			return _default;
+		}
+	});
+var $author$project$Main$getNextSimulation = F2(
+	function (current, simulations) {
+		var splits = A2(
+			$elm_community$list_extra$List$Extra$splitWhen,
+			$elm$core$Basics$eq(current),
+			simulations);
+		var next = function () {
+			if (splits.$ === 'Just') {
+				var _v1 = splits.a;
+				var firstToPrevious = _v1.a;
+				var currentToLast = _v1.b;
+				return ($elm$core$List$length(currentToLast) === 1) ? A2(
+					$elm$core$Maybe$withDefault,
+					current,
+					$elm_community$list_extra$List$Extra$last(firstToPrevious)) : A2(
+					$elm$core$Maybe$withDefault,
+					current,
+					$elm$core$List$head(
+						A2($elm_community$list_extra$List$Extra$removeAt, 0, currentToLast)));
+			} else {
+				return current;
+			}
+		}();
+		return next;
+	});
+var $elm$core$Basics$neq = _Utils_notEqual;
+var $author$project$Main$removeSimulation = F2(
+	function (target, model) {
+		if ($elm$core$List$length(model.simulations) === 1) {
+			return model;
+		} else {
+			var simulations = A2(
+				$elm$core$List$filter,
+				function (simulation) {
+					return !_Utils_eq(simulation, target);
+				},
+				model.simulations);
+			return _Utils_eq(target, model.activeSimulation) ? _Utils_update(
+				model,
+				{
+					activeSimulation: A2($author$project$Main$getNextSimulation, target, model.simulations),
+					simulations: simulations
+				}) : _Utils_update(
+				model,
+				{simulations: simulations});
+		}
+	});
 var $author$project$Main$saveProject = _Platform_outgoingPort('saveProject', $elm$core$Basics$identity);
 var $author$project$Main$updateActiveSimulation = F2(
 	function (newActiveSimulation, model) {
@@ -7449,18 +7772,6 @@ var $author$project$Simulation$closeSettingsPopUp = function (model) {
 		model,
 		{pendingSettings: model.settings, popUp: $author$project$Simulation$NoPopUp});
 };
-var $elm$core$List$filter = F2(
-	function (isGood, list) {
-		return A3(
-			$elm$core$List$foldr,
-			F2(
-				function (x, xs) {
-					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
-				}),
-			_List_Nil,
-			list);
-	});
-var $elm$core$Basics$neq = _Utils_notEqual;
 var $author$project$Simulation$deleteActiveField = function (model) {
 	var newFields = function () {
 		var _v0 = model.activeSourceId;
@@ -7821,31 +8132,12 @@ var $author$project$Simulation$toggleSourceSign = function (model) {
 			fields: A3($author$project$Simulation$calculateFields, model.width, model.height, newFields)
 		});
 };
-var $elm$core$Maybe$map = F2(
-	function (f, maybe) {
-		if (maybe.$ === 'Just') {
-			var value = maybe.a;
-			return $elm$core$Maybe$Just(
-				f(value));
-		} else {
-			return $elm$core$Maybe$Nothing;
-		}
-	});
 var $zaboco$elm_draggable$Cmd$Extra$message = function (x) {
 	return A2(
 		$elm$core$Task$perform,
 		$elm$core$Basics$identity,
 		$elm$core$Task$succeed(x));
 };
-var $elm$core$Maybe$withDefault = F2(
-	function (_default, maybe) {
-		if (maybe.$ === 'Just') {
-			var value = maybe.a;
-			return value;
-		} else {
-			return _default;
-		}
-	});
 var $zaboco$elm_draggable$Cmd$Extra$optionalMessage = function (msgMaybe) {
 	return A2(
 		$elm$core$Maybe$withDefault,
@@ -8144,6 +8436,11 @@ var $author$project$Main$update = F2(
 			case 'AddSimulation':
 				return _Utils_Tuple2(
 					$author$project$Main$addSimulation(model),
+					$elm$core$Platform$Cmd$none);
+			case 'RemoveSimulation':
+				var target = message.a;
+				return _Utils_Tuple2(
+					A2($author$project$Main$removeSimulation, target, model),
 					$elm$core$Platform$Cmd$none);
 			default:
 				return _Utils_Tuple2(
@@ -8730,14 +9027,6 @@ var $mdgriffith$elm_ui$Internal$Style$CenterY = {$: 'CenterY'};
 var $mdgriffith$elm_ui$Internal$Style$Top = {$: 'Top'};
 var $mdgriffith$elm_ui$Internal$Style$alignments = _List_fromArray(
 	[$mdgriffith$elm_ui$Internal$Style$Top, $mdgriffith$elm_ui$Internal$Style$Bottom, $mdgriffith$elm_ui$Internal$Style$Right, $mdgriffith$elm_ui$Internal$Style$Left, $mdgriffith$elm_ui$Internal$Style$CenterX, $mdgriffith$elm_ui$Internal$Style$CenterY]);
-var $elm$core$List$append = F2(
-	function (xs, ys) {
-		if (!ys.b) {
-			return xs;
-		} else {
-			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
-		}
-	});
 var $elm$core$List$concat = function (lists) {
 	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
 };
@@ -14123,9 +14412,34 @@ var $avh4$elm_color$Color$RgbaSpace = F4(
 	function (a, b, c, d) {
 		return {$: 'RgbaSpace', a: a, b: b, c: c, d: d};
 	});
+var $avh4$elm_color$Color$black = A4($avh4$elm_color$Color$RgbaSpace, 0 / 255, 0 / 255, 0 / 255, 1.0);
 var $avh4$elm_color$Color$darkGrey = A4($avh4$elm_color$Color$RgbaSpace, 186 / 255, 189 / 255, 182 / 255, 1.0);
-var $avh4$elm_color$Color$grey = A4($avh4$elm_color$Color$RgbaSpace, 211 / 255, 215 / 255, 207 / 255, 1.0);
-var $avh4$elm_color$Color$lightGrey = A4($avh4$elm_color$Color$RgbaSpace, 238 / 255, 238 / 255, 236 / 255, 1.0);
+var $mdgriffith$elm_ui$Element$rgb = F3(
+	function (r, g, b) {
+		return A4($mdgriffith$elm_ui$Internal$Model$Rgba, r, g, b, 1);
+	});
+var $mdgriffith$elm_ui$Element$rgba = $mdgriffith$elm_ui$Internal$Model$Rgba;
+var $avh4$elm_color$Color$toRgba = function (_v0) {
+	var r = _v0.a;
+	var g = _v0.b;
+	var b = _v0.c;
+	var a = _v0.d;
+	return {alpha: a, blue: b, green: g, red: r};
+};
+var $author$project$Utils$toElmUiColor = function (color) {
+	var _v0 = $avh4$elm_color$Color$toRgba(color);
+	var red = _v0.red;
+	var green = _v0.green;
+	var blue = _v0.blue;
+	var alpha = _v0.alpha;
+	return A4($mdgriffith$elm_ui$Element$rgba, red, green, blue, alpha);
+};
+var $author$project$Utils$colors = {
+	black: $author$project$Utils$toElmUiColor($avh4$elm_color$Color$black),
+	darkGrey: $author$project$Utils$toElmUiColor($avh4$elm_color$Color$darkGrey),
+	lightGrey: A3($mdgriffith$elm_ui$Element$rgb, 0.87, 0.87, 0.87),
+	white: A3($mdgriffith$elm_ui$Element$rgb, 0.97, 0.97, 0.97)
+};
 var $mdgriffith$elm_ui$Internal$Model$Hover = {$: 'Hover'};
 var $mdgriffith$elm_ui$Internal$Model$PseudoSelector = F2(
 	function (a, b) {
@@ -14287,22 +14601,6 @@ var $mdgriffith$elm_ui$Element$Border$roundEach = function (_v0) {
 			'border-radius',
 			$elm$core$String$fromInt(topLeft) + ('px ' + ($elm$core$String$fromInt(topRight) + ('px ' + ($elm$core$String$fromInt(bottomRight) + ('px ' + ($elm$core$String$fromInt(bottomLeft) + 'px'))))))));
 };
-var $mdgriffith$elm_ui$Element$rgba = $mdgriffith$elm_ui$Internal$Model$Rgba;
-var $avh4$elm_color$Color$toRgba = function (_v0) {
-	var r = _v0.a;
-	var g = _v0.b;
-	var b = _v0.c;
-	var a = _v0.d;
-	return {alpha: a, blue: b, green: g, red: r};
-};
-var $author$project$Utils$toElmUiColor = function (color) {
-	var _v0 = $avh4$elm_color$Color$toRgba(color);
-	var red = _v0.red;
-	var green = _v0.green;
-	var blue = _v0.blue;
-	var alpha = _v0.alpha;
-	return A4($mdgriffith$elm_ui$Element$rgba, red, green, blue, alpha);
-};
 var $mdgriffith$elm_ui$Internal$Model$BorderWidth = F5(
 	function (a, b, c, d, e) {
 		return {$: 'BorderWidth', a: a, b: b, c: c, d: d, e: e};
@@ -14351,35 +14649,29 @@ var $mdgriffith$elm_ui$Element$Border$widthEach = function (_v0) {
 var $author$project$Utils$styles = {
 	button: _List_fromArray(
 		[
-			$mdgriffith$elm_ui$Element$Background$color(
-			$author$project$Utils$toElmUiColor($avh4$elm_color$Color$lightGrey)),
+			$mdgriffith$elm_ui$Element$Background$color($author$project$Utils$colors.lightGrey),
 			$mdgriffith$elm_ui$Element$mouseOver(
 			_List_fromArray(
 				[
-					$mdgriffith$elm_ui$Element$Background$color(
-					$author$project$Utils$toElmUiColor($avh4$elm_color$Color$grey))
+					$mdgriffith$elm_ui$Element$Background$color($author$project$Utils$colors.white)
 				])),
 			A2($mdgriffith$elm_ui$Element$paddingXY, 10, 5),
 			$mdgriffith$elm_ui$Element$width(
 			$mdgriffith$elm_ui$Element$px(150)),
 			A2($mdgriffith$elm_ui$Element$Border$widthXY, 2, 1),
-			$mdgriffith$elm_ui$Element$Border$color(
-			$author$project$Utils$toElmUiColor($avh4$elm_color$Color$darkGrey))
+			$mdgriffith$elm_ui$Element$Border$color($author$project$Utils$colors.darkGrey)
 		]),
 	tab: _List_fromArray(
 		[
-			$mdgriffith$elm_ui$Element$Background$color(
-			$author$project$Utils$toElmUiColor($avh4$elm_color$Color$lightGrey)),
+			$mdgriffith$elm_ui$Element$Background$color($author$project$Utils$colors.lightGrey),
 			$mdgriffith$elm_ui$Element$mouseOver(
 			_List_fromArray(
 				[
-					$mdgriffith$elm_ui$Element$Background$color(
-					$author$project$Utils$toElmUiColor($avh4$elm_color$Color$grey))
+					$mdgriffith$elm_ui$Element$Background$color($author$project$Utils$colors.white)
 				])),
 			$mdgriffith$elm_ui$Element$Border$widthEach(
 			{bottom: 0, left: 1, right: 1, top: 1}),
-			$mdgriffith$elm_ui$Element$Border$color(
-			$author$project$Utils$toElmUiColor($avh4$elm_color$Color$darkGrey)),
+			$mdgriffith$elm_ui$Element$Border$color($author$project$Utils$colors.darkGrey),
 			$mdgriffith$elm_ui$Element$Border$roundEach(
 			{bottomLeft: 0, bottomRight: 0, topLeft: 10, topRight: 10})
 		])
@@ -14523,15 +14815,6 @@ var $mdgriffith$elm_ui$Element$column = F2(
 						attrs))),
 			$mdgriffith$elm_ui$Internal$Model$Unkeyed(children));
 	});
-var $elm$core$List$head = function (list) {
-	if (list.b) {
-		var x = list.a;
-		var xs = list.b;
-		return $elm$core$Maybe$Just(x);
-	} else {
-		return $elm$core$Maybe$Nothing;
-	}
-};
 var $mdgriffith$elm_ui$Internal$Model$MoveY = function (a) {
 	return {$: 'MoveY', a: a};
 };
@@ -14751,7 +15034,6 @@ var $elm_community$typed_svg$TypedSvg$Types$Paint = function (a) {
 	return {$: 'Paint', a: a};
 };
 var $elm_community$typed_svg$TypedSvg$Types$PaintNone = {$: 'PaintNone'};
-var $avh4$elm_color$Color$black = A4($avh4$elm_color$Color$RgbaSpace, 0 / 255, 0 / 255, 0 / 255, 1.0);
 var $avh4$elm_color$Color$toCssString = function (_v0) {
 	var r = _v0.a;
 	var g = _v0.b;
@@ -15325,11 +15607,9 @@ var $author$project$Simulation$viewPopUpOf = F3(
 						$mdgriffith$elm_ui$Element$centerY,
 						$mdgriffith$elm_ui$Element$padding(20),
 						$mdgriffith$elm_ui$Element$spacing(6),
-						$mdgriffith$elm_ui$Element$Background$color(
-						$author$project$Utils$toElmUiColor($avh4$elm_color$Color$lightGrey)),
+						$mdgriffith$elm_ui$Element$Background$color($author$project$Utils$colors.lightGrey),
 						$mdgriffith$elm_ui$Element$Border$width(2),
-						$mdgriffith$elm_ui$Element$Border$color(
-						$author$project$Utils$toElmUiColor($avh4$elm_color$Color$black)),
+						$mdgriffith$elm_ui$Element$Border$color($author$project$Utils$colors.black),
 						$mdgriffith$elm_ui$Element$htmlAttribute(
 						$author$project$Simulation$onClickNoProp($author$project$Simulation$DoNothing))
 					]),
@@ -15557,10 +15837,6 @@ var $mdgriffith$elm_ui$Element$Input$calcMoveToCompensateForPadding = function (
 };
 var $mdgriffith$elm_ui$Internal$Flag$overflow = $mdgriffith$elm_ui$Internal$Flag$flag(20);
 var $mdgriffith$elm_ui$Element$clip = A2($mdgriffith$elm_ui$Internal$Model$Class, $mdgriffith$elm_ui$Internal$Flag$overflow, $mdgriffith$elm_ui$Internal$Style$classes.clip);
-var $mdgriffith$elm_ui$Element$rgb = F3(
-	function (r, g, b) {
-		return A4($mdgriffith$elm_ui$Internal$Model$Rgba, r, g, b, 1);
-	});
 var $mdgriffith$elm_ui$Element$Input$darkGrey = A3($mdgriffith$elm_ui$Element$rgb, 186 / 255, 189 / 255, 182 / 255);
 var $mdgriffith$elm_ui$Element$Input$defaultTextPadding = A2($mdgriffith$elm_ui$Element$paddingXY, 12, 12);
 var $mdgriffith$elm_ui$Element$Border$rounded = function (radius) {
@@ -16449,6 +16725,30 @@ var $author$project$Main$viewAddTab = A2(
 		label: $author$project$Utils$centeredText('+'),
 		onPress: $elm$core$Maybe$Just($author$project$Main$AddSimulation)
 	});
+var $author$project$Main$RemoveSimulation = function (a) {
+	return {$: 'RemoveSimulation', a: a};
+};
+var $author$project$Main$viewCloseTabButton = function (target) {
+	return A2(
+		$mdgriffith$elm_ui$Element$Input$button,
+		_List_fromArray(
+			[
+				$mdgriffith$elm_ui$Element$mouseOver(
+				_List_fromArray(
+					[
+						$mdgriffith$elm_ui$Element$Background$color($author$project$Utils$colors.lightGrey)
+					])),
+				A2($mdgriffith$elm_ui$Element$paddingXY, 3, 3),
+				$mdgriffith$elm_ui$Element$centerY,
+				$mdgriffith$elm_ui$Element$alignRight,
+				$mdgriffith$elm_ui$Element$Border$rounded(10)
+			]),
+		{
+			label: $author$project$Utils$centeredText('x'),
+			onPress: $elm$core$Maybe$Just(
+				$author$project$Main$RemoveSimulation(target))
+		});
+};
 var $author$project$Main$viewTabs = function (model) {
 	return A2(
 		$mdgriffith$elm_ui$Element$row,
@@ -16466,11 +16766,10 @@ var $author$project$Main$viewTabs = function (model) {
 							$author$project$Utils$styles.tab,
 							_List_fromArray(
 								[
-									$mdgriffith$elm_ui$Element$Background$color(
-									$author$project$Utils$toElmUiColor($avh4$elm_color$Color$grey)),
+									$mdgriffith$elm_ui$Element$Background$color($author$project$Utils$colors.white),
 									$mdgriffith$elm_ui$Element$padding(15),
-									$mdgriffith$elm_ui$Element$htmlAttribute(
-									A2($elm$html$Html$Attributes$style, 'text-align', 'center'))
+									$mdgriffith$elm_ui$Element$inFront(
+									$author$project$Main$viewCloseTabButton(simulation))
 								])),
 						{
 							label: $mdgriffith$elm_ui$Element$Input$labelHidden('current simulation name'),
@@ -16485,9 +16784,12 @@ var $author$project$Main$viewTabs = function (model) {
 								$mdgriffith$elm_ui$Element$el,
 								_List_fromArray(
 									[
-										$mdgriffith$elm_ui$Element$padding(15)
+										$mdgriffith$elm_ui$Element$padding(15),
+										$mdgriffith$elm_ui$Element$inFront(
+										$author$project$Main$viewCloseTabButton(simulation)),
+										$mdgriffith$elm_ui$Element$alignLeft
 									]),
-								$author$project$Utils$centeredText(simulation.name)),
+								$mdgriffith$elm_ui$Element$text(simulation.name)),
 							onPress: $elm$core$Maybe$Just(
 								$author$project$Main$ChangeActiveSimulation(simulation))
 						});
