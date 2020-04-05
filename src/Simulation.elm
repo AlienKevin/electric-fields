@@ -102,6 +102,25 @@ defaultName =
   "Untitled Model"
 
 
+type Msg
+  = OnDragBy Draggable.Delta
+  | DragMsg (Draggable.Msg Id)
+  | StartDragging Id
+  | EndDragging
+  | ActivateSource Id
+  | ToggleSourceSign
+  | ScaleSourceMagnitude Int
+  | ShowFieldContextMenu
+  | ShowGeneralContextMenu Mouse.Event
+  | DeleteActiveField
+  | ClickedBackground
+  | DuplicateActiveField
+  | DeselectActiveField
+  | AddPositiveCharge Position
+  | AddNegativeCharge Position
+  | StopWheelingTimeOut
+
+
 init : Model
 init =
   let
@@ -267,25 +286,6 @@ calculateFieldLine { charges, steps, delta, sourceSign, start, xBound, yBound } 
 distance : Point -> Point -> Float
 distance (x1, y1) (x2, y2) =
   sqrt ((x2 - x1) ^ 2 + (y2 - y1) ^ 2)
-
-
-type Msg
-  = OnDragBy Draggable.Delta
-  | DragMsg (Draggable.Msg Id)
-  | StartDragging Id
-  | EndDragging
-  | ActivateSource Id
-  | ToggleSourceSign
-  | ScaleSourceMagnitude Int
-  | ShowFieldContextMenu
-  | ShowGeneralContextMenu Mouse.Event
-  | DeleteActiveField
-  | ClickedBackground
-  | DuplicateActiveField
-  | DeselectActiveField
-  | AddPositiveCharge Position
-  | AddNegativeCharge Position
-  | StopWheelingTimeOut
 
 
 dragConfig : Draggable.Config Id Msg
@@ -841,7 +841,9 @@ viewContextMenu model =
     GeneralContextMenu position ->
       viewGeneralContextMenu styles.button position
     NoContextMenu ->
-      E.none
+      -- very weired. Should be `E.none` but need below for buttons to be styled correctly
+      E.el [ E.htmlAttribute <| Html.Attributes.style "display" "none" ] <|
+      viewFieldContextMenu styles.button model
 
 
 getActiveFields : Model -> List Field
