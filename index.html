@@ -5,7 +5,7 @@
   <title>Electric Field Simulation</title>
 </head>
 <body>
-  <script src="elm.js"></script>
+  <script src="/public/elm.js"></script>
   <main></main>
   <script>
     var localStorageKey = "electric-fields-simulation";
@@ -17,8 +17,8 @@
     // initiate elm app
     var app = Elm.Main.init({ node: document.querySelector('main'), flags: savedProject });
 
-    // downloadMovel
-    app.ports.downloadModel.subscribe(function() {
+    // download model as svg
+    app.ports.downloadModelAsSvg.subscribe(function() {
       var activeSource = document.getElementById("activeSource");
       if (activeSource !== null) {
         var strokeWidth = activeSource.getAttribute("stroke-width");
@@ -30,15 +30,25 @@
       if (activeSource !== null) {
         activeSource.setAttribute("stroke-width", strokeWidth);
       }
-      var svgBlob = new Blob([svgData], {type:"image/svg+xml;charset=utf-8"});
-      var svgUrl = URL.createObjectURL(svgBlob);
+      download("model.svg", "image/svg+xml;charset=utf-8", svgData);
+    });
+
+    // download model as json
+    app.ports.downloadModelAsJson.subscribe(function(json) {
+      download("model.json", "application/json", JSON.stringify(json,undefined,2));
+    });
+
+    function download(fileName, type, data) {
+      var blob = new Blob([data], {type: type});
+      var url = URL.createObjectURL(blob);
       var downloadLink = document.createElement("a");
-      downloadLink.href = svgUrl;
-      downloadLink.download = "model.svg";
+      downloadLink.href = url;
+      downloadLink.download = fileName;
       document.body.appendChild(downloadLink);
+      downloadLink.style.display = 'none';
       downloadLink.click();
       document.body.removeChild(downloadLink);
-    });
+    }
 
     // save project
     app.ports.saveProject.subscribe(function(project) {
