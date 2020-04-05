@@ -313,6 +313,7 @@ type Msg
   | StopWheelingTimeOut
   | DownloadModelAsSvg
   | DownloadModelAsJson
+  | CloseDownloadPopUp
   | DoNothing
 
 
@@ -399,10 +400,13 @@ update msg model =
       (closeHelpPopUp model, Cmd.none)
 
     DownloadModelAsSvg ->
-      ({ model | popUp = NoPopUp}, downloadModelAsSvg ())
+      (closeDownloadPopUp model, downloadModelAsSvg ())
 
     DownloadModelAsJson ->
-      ({ model | popUp = NoPopUp}, downloadModelAsJson <| encodeModel model)
+      (closeDownloadPopUp model, downloadModelAsJson <| encodeModel model)
+
+    CloseDownloadPopUp ->
+      (closeDownloadPopUp model, Cmd.none)
 
     DoNothing ->
       (model, Cmd.none)
@@ -473,6 +477,14 @@ deoptimizeModel model =
 
 closeHelpPopUp : Model -> Model
 closeHelpPopUp model =
+  { model
+    | popUp =
+      NoPopUp
+  }
+
+
+closeDownloadPopUp : Model -> Model
+closeDownloadPopUp model =
   { model
     | popUp =
       NoPopUp
@@ -1147,7 +1159,7 @@ viewHelpPopUp =
     , textHeader "When you mouse over background and ..."
     , E.text "  Right Click:  * add + charge"
     , E.text "                * add - charge"
-    , E.el [ E.paddingEach { top = 20, right = 0, bottom = 0, left = 0 } ] <|
+    , E.el [ E.paddingEach { top = 20, right = 0, bottom = 0, left = 0 }, E.alignRight ] <|
       Input.button
         styles.button
         { onPress = Just CloseHelpPopUp
@@ -1156,8 +1168,9 @@ viewHelpPopUp =
       ]
 
 
+viewDownloadPopUp : E.Element Msg
 viewDownloadPopUp =
-  viewPopUpOf "Download" []
+  viewPopUpOf "Download" [ E.spacing 12 ]
     [ textHeader "Which format do you want to download in?"
     , E.text "Pick SVG if you want to share or display the model."
     , Input.button
@@ -1171,6 +1184,17 @@ viewDownloadPopUp =
       { onPress = Just DownloadModelAsJson
       , label = centeredText "Downloas as JSON"
       }
+    , E.el
+        [ E.paddingEach
+          { top = 20, right = 0, bottom = 0, left = 0 }
+        , E.alignRight
+        ] <|
+        Input.button styles.button
+        { onPress =
+          Just CloseDownloadPopUp
+        , label =
+          centeredText "Cancel"
+        }
     ]
 
 
