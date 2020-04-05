@@ -8000,12 +8000,21 @@ var $author$project$Simulation$deselectActiveField = function (model) {
 		model,
 		{activeSourceId: $elm$core$Maybe$Nothing});
 };
-var $author$project$Simulation$downloadModelAsJson = _Platform_outgoingPort('downloadModelAsJson', $elm$core$Basics$identity);
-var $author$project$Simulation$downloadModelAsSvg = _Platform_outgoingPort(
-	'downloadModelAsSvg',
+var $author$project$Simulation$downloadModelAsJson = _Platform_outgoingPort(
+	'downloadModelAsJson',
 	function ($) {
-		return $elm$json$Json$Encode$null;
+		var a = $.a;
+		var b = $.b;
+		return A2(
+			$elm$json$Json$Encode$list,
+			$elm$core$Basics$identity,
+			_List_fromArray(
+				[
+					$elm$json$Json$Encode$string(a),
+					$elm$core$Basics$identity(b)
+				]));
 	});
+var $author$project$Simulation$downloadModelAsSvg = _Platform_outgoingPort('downloadModelAsSvg', $elm$json$Json$Encode$string);
 var $author$project$Simulation$ActivateSource = function (a) {
 	return {$: 'ActivateSource', a: a};
 };
@@ -8638,12 +8647,14 @@ var $author$project$Simulation$update = F2(
 			case 'DownloadModelAsSvg':
 				return _Utils_Tuple2(
 					$author$project$Simulation$closeDownloadPopUp(model),
-					$author$project$Simulation$downloadModelAsSvg(_Utils_Tuple0));
+					$author$project$Simulation$downloadModelAsSvg(model.name));
 			case 'DownloadModelAsJson':
 				return _Utils_Tuple2(
 					$author$project$Simulation$closeDownloadPopUp(model),
 					$author$project$Simulation$downloadModelAsJson(
-						$author$project$Simulation$encodeModel(model)));
+						_Utils_Tuple2(
+							model.name,
+							$author$project$Simulation$encodeModel(model))));
 			case 'CloseDownloadPopUp':
 				return _Utils_Tuple2(
 					$author$project$Simulation$closeDownloadPopUp(model),

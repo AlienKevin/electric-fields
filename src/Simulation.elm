@@ -28,8 +28,8 @@ import File.Select
 import Utils exposing (styles, colors, centeredText)
 
 
-port downloadModelAsSvg : () -> Cmd msg
-port downloadModelAsJson : Encode.Value -> Cmd msg
+port downloadModelAsSvg : String -> Cmd msg
+port downloadModelAsJson : (String, Encode.Value) -> Cmd msg
 
 
 type alias Model =
@@ -415,10 +415,10 @@ update msg model =
       (closeHelpPopUp model, Cmd.none)
 
     DownloadModelAsSvg ->
-      (closeDownloadPopUp model, downloadModelAsSvg ())
+      (closeDownloadPopUp model, downloadModelAsSvg model.name)
 
     DownloadModelAsJson ->
-      (closeDownloadPopUp model, downloadModelAsJson <| encodeModel model)
+      (closeDownloadPopUp model, downloadModelAsJson (model.name, encodeModel model))
 
     CloseDownloadPopUp ->
       (closeDownloadPopUp model, Cmd.none)
