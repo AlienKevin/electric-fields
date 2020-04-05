@@ -1,4 +1,4 @@
-module Main exposing (main)
+port module Main exposing (main)
 
 import Browser
 import Html exposing (Html)
@@ -7,12 +7,22 @@ import Element as E
 import Element.Input as Input
 import Element.Background as Background
 import Element.Font as Font
+import Element.Border as Border
 import Color
-import Utils exposing (toElmUiColor, styles)
+import Json.Encode as Encode
+import Json.Decode as Decode exposing (Decoder)
+import Json.Decode.Field as Field
+import Utils exposing (toElmUiColor, styles, centeredText)
+
+
+port pageWillClose : (() -> msg) -> Sub msg
+port saveProject : Encode.Value -> Cmd msg
+
 
 type alias Model =
   { simulations : List Simulation.Model
   , activeSimulation : Simulation.Model
+  , defaultSimulationIndex : Int
   }
 
 
@@ -20,30 +30,46 @@ type Msg
   = UpdateActiveSimulationName String
   | ChangeActiveSimulation Simulation.Model
   | SimulationMsg Simulation.Msg
+  | AddSimulation
+  | SaveProject
 
 
-
-init : (List String) -> (Model, Cmd Msg)
-init savedSimulations =
+init : (Maybe String) -> (Model, Cmd Msg)
+init savedProject =
   let
-    activeSimulation =
-      Tuple.first <| Simulation.init <| List.head savedSimulations
-    simulations =
-      case savedSimulations of
-        [] ->
-          [ activeSimulation ]
-        _ :: tail ->
-          activeSimulation :: List.map
-          (\simulation ->
-            Tuple.first <| Simulation.init (Just simulation)
-          )
-          tail
+    project =
+      case savedProject of
+        Just projectJson ->
+          Result.withDefault defaultProject <| Decode.decodeString decodeProject projectJson
+        Nothing ->
+          defaultProject
+    
+    defaultActiveSimulation =
+      let
+        simulation =
+          Simulation.init
+      in
+      if simulation.name == Simulation.defaultName then
+        { simulation
+          | name =
+            getDefaultSimulationName 1
+        }
+      else
+        simulation
+    
+    defaultSimulations =
+      [ defaultActiveSimulation ]
+    
+    defaultProject =
+      { simulations =
+        defaultSimulations
+      , activeSimulation =
+        defaultActiveSimulation
+      , defaultSimulationIndex =
+        1
+      }
   in
-  ({ simulations =
-    simulations
-  , activeSimulation =
-    activeSimulation
-  }
+  ( project
   , Cmd.none
   )
 
@@ -68,7 +94,9 @@ view model =
 
 viewTabs : Model -> E.Element Msg
 viewTabs model =
-  E.row [] <|
+  E.row
+    [ E.spacing 10
+    ] <|
     List.map
       (\simulation ->
         if simulation == model.activeSimulation then
@@ -88,6 +116,17 @@ viewTabs model =
             }
       )
       model.simulations
+    ++ [ viewAddTab ]
+
+
+viewAddTab : E.Element Msg
+viewAddTab =
+  Input.button (styles.button ++ [ E.width <| E.px 20, Border.rounded 20 ])
+    { onPress =
+      Just AddSimulation
+    , label =
+      centeredText "+"
+    }
 
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -102,6 +141,14 @@ update message model =
     SimulationMsg msg ->
       updateActiveSimulationWithMsg msg model
 
+    AddSimulation ->
+      (addSimulation model, Cmd.none)
+
+    SaveProject ->
+      ( model
+      , saveProject <| encodeProject model
+      )
+
 
 updateActiveSimulationName : String -> Model -> Model
 updateActiveSimulationName newName model =
@@ -112,12 +159,17 @@ updateActiveSimulationName newName model =
       { oldActiveSimulation
         | name =
           if newName == "" then
-            Simulation.defaultName
+            getDefaultSimulationName model.defaultSimulationIndex
           else
             newName
       }
   in
   updateActiveSimulation newActiveSimulation model
+
+
+getDefaultSimulationName : Int -> String
+getDefaultSimulationName index =
+  Simulation.defaultName ++ " " ++ String.fromInt index
 
 
 changeActiveSimulation : Simulation.Model -> Model -> Model
@@ -156,12 +208,67 @@ updateActiveSimulation newActiveSimulation model =
  }
 
 
+addSimulation : Model -> Model
+addSimulation model =
+  let
+    newDefaultSimulationIndex =
+      model.defaultSimulationIndex + 1
+
+    defaultSimulationName =
+      getDefaultSimulationName <| newDefaultSimulationIndex
+    
+    newSimulation =
+      let
+        simulation =
+          Simulation.init
+      in
+      { simulation
+        | name =
+          defaultSimulationName
+      }
+  in
+  { model
+    | simulations =
+      model.simulations ++ [ newSimulation ]
+    , activeSimulation =
+      newSimulation
+    , defaultSimulationIndex =
+      newDefaultSimulationIndex
+  }
+
+
+encodeProject : Model -> Encode.Value
+encodeProject model =
+  Encode.object
+    [ ("simulations", Encode.list Simulation.encodeModel model.simulations)
+    , ("activeSimulation", Simulation.encodeModel model.activeSimulation)
+    , ("defaultSimulationIndex", Encode.int model.defaultSimulationIndex)
+    ]
+
+
+
+decodeProject : Decoder Model
+decodeProject =
+  Field.require "simulations" (Decode.list Simulation.decodeModel) <| \simulations ->
+  Field.require "activeSimulation" Simulation.decodeModel <| \activeSimulation ->
+  Field.require "defaultSimulationIndex" Decode.int <| \defaultSimulationIndex ->
+
+  Decode.succeed
+    { simulations = simulations
+    , activeSimulation = activeSimulation
+    , defaultSimulationIndex = defaultSimulationIndex
+    }
+
+
 subscriptions : Model -> Sub Msg
 subscriptions model =
-  Sub.map SimulationMsg <| Simulation.subscriptions model.activeSimulation
+  Sub.batch
+    [ Sub.map SimulationMsg <| Simulation.subscriptions model.activeSimulation
+    , pageWillClose (\_ -> SaveProject)
+    ]
 
   
-main : Program (List String) Model Msg
+main : Program (Maybe String) Model Msg
 main =
   Browser.element
     { init = init

@@ -1,6 +1,5 @@
-port module Simulation exposing (Model, Msg, init, view, update, subscriptions, defaultName)
+port module Simulation exposing (Model, Msg, init, view, update, subscriptions, encodeModel, decodeModel, defaultName)
 
-import Browser
 import Html exposing (Html)
 import Html.Attributes
 import Html.Events
@@ -24,12 +23,10 @@ import Element.Events
 import Html.Events.Extra.Mouse as Mouse
 import Process
 import Task
-import Utils exposing (toElmUiColor, styles)
+import Utils exposing (toElmUiColor, styles, centeredText)
 
 
 port downloadModel : () -> Cmd msg
-port saveModel : (String, Encode.Value) -> Cmd msg
-port pageWillClose : (() -> msg) -> Sub msg
 
 
 type alias Model =
@@ -119,8 +116,8 @@ defaultName =
   "Untitled Model"
 
 
-init : Maybe String -> (Model, Cmd Msg)
-init savedModel =
+init : Model
+init =
   let
     defaultFields =
       [{ source = { id = 0, sign = Negative, magnitude = 3.0, x = 465.0, y = 270.0, r = 10.0 }
@@ -170,20 +167,7 @@ init savedModel =
       , height = defaultHeight
       }
   in
-  ( case savedModel of
-    Just modelStr ->
-      case Decode.decodeString decodeModel modelStr of
-        Ok model ->
-          { model
-            | fields =
-              calculateFields model.width model.height model.fields
-          }
-        Err _ ->
-          defaultModel
-    Nothing ->
-      defaultModel
-  , Cmd.none
-  )
+  defaultModel
 
 
 calculateFields : Float -> Float -> List Field -> List Field
@@ -326,7 +310,6 @@ type Msg
   | CloseHelpPopUp
   | StopWheelingTimeOut
   | DownloadModel
-  | SaveModel
   | DoNothing
 
 
@@ -414,9 +397,6 @@ update msg model =
 
     DownloadModel ->
       (model, downloadModel ())
-
-    SaveModel ->
-      (model, saveModel (model.name, encodeModel model))
 
     DoNothing ->
       (model, Cmd.none)
@@ -625,7 +605,7 @@ decodeModel =
 
   Decode.succeed
     { name = name
-    , fields = fields
+    , fields = calculateFields width height fields
     , activeSourceId = activeSourceId
     , nextId = nextId
     , settings = settings
@@ -1406,12 +1386,6 @@ negateSign sign =
       Positive
 
 
-centeredText : String -> E.Element Msg
-centeredText text =
-  E.el [ E.centerX ] <|
-    E.text text
-
-
 lerp : Float -> Float -> Float -> Float -> Float -> Float
 lerp min1 max1 min2 max2 num =
   let
@@ -1442,7 +1416,4 @@ foldlWhile accumulate initial list =
 
 subscriptions : Model -> Sub Msg
 subscriptions { drag } =
-  Sub.batch
-    [ Draggable.subscriptions DragMsg drag
-    , pageWillClose (\_ -> SaveModel)
-    ]
+  Draggable.subscriptions DragMsg drag

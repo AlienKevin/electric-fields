@@ -1,4 +1,4 @@
-module Utils exposing (toElmUiColor, styles)
+module Utils exposing (toElmUiColor, styles, centeredText)
 
 import Color
 import Element as E
@@ -28,3 +28,9 @@ styles =
     , Border.color <| toElmUiColor Color.darkGrey
     ]
   }
+
+
+centeredText : String -> E.Element msg
+centeredText text =
+  E.el [ E.centerX ] <|
+    E.text text
