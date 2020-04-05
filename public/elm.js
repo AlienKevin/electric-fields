@@ -7669,20 +7669,23 @@ var $author$project$Main$removeSimulation = F2(
 		if ($elm$core$List$length(model.simulations) === 1) {
 			return model;
 		} else {
-			var simulations = A2(
+			var updatedSimulations = A2(
 				$elm$core$List$filter,
 				function (simulation) {
 					return !_Utils_eq(simulation, target);
 				},
 				model.simulations);
-			return _Utils_eq(target, model.activeSimulation) ? _Utils_update(
+			var updatedModel = _Utils_update(
 				model,
 				{
-					activeSimulation: A2($author$project$Main$getNextSimulation, target, model.simulations),
-					simulations: simulations
-				}) : _Utils_update(
-				model,
-				{simulations: simulations});
+					defaultSimulationIndex: A2($elm$core$String$startsWith, $author$project$Simulation$defaultName, target.name) ? (model.defaultSimulationIndex - 1) : model.defaultSimulationIndex,
+					simulations: updatedSimulations
+				});
+			return _Utils_eq(target, model.activeSimulation) ? _Utils_update(
+				updatedModel,
+				{
+					activeSimulation: A2($author$project$Main$getNextSimulation, target, model.simulations)
+				}) : updatedModel;
 		}
 	});
 var $author$project$Main$saveProject = _Platform_outgoingPort('saveProject', $elm$core$Basics$identity);

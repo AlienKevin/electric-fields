@@ -2,7 +2,6 @@ port module Main exposing (main)
 
 import Browser
 import Html exposing (Html)
-import Html.Attributes
 import Simulation
 import Element as E
 import Element.Input as Input
@@ -267,25 +266,30 @@ removeSimulation target model =
     model
   else
     let
-      simulations =
+      updatedSimulations =
         List.filter
           (\simulation ->
             simulation /= target
           )
           model.simulations
+      updatedModel =
+        { model
+          | simulations =
+            updatedSimulations
+          , defaultSimulationIndex =
+            if String.startsWith Simulation.defaultName target.name then
+              model.defaultSimulationIndex - 1
+            else
+              model.defaultSimulationIndex
+        }
     in
     if target == model.activeSimulation then
-      { model
-        | simulations =
-          simulations
-        , activeSimulation =
+      { updatedModel
+        | activeSimulation =
           getNextSimulation target model.simulations
       }
     else
-      { model
-        | simulations =
-          simulations
-      }
+      updatedModel
 
 
 getNextSimulation : Simulation.Model -> List Simulation.Model -> Simulation.Model
