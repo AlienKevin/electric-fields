@@ -14693,8 +14693,9 @@ var $elm_community$typed_svg$TypedSvg$Attributes$viewBox = F4(
 					_List_fromArray(
 						[minX, minY, vWidth, vHeight]))));
 	});
-var $mdgriffith$elm_ui$Internal$Model$Empty = {$: 'Empty'};
-var $mdgriffith$elm_ui$Element$none = $mdgriffith$elm_ui$Internal$Model$Empty;
+var $mdgriffith$elm_ui$Element$htmlAttribute = $mdgriffith$elm_ui$Internal$Model$Attr;
+var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
+var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
 var $mdgriffith$elm_ui$Element$Background$color = function (clr) {
 	return A2(
 		$mdgriffith$elm_ui$Internal$Model$StyleClass,
@@ -14765,6 +14766,7 @@ var $mdgriffith$elm_ui$Internal$Model$TransformComponent = F2(
 	function (a, b) {
 		return {$: 'TransformComponent', a: a, b: b};
 	});
+var $mdgriffith$elm_ui$Internal$Model$Empty = {$: 'Empty'};
 var $mdgriffith$elm_ui$Internal$Model$Text = function (a) {
 	return {$: 'Text', a: a};
 };
@@ -15240,7 +15242,14 @@ var $author$project$Simulation$viewContextMenu = function (model) {
 			var position = _v0.a;
 			return A2($author$project$Simulation$viewGeneralContextMenu, $author$project$Utils$styles.button, position);
 		default:
-			return $mdgriffith$elm_ui$Element$none;
+			return A2(
+				$mdgriffith$elm_ui$Element$el,
+				_List_fromArray(
+					[
+						$mdgriffith$elm_ui$Element$htmlAttribute(
+						A2($elm$html$Html$Attributes$style, 'display', 'none'))
+					]),
+				A2($author$project$Simulation$viewFieldContextMenu, $author$project$Utils$styles.button, model));
 	}
 };
 var $elm_community$typed_svg$TypedSvg$Types$Paint = function (a) {
@@ -15519,8 +15528,6 @@ var $elm_community$typed_svg$TypedSvg$Attributes$strokeWidth = function (length)
 		'stroke-width',
 		$elm_community$typed_svg$TypedSvg$TypesToStrings$lengthToString(length));
 };
-var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
-var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
 var $elm$core$Basics$composeR = F3(
 	function (f, g, x) {
 		return g(
@@ -15867,7 +15874,6 @@ var $author$project$Utils$centeredText = function (text) {
 			[$mdgriffith$elm_ui$Element$centerX]),
 		$mdgriffith$elm_ui$Element$text(text));
 };
-var $mdgriffith$elm_ui$Element$htmlAttribute = $mdgriffith$elm_ui$Internal$Model$Attr;
 var $author$project$Main$onClickNoProp = function (msg) {
 	return A2(
 		$elm$html$Html$Events$custom,
@@ -15917,6 +15923,7 @@ var $author$project$Main$viewControlPanel = A2(
 			'Upload',
 			$author$project$Main$ShowPopUp($author$project$Main$UploadPopUp))
 		]));
+var $mdgriffith$elm_ui$Element$none = $mdgriffith$elm_ui$Internal$Model$Empty;
 var $author$project$Main$ApplySettingsToCurrentAndFutureFields = {$: 'ApplySettingsToCurrentAndFutureFields'};
 var $author$project$Main$ApplySettingsToFutureFields = {$: 'ApplySettingsToFutureFields'};
 var $author$project$Main$DoNothing = {$: 'DoNothing'};
