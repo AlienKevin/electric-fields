@@ -6373,11 +6373,11 @@ var $elm$core$Task$perform = F2(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
 var $elm$browser$Browser$element = _Browser_element;
+var $author$project$Main$NoPopUp = {$: 'NoPopUp'};
+var $author$project$Main$UploadPending = {$: 'UploadPending'};
 var $author$project$Simulation$Negative = {$: 'Negative'};
 var $author$project$Simulation$NoContextMenu = {$: 'NoContextMenu'};
-var $author$project$Simulation$NoPopUp = {$: 'NoPopUp'};
 var $author$project$Simulation$Positive = {$: 'Positive'};
-var $author$project$Simulation$UploadPending = {$: 'UploadPending'};
 var $elm$json$Json$Decode$andThen = _Json_andThen;
 var $elm$json$Json$Decode$field = _Json_decodeField;
 var $elm$json$Json$Decode$oneOf = _Json_oneOf;
@@ -6567,7 +6567,6 @@ var $author$project$Simulation$calculateFields = F3(
 			},
 			fields);
 	});
-var $author$project$Simulation$defaultSettings = {delta: 1, density: 30, magnitude: 1.0, r: 10.0, steps: 900};
 var $elm$json$Json$Decode$fail = _Json_fail;
 var $elm$json$Json$Decode$float = _Json_decodeFloat;
 var $zaboco$elm_draggable$Internal$NotDragging = {$: 'NotDragging'};
@@ -6741,10 +6740,7 @@ var $author$project$Simulation$decodeModel = function () {
 																	isWheelingTimeOutCleared: false,
 																	name: name,
 																	nextId: nextId,
-																	pendingSettings: $author$project$Simulation$defaultSettings,
-																	popUp: $author$project$Simulation$NoPopUp,
 																	settings: settings,
-																	uploadResult: $author$project$Simulation$UploadPending,
 																	width: width
 																});
 														});
@@ -6755,6 +6751,7 @@ var $author$project$Simulation$decodeModel = function () {
 				});
 		});
 }();
+var $author$project$Simulation$defaultSettings = {delta: 1, density: 30, magnitude: 1.0, r: 10.0, steps: 900};
 var $author$project$Main$decodeProject = A3(
 	$webbhuset$elm_json_decode$Json$Decode$Field$require,
 	'simulations',
@@ -6771,7 +6768,7 @@ var $author$project$Main$decodeProject = A3(
 					$elm$json$Json$Decode$int,
 					function (defaultSimulationIndex) {
 						return $elm$json$Json$Decode$succeed(
-							{activeSimulation: activeSimulation, defaultSimulationIndex: defaultSimulationIndex, simulations: simulations});
+							{activeSimulation: activeSimulation, defaultSimulationIndex: defaultSimulationIndex, pendingSettings: $author$project$Simulation$defaultSettings, popUp: $author$project$Main$NoPopUp, simulations: simulations, uploadResult: $author$project$Main$UploadPending});
 					});
 			});
 	});
@@ -6824,10 +6821,7 @@ var $author$project$Simulation$init = function () {
 		isWheelingTimeOutCleared: false,
 		name: $author$project$Simulation$defaultName,
 		nextId: $elm$core$List$length(defaultFields),
-		pendingSettings: $author$project$Simulation$defaultSettings,
-		popUp: $author$project$Simulation$NoPopUp,
 		settings: $author$project$Simulation$defaultSettings,
-		uploadResult: $author$project$Simulation$UploadPending,
 		width: defaultWidth
 	};
 	return defaultModel;
@@ -6854,7 +6848,7 @@ var $author$project$Main$init = function (savedProject) {
 	}();
 	var defaultSimulations = _List_fromArray(
 		[defaultActiveSimulation]);
-	var defaultProject = {activeSimulation: defaultActiveSimulation, defaultSimulationIndex: 1, simulations: defaultSimulations};
+	var defaultProject = {activeSimulation: defaultActiveSimulation, defaultSimulationIndex: 1, pendingSettings: $author$project$Simulation$defaultSettings, popUp: $author$project$Main$NoPopUp, simulations: defaultSimulations, uploadResult: $author$project$Main$UploadPending};
 	var project = function () {
 		if (savedProject.$ === 'Just') {
 			var projectJson = savedProject.a;
@@ -7349,6 +7343,12 @@ var $author$project$Main$subscriptions = function (model) {
 				})
 			]));
 };
+var $author$project$Main$JsonLoaded = function (a) {
+	return {$: 'JsonLoaded', a: a};
+};
+var $author$project$Main$JsonSelected = function (a) {
+	return {$: 'JsonSelected', a: a};
+};
 var $author$project$Main$addSimulation = function (model) {
 	var newDefaultSimulationIndex = model.defaultSimulationIndex + 1;
 	var defaultSimulationName = $author$project$Main$getDefaultSimulationName(newDefaultSimulationIndex);
@@ -7369,14 +7369,99 @@ var $author$project$Main$addSimulation = function (model) {
 					[newSimulation]))
 		});
 };
+var $author$project$Main$ApplyOptionsPopUp = {$: 'ApplyOptionsPopUp'};
+var $author$project$Main$applyPendingSettings = function (model) {
+	return _Utils_update(
+		model,
+		{popUp: $author$project$Main$ApplyOptionsPopUp});
+};
+var $author$project$Main$mapActiveSimulation = F2(
+	function (func, model) {
+		var mappedActiveSimulation = func(model.activeSimulation);
+		return _Utils_update(
+			model,
+			{
+				activeSimulation: mappedActiveSimulation,
+				simulations: A2(
+					$elm$core$List$map,
+					function (simulation) {
+						return _Utils_eq(simulation, model.activeSimulation) ? mappedActiveSimulation : simulation;
+					},
+					model.simulations)
+			});
+	});
+var $author$project$Main$applySettingsToCurrentAndFutureFields = function (model) {
+	var newSettings = model.pendingSettings;
+	var newFields = A2(
+		$elm$core$List$map,
+		function (field) {
+			var source = field.source;
+			return _Utils_update(
+				field,
+				{
+					delta: newSettings.delta,
+					density: newSettings.density,
+					source: _Utils_update(
+						source,
+						{magnitude: newSettings.magnitude, r: newSettings.r}),
+					steps: newSettings.steps
+				});
+		},
+		model.activeSimulation.fields);
+	var updatedModel = A2(
+		$author$project$Main$mapActiveSimulation,
+		function (simulation) {
+			return _Utils_update(
+				simulation,
+				{
+					fields: A3($author$project$Simulation$calculateFields, simulation.width, simulation.height, newFields),
+					settings: newSettings
+				});
+		},
+		model);
+	return _Utils_update(
+		updatedModel,
+		{popUp: $author$project$Main$NoPopUp});
+};
+var $author$project$Main$applySettingsToFutureFields = function (model) {
+	var updatedModel = A2(
+		$author$project$Main$mapActiveSimulation,
+		function (simulation) {
+			return _Utils_update(
+				simulation,
+				{settings: model.pendingSettings});
+		},
+		model);
+	return _Utils_update(
+		updatedModel,
+		{popUp: $author$project$Main$NoPopUp});
+};
 var $author$project$Main$changeActiveSimulation = F2(
 	function (newSimulation, model) {
 		return _Utils_update(
 			model,
 			{activeSimulation: newSimulation});
 	});
-var $elm$json$Json$Encode$float = _Json_wrap;
-var $elm$json$Json$Encode$int = _Json_wrap;
+var $author$project$Main$closeDownloadPopUp = function (model) {
+	return _Utils_update(
+		model,
+		{popUp: $author$project$Main$NoPopUp});
+};
+var $author$project$Main$closeHelpPopUp = function (model) {
+	return _Utils_update(
+		model,
+		{popUp: $author$project$Main$NoPopUp});
+};
+var $author$project$Main$closeSettingsPopUp = function (model) {
+	return _Utils_update(
+		model,
+		{pendingSettings: model.activeSimulation.settings, popUp: $author$project$Main$NoPopUp});
+};
+var $author$project$Main$closeUploadPopUp = function (model) {
+	return _Utils_update(
+		model,
+		{popUp: $author$project$Main$NoPopUp, uploadResult: $author$project$Main$UploadPending});
+};
 var $elm$json$Json$Encode$list = F2(
 	function (func, entries) {
 		return _Json_wrap(
@@ -7386,6 +7471,24 @@ var $elm$json$Json$Encode$list = F2(
 				_Json_emptyArray(_Utils_Tuple0),
 				entries));
 	});
+var $elm$json$Json$Encode$string = _Json_wrap;
+var $author$project$Main$downloadModelAsJson = _Platform_outgoingPort(
+	'downloadModelAsJson',
+	function ($) {
+		var a = $.a;
+		var b = $.b;
+		return A2(
+			$elm$json$Json$Encode$list,
+			$elm$core$Basics$identity,
+			_List_fromArray(
+				[
+					$elm$json$Json$Encode$string(a),
+					$elm$core$Basics$identity(b)
+				]));
+	});
+var $author$project$Main$downloadModelAsSvg = _Platform_outgoingPort('downloadModelAsSvg', $elm$json$Json$Encode$string);
+var $elm$json$Json$Encode$float = _Json_wrap;
+var $elm$json$Json$Encode$int = _Json_wrap;
 var $elm$json$Json$Encode$null = _Json_encodeNull;
 var $elm$json$Json$Encode$object = function (pairs) {
 	return _Json_wrap(
@@ -7400,7 +7503,6 @@ var $elm$json$Json$Encode$object = function (pairs) {
 			_Json_emptyObject(_Utils_Tuple0),
 			pairs));
 };
-var $elm$json$Json$Encode$string = _Json_wrap;
 var $author$project$Simulation$encodeModel = function (_v0) {
 	var name = _v0.name;
 	var fields = _v0.fields;
@@ -7543,6 +7645,45 @@ var $author$project$Main$encodeProject = function (model) {
 				$elm$json$Json$Encode$int(model.defaultSimulationIndex))
 			]));
 };
+var $elm$time$Time$Posix = function (a) {
+	return {$: 'Posix', a: a};
+};
+var $elm$time$Time$millisToPosix = $elm$time$Time$Posix;
+var $elm$file$File$Select$file = F2(
+	function (mimes, toMsg) {
+		return A2(
+			$elm$core$Task$perform,
+			toMsg,
+			_File_uploadOne(mimes));
+	});
+var $author$project$Main$UploadFailure = function (a) {
+	return {$: 'UploadFailure', a: a};
+};
+var $author$project$Main$UploadSuccess = {$: 'UploadSuccess'};
+var $author$project$Main$loadSimulation = F2(
+	function (jsonString, model) {
+		var _v0 = A2($elm$json$Json$Decode$decodeString, $author$project$Simulation$decodeModel, jsonString);
+		if (_v0.$ === 'Ok') {
+			var uploadedSimulation = _v0.a;
+			return _Utils_update(
+				model,
+				{
+					activeSimulation: uploadedSimulation,
+					simulations: _Utils_ap(
+						model.simulations,
+						_List_fromArray(
+							[uploadedSimulation])),
+					uploadResult: $author$project$Main$UploadSuccess
+				});
+		} else {
+			var err = _v0.a;
+			return _Utils_update(
+				model,
+				{
+					uploadResult: $author$project$Main$UploadFailure(err)
+				});
+		}
+	});
 var $elm$core$List$filter = F2(
 	function (isGood, list) {
 		return A3(
@@ -7870,6 +8011,13 @@ var $author$project$Main$removeSimulation = F2(
 		}
 	});
 var $author$project$Main$saveProject = _Platform_outgoingPort('saveProject', $elm$core$Basics$identity);
+var $author$project$Main$showPopUp = F2(
+	function (popUp, model) {
+		return _Utils_update(
+			model,
+			{popUp: popUp});
+	});
+var $elm$file$File$toString = _File_toString;
 var $author$project$Main$updateActiveSimulation = F2(
 	function (newActiveSimulation, model) {
 		return _Utils_update(
@@ -7895,12 +8043,6 @@ var $author$project$Main$updateActiveSimulationName = F2(
 		return A2($author$project$Main$updateActiveSimulation, newActiveSimulation, model);
 	});
 var $elm$core$Platform$Cmd$map = _Platform_map;
-var $author$project$Simulation$JsonLoaded = function (a) {
-	return {$: 'JsonLoaded', a: a};
-};
-var $author$project$Simulation$JsonSelected = function (a) {
-	return {$: 'JsonSelected', a: a};
-};
 var $author$project$Simulation$addCharge = F3(
 	function (sign, _v0, model) {
 		var x = _v0.a;
@@ -7915,63 +8057,6 @@ var $author$project$Simulation$addCharge = F3(
 				nextId: model.nextId + 1
 			});
 	});
-var $author$project$Simulation$ApplyOptionsPopUp = {$: 'ApplyOptionsPopUp'};
-var $author$project$Simulation$applyPendingSettings = function (model) {
-	return _Utils_update(
-		model,
-		{popUp: $author$project$Simulation$ApplyOptionsPopUp});
-};
-var $author$project$Simulation$applySettingsToCurrentAndFutureFields = function (model) {
-	var newSettings = model.pendingSettings;
-	var newFields = A2(
-		$elm$core$List$map,
-		function (field) {
-			var source = field.source;
-			return _Utils_update(
-				field,
-				{
-					delta: newSettings.delta,
-					density: newSettings.density,
-					source: _Utils_update(
-						source,
-						{magnitude: newSettings.magnitude, r: newSettings.r}),
-					steps: newSettings.steps
-				});
-		},
-		model.fields);
-	return _Utils_update(
-		model,
-		{
-			fields: A3($author$project$Simulation$calculateFields, model.width, model.height, newFields),
-			popUp: $author$project$Simulation$NoPopUp,
-			settings: newSettings
-		});
-};
-var $author$project$Simulation$applySettingsToFutureFields = function (model) {
-	return _Utils_update(
-		model,
-		{popUp: $author$project$Simulation$NoPopUp, settings: model.pendingSettings});
-};
-var $author$project$Simulation$closeDownloadPopUp = function (model) {
-	return _Utils_update(
-		model,
-		{popUp: $author$project$Simulation$NoPopUp});
-};
-var $author$project$Simulation$closeHelpPopUp = function (model) {
-	return _Utils_update(
-		model,
-		{popUp: $author$project$Simulation$NoPopUp});
-};
-var $author$project$Simulation$closeSettingsPopUp = function (model) {
-	return _Utils_update(
-		model,
-		{pendingSettings: model.settings, popUp: $author$project$Simulation$NoPopUp});
-};
-var $author$project$Simulation$closeUploadPopUp = function (model) {
-	return _Utils_update(
-		model,
-		{popUp: $author$project$Simulation$NoPopUp, uploadResult: $author$project$Simulation$UploadPending});
-};
 var $author$project$Simulation$deleteActiveField = function (model) {
 	var newFields = function () {
 		var _v0 = model.activeSourceId;
@@ -8000,21 +8085,6 @@ var $author$project$Simulation$deselectActiveField = function (model) {
 		model,
 		{activeSourceId: $elm$core$Maybe$Nothing});
 };
-var $author$project$Simulation$downloadModelAsJson = _Platform_outgoingPort(
-	'downloadModelAsJson',
-	function ($) {
-		var a = $.a;
-		var b = $.b;
-		return A2(
-			$elm$json$Json$Encode$list,
-			$elm$core$Basics$identity,
-			_List_fromArray(
-				[
-					$elm$json$Json$Encode$string(a),
-					$elm$core$Basics$identity(b)
-				]));
-	});
-var $author$project$Simulation$downloadModelAsSvg = _Platform_outgoingPort('downloadModelAsSvg', $elm$json$Json$Encode$string);
 var $author$project$Simulation$ActivateSource = function (a) {
 	return {$: 'ActivateSource', a: a};
 };
@@ -8145,39 +8215,6 @@ var $author$project$Simulation$deoptimizeModel = function (model) {
 var $author$project$Simulation$endDragging = function (model) {
 	return $author$project$Simulation$deoptimizeModel(model);
 };
-var $elm$time$Time$Posix = function (a) {
-	return {$: 'Posix', a: a};
-};
-var $elm$time$Time$millisToPosix = $elm$time$Time$Posix;
-var $elm$file$File$Select$file = F2(
-	function (mimes, toMsg) {
-		return A2(
-			$elm$core$Task$perform,
-			toMsg,
-			_File_uploadOne(mimes));
-	});
-var $author$project$Simulation$UploadFailure = function (a) {
-	return {$: 'UploadFailure', a: a};
-};
-var $author$project$Simulation$UploadPopUp = {$: 'UploadPopUp'};
-var $author$project$Simulation$UploadSuccess = {$: 'UploadSuccess'};
-var $author$project$Simulation$loadModel = F2(
-	function (jsonString, model) {
-		var _v0 = A2($elm$json$Json$Decode$decodeString, $author$project$Simulation$decodeModel, jsonString);
-		if (_v0.$ === 'Ok') {
-			var uploadedModel = _v0.a;
-			return _Utils_update(
-				uploadedModel,
-				{popUp: $author$project$Simulation$UploadPopUp, uploadResult: $author$project$Simulation$UploadSuccess});
-		} else {
-			var err = _v0.a;
-			return _Utils_update(
-				model,
-				{
-					uploadResult: $author$project$Simulation$UploadFailure(err)
-				});
-		}
-	});
 var $author$project$Simulation$dragSource = F2(
 	function (_v0, field) {
 		var dx = _v0.a;
@@ -8219,11 +8256,9 @@ var $author$project$Simulation$onDragBy = F2(
 			});
 	});
 var $author$project$Simulation$resetState = function (model) {
-	return $author$project$Simulation$closeHelpPopUp(
-		$author$project$Simulation$closeSettingsPopUp(
-			_Utils_update(
-				model,
-				{contextMenu: $author$project$Simulation$NoContextMenu})));
+	return _Utils_update(
+		model,
+		{contextMenu: $author$project$Simulation$NoContextMenu});
 };
 var $author$project$Simulation$StopWheelingTimeOut = {$: 'StopWheelingTimeOut'};
 var $elm$core$Basics$min = F2(
@@ -8324,12 +8359,6 @@ var $author$project$Simulation$showGeneralContextMenu = F2(
 				contextMenu: $author$project$Simulation$GeneralContextMenu(offsetPos)
 			});
 	});
-var $author$project$Simulation$showPopUp = F2(
-	function (popUp, model) {
-		return _Utils_update(
-			model,
-			{popUp: popUp});
-	});
 var $author$project$Simulation$startDragging = F2(
 	function (id, model) {
 		return A2(
@@ -8345,7 +8374,6 @@ var $author$project$Simulation$stopWheelingTimeOut = function (model) {
 			model,
 			{isWheeling: false, isWheelingTimeOutCleared: false}));
 };
-var $elm$file$File$toString = _File_toString;
 var $author$project$Simulation$negateSign = function (sign) {
 	if (sign.$ === 'Positive') {
 		return $author$project$Simulation$Negative;
@@ -8478,70 +8506,6 @@ var $zaboco$elm_draggable$Draggable$update = F3(
 				{drag: dragState}),
 			dragCmd);
 	});
-var $elm$core$String$toFloat = _String_toFloat;
-var $author$project$Simulation$updatePendingSetting = F3(
-	function (field, value, model) {
-		var settings = model.pendingSettings;
-		var newSettings = function () {
-			switch (field) {
-				case 'r':
-					var _v1 = $elm$core$String$toFloat(value);
-					if (_v1.$ === 'Just') {
-						var v = _v1.a;
-						return _Utils_update(
-							settings,
-							{r: v});
-					} else {
-						return settings;
-					}
-				case 'density':
-					var _v2 = $elm$core$String$toInt(value);
-					if (_v2.$ === 'Just') {
-						var v = _v2.a;
-						return _Utils_update(
-							settings,
-							{density: v});
-					} else {
-						return settings;
-					}
-				case 'steps':
-					var _v3 = $elm$core$String$toInt(value);
-					if (_v3.$ === 'Just') {
-						var v = _v3.a;
-						return _Utils_update(
-							settings,
-							{steps: v});
-					} else {
-						return settings;
-					}
-				case 'delta':
-					var _v4 = $elm$core$String$toFloat(value);
-					if (_v4.$ === 'Just') {
-						var v = _v4.a;
-						return _Utils_update(
-							settings,
-							{delta: v});
-					} else {
-						return settings;
-					}
-				case 'magnitude':
-					var _v5 = $elm$core$String$toFloat(value);
-					if (_v5.$ === 'Just') {
-						var v = _v5.a;
-						return _Utils_update(
-							settings,
-							{magnitude: v});
-					} else {
-						return settings;
-					}
-				default:
-					return settings;
-			}
-		}();
-		return _Utils_update(
-			model,
-			{pendingSettings: newSettings});
-	});
 var $author$project$Simulation$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
@@ -8608,84 +8572,11 @@ var $author$project$Simulation$update = F2(
 				return _Utils_Tuple2(
 					A3($author$project$Simulation$addCharge, $author$project$Simulation$Positive, position, model),
 					$elm$core$Platform$Cmd$none);
-			case 'AddNegativeCharge':
+			default:
 				var position = msg.a;
 				return _Utils_Tuple2(
 					A3($author$project$Simulation$addCharge, $author$project$Simulation$Negative, position, model),
 					$elm$core$Platform$Cmd$none);
-			case 'ShowPopUp':
-				var popUp = msg.a;
-				return _Utils_Tuple2(
-					A2($author$project$Simulation$showPopUp, popUp, model),
-					$elm$core$Platform$Cmd$none);
-			case 'UpdatePendingSetting':
-				var field = msg.a;
-				var value = msg.b;
-				return _Utils_Tuple2(
-					A3($author$project$Simulation$updatePendingSetting, field, value, model),
-					$elm$core$Platform$Cmd$none);
-			case 'ApplyPendingSettings':
-				return _Utils_Tuple2(
-					$author$project$Simulation$applyPendingSettings(model),
-					$elm$core$Platform$Cmd$none);
-			case 'ApplySettingsToFutureFields':
-				return _Utils_Tuple2(
-					$author$project$Simulation$applySettingsToFutureFields(model),
-					$elm$core$Platform$Cmd$none);
-			case 'ApplySettingsToCurrentAndFutureFields':
-				return _Utils_Tuple2(
-					$author$project$Simulation$applySettingsToCurrentAndFutureFields(model),
-					$elm$core$Platform$Cmd$none);
-			case 'CloseSettingsPopUp':
-				return _Utils_Tuple2(
-					$author$project$Simulation$closeSettingsPopUp(model),
-					$elm$core$Platform$Cmd$none);
-			case 'CloseHelpPopUp':
-				return _Utils_Tuple2(
-					$author$project$Simulation$closeHelpPopUp(model),
-					$elm$core$Platform$Cmd$none);
-			case 'DownloadModelAsSvg':
-				return _Utils_Tuple2(
-					$author$project$Simulation$closeDownloadPopUp(model),
-					$author$project$Simulation$downloadModelAsSvg(model.name));
-			case 'DownloadModelAsJson':
-				return _Utils_Tuple2(
-					$author$project$Simulation$closeDownloadPopUp(model),
-					$author$project$Simulation$downloadModelAsJson(
-						_Utils_Tuple2(
-							model.name,
-							$author$project$Simulation$encodeModel(model))));
-			case 'CloseDownloadPopUp':
-				return _Utils_Tuple2(
-					$author$project$Simulation$closeDownloadPopUp(model),
-					$elm$core$Platform$Cmd$none);
-			case 'JsonRequested':
-				return _Utils_Tuple2(
-					model,
-					A2(
-						$elm$file$File$Select$file,
-						_List_fromArray(
-							['application/json']),
-						$author$project$Simulation$JsonSelected));
-			case 'JsonSelected':
-				var file = msg.a;
-				return _Utils_Tuple2(
-					model,
-					A2(
-						$elm$core$Task$perform,
-						$author$project$Simulation$JsonLoaded,
-						$elm$file$File$toString(file)));
-			case 'JsonLoaded':
-				var jsonString = msg.a;
-				return _Utils_Tuple2(
-					A2($author$project$Simulation$loadModel, jsonString, model),
-					$elm$core$Platform$Cmd$none);
-			case 'CloseUploadPopUp':
-				return _Utils_Tuple2(
-					$author$project$Simulation$closeUploadPopUp(model),
-					$elm$core$Platform$Cmd$none);
-			default:
-				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 		}
 	});
 var $author$project$Main$updateActiveSimulationWithMsg = F2(
@@ -8696,6 +8587,70 @@ var $author$project$Main$updateActiveSimulationWithMsg = F2(
 		return _Utils_Tuple2(
 			A2($author$project$Main$updateActiveSimulation, newSimulation, model),
 			A2($elm$core$Platform$Cmd$map, $author$project$Main$SimulationMsg, cmd));
+	});
+var $elm$core$String$toFloat = _String_toFloat;
+var $author$project$Main$updatePendingSetting = F3(
+	function (field, value, model) {
+		var settings = model.pendingSettings;
+		var newSettings = function () {
+			switch (field) {
+				case 'r':
+					var _v1 = $elm$core$String$toFloat(value);
+					if (_v1.$ === 'Just') {
+						var v = _v1.a;
+						return _Utils_update(
+							settings,
+							{r: v});
+					} else {
+						return settings;
+					}
+				case 'density':
+					var _v2 = $elm$core$String$toInt(value);
+					if (_v2.$ === 'Just') {
+						var v = _v2.a;
+						return _Utils_update(
+							settings,
+							{density: v});
+					} else {
+						return settings;
+					}
+				case 'steps':
+					var _v3 = $elm$core$String$toInt(value);
+					if (_v3.$ === 'Just') {
+						var v = _v3.a;
+						return _Utils_update(
+							settings,
+							{steps: v});
+					} else {
+						return settings;
+					}
+				case 'delta':
+					var _v4 = $elm$core$String$toFloat(value);
+					if (_v4.$ === 'Just') {
+						var v = _v4.a;
+						return _Utils_update(
+							settings,
+							{delta: v});
+					} else {
+						return settings;
+					}
+				case 'magnitude':
+					var _v5 = $elm$core$String$toFloat(value);
+					if (_v5.$ === 'Just') {
+						var v = _v5.a;
+						return _Utils_update(
+							settings,
+							{magnitude: v});
+					} else {
+						return settings;
+					}
+				default:
+					return settings;
+			}
+		}();
+		return _Utils_update(
+			model,
+			{pendingSettings: newSettings});
 	});
 var $author$project$Main$update = F2(
 	function (message, model) {
@@ -8722,11 +8677,84 @@ var $author$project$Main$update = F2(
 				return _Utils_Tuple2(
 					A2($author$project$Main$removeSimulation, target, model),
 					$elm$core$Platform$Cmd$none);
-			default:
+			case 'SaveProject':
 				return _Utils_Tuple2(
 					model,
 					$author$project$Main$saveProject(
 						$author$project$Main$encodeProject(model)));
+			case 'ShowPopUp':
+				var popUp = message.a;
+				return _Utils_Tuple2(
+					A2($author$project$Main$showPopUp, popUp, model),
+					$elm$core$Platform$Cmd$none);
+			case 'UpdatePendingSetting':
+				var field = message.a;
+				var value = message.b;
+				return _Utils_Tuple2(
+					A3($author$project$Main$updatePendingSetting, field, value, model),
+					$elm$core$Platform$Cmd$none);
+			case 'ApplyPendingSettings':
+				return _Utils_Tuple2(
+					$author$project$Main$applyPendingSettings(model),
+					$elm$core$Platform$Cmd$none);
+			case 'ApplySettingsToFutureFields':
+				return _Utils_Tuple2(
+					$author$project$Main$applySettingsToFutureFields(model),
+					$elm$core$Platform$Cmd$none);
+			case 'ApplySettingsToCurrentAndFutureFields':
+				return _Utils_Tuple2(
+					$author$project$Main$applySettingsToCurrentAndFutureFields(model),
+					$elm$core$Platform$Cmd$none);
+			case 'CloseSettingsPopUp':
+				return _Utils_Tuple2(
+					$author$project$Main$closeSettingsPopUp(model),
+					$elm$core$Platform$Cmd$none);
+			case 'CloseHelpPopUp':
+				return _Utils_Tuple2(
+					$author$project$Main$closeHelpPopUp(model),
+					$elm$core$Platform$Cmd$none);
+			case 'DownloadModelAsSvg':
+				return _Utils_Tuple2(
+					$author$project$Main$closeDownloadPopUp(model),
+					$author$project$Main$downloadModelAsSvg(model.activeSimulation.name));
+			case 'DownloadModelAsJson':
+				return _Utils_Tuple2(
+					$author$project$Main$closeDownloadPopUp(model),
+					$author$project$Main$downloadModelAsJson(
+						_Utils_Tuple2(
+							model.activeSimulation.name,
+							$author$project$Simulation$encodeModel(model.activeSimulation))));
+			case 'CloseDownloadPopUp':
+				return _Utils_Tuple2(
+					$author$project$Main$closeDownloadPopUp(model),
+					$elm$core$Platform$Cmd$none);
+			case 'JsonRequested':
+				return _Utils_Tuple2(
+					model,
+					A2(
+						$elm$file$File$Select$file,
+						_List_fromArray(
+							['application/json']),
+						$author$project$Main$JsonSelected));
+			case 'JsonSelected':
+				var file = message.a;
+				return _Utils_Tuple2(
+					model,
+					A2(
+						$elm$core$Task$perform,
+						$author$project$Main$JsonLoaded,
+						$elm$file$File$toString(file)));
+			case 'JsonLoaded':
+				var jsonString = message.a;
+				return _Utils_Tuple2(
+					A2($author$project$Main$loadSimulation, jsonString, model),
+					$elm$core$Platform$Cmd$none);
+			case 'CloseUploadPopUp':
+				return _Utils_Tuple2(
+					$author$project$Main$closeUploadPopUp(model),
+					$elm$core$Platform$Cmd$none);
+			default:
+				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 		}
 	});
 var $mdgriffith$elm_ui$Internal$Model$Above = {$: 'Above'};
@@ -8745,6 +8773,10 @@ var $mdgriffith$elm_ui$Element$createNearby = F2(
 	});
 var $mdgriffith$elm_ui$Element$above = function (element) {
 	return A2($mdgriffith$elm_ui$Element$createNearby, $mdgriffith$elm_ui$Internal$Model$Above, element);
+};
+var $mdgriffith$elm_ui$Internal$Model$Below = {$: 'Below'};
+var $mdgriffith$elm_ui$Element$below = function (element) {
+	return A2($mdgriffith$elm_ui$Element$createNearby, $mdgriffith$elm_ui$Internal$Model$Below, element);
 };
 var $mdgriffith$elm_ui$Internal$Model$AlignX = function (a) {
 	return {$: 'AlignX', a: a};
@@ -14192,6 +14224,10 @@ var $elm$core$Basics$always = F2(
 	});
 var $mdgriffith$elm_ui$Internal$Model$unstyled = A2($elm$core$Basics$composeL, $mdgriffith$elm_ui$Internal$Model$Unstyled, $elm$core$Basics$always);
 var $mdgriffith$elm_ui$Element$html = $mdgriffith$elm_ui$Internal$Model$unstyled;
+var $mdgriffith$elm_ui$Internal$Model$InFront = {$: 'InFront'};
+var $mdgriffith$elm_ui$Element$inFront = function (element) {
+	return A2($mdgriffith$elm_ui$Element$createNearby, $mdgriffith$elm_ui$Internal$Model$InFront, element);
+};
 var $mdgriffith$elm_ui$Internal$Model$Attr = function (a) {
 	return {$: 'Attr', a: a};
 };
@@ -14442,10 +14478,6 @@ var $author$project$Simulation$ClickedBackground = {$: 'ClickedBackground'};
 var $author$project$Simulation$ShowGeneralContextMenu = function (a) {
 	return {$: 'ShowGeneralContextMenu', a: a};
 };
-var $mdgriffith$elm_ui$Internal$Model$Below = {$: 'Below'};
-var $mdgriffith$elm_ui$Element$below = function (element) {
-	return A2($mdgriffith$elm_ui$Element$createNearby, $mdgriffith$elm_ui$Internal$Model$Below, element);
-};
 var $elm_community$typed_svg$TypedSvg$Core$attribute = $elm$virtual_dom$VirtualDom$attribute;
 var $elm_community$typed_svg$TypedSvg$TypesToStrings$lengthToString = function (length) {
 	switch (length.$) {
@@ -14488,10 +14520,6 @@ var $elm_community$typed_svg$TypedSvg$Attributes$height = function (length) {
 		$elm_community$typed_svg$TypedSvg$TypesToStrings$lengthToString(length));
 };
 var $elm_community$typed_svg$TypedSvg$Attributes$id = $elm_community$typed_svg$TypedSvg$Core$attribute('id');
-var $mdgriffith$elm_ui$Internal$Model$InFront = {$: 'InFront'};
-var $mdgriffith$elm_ui$Element$inFront = function (element) {
-	return A2($mdgriffith$elm_ui$Element$createNearby, $mdgriffith$elm_ui$Internal$Model$InFront, element);
-};
 var $elm$virtual_dom$VirtualDom$Normal = function (a) {
 	return {$: 'Normal', a: a};
 };
@@ -15215,108 +15243,6 @@ var $author$project$Simulation$viewContextMenu = function (model) {
 			return $mdgriffith$elm_ui$Element$none;
 	}
 };
-var $author$project$Simulation$DownloadPopUp = {$: 'DownloadPopUp'};
-var $author$project$Simulation$HelpPopUp = {$: 'HelpPopUp'};
-var $author$project$Simulation$SettingsPopUp = {$: 'SettingsPopUp'};
-var $author$project$Simulation$ShowPopUp = function (a) {
-	return {$: 'ShowPopUp', a: a};
-};
-var $mdgriffith$elm_ui$Internal$Model$AsRow = {$: 'AsRow'};
-var $mdgriffith$elm_ui$Internal$Model$asRow = $mdgriffith$elm_ui$Internal$Model$AsRow;
-var $mdgriffith$elm_ui$Element$row = F2(
-	function (attrs, children) {
-		return A4(
-			$mdgriffith$elm_ui$Internal$Model$element,
-			$mdgriffith$elm_ui$Internal$Model$asRow,
-			$mdgriffith$elm_ui$Internal$Model$div,
-			A2(
-				$elm$core$List$cons,
-				$mdgriffith$elm_ui$Internal$Model$htmlClass($mdgriffith$elm_ui$Internal$Style$classes.contentLeft + (' ' + $mdgriffith$elm_ui$Internal$Style$classes.contentCenterY)),
-				A2(
-					$elm$core$List$cons,
-					$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$shrink),
-					A2(
-						$elm$core$List$cons,
-						$mdgriffith$elm_ui$Element$height($mdgriffith$elm_ui$Element$shrink),
-						attrs))),
-			$mdgriffith$elm_ui$Internal$Model$Unkeyed(children));
-	});
-var $mdgriffith$elm_ui$Internal$Model$SpacingStyle = F3(
-	function (a, b, c) {
-		return {$: 'SpacingStyle', a: a, b: b, c: c};
-	});
-var $mdgriffith$elm_ui$Internal$Flag$spacing = $mdgriffith$elm_ui$Internal$Flag$flag(3);
-var $mdgriffith$elm_ui$Internal$Model$spacingName = F2(
-	function (x, y) {
-		return 'spacing-' + ($elm$core$String$fromInt(x) + ('-' + $elm$core$String$fromInt(y)));
-	});
-var $mdgriffith$elm_ui$Element$spacing = function (x) {
-	return A2(
-		$mdgriffith$elm_ui$Internal$Model$StyleClass,
-		$mdgriffith$elm_ui$Internal$Flag$spacing,
-		A3(
-			$mdgriffith$elm_ui$Internal$Model$SpacingStyle,
-			A2($mdgriffith$elm_ui$Internal$Model$spacingName, x, x),
-			x,
-			x));
-};
-var $author$project$Utils$centeredText = function (text) {
-	return A2(
-		$mdgriffith$elm_ui$Element$el,
-		_List_fromArray(
-			[$mdgriffith$elm_ui$Element$centerX]),
-		$mdgriffith$elm_ui$Element$text(text));
-};
-var $mdgriffith$elm_ui$Element$htmlAttribute = $mdgriffith$elm_ui$Internal$Model$Attr;
-var $author$project$Simulation$onClickNoProp = function (msg) {
-	return A2(
-		$elm$html$Html$Events$custom,
-		'click',
-		$elm$json$Json$Decode$succeed(
-			{message: msg, preventDefault: false, stopPropagation: true}));
-};
-var $author$project$Simulation$viewButtonNoProp = F2(
-	function (text, msg) {
-		return A2(
-			$mdgriffith$elm_ui$Element$Input$button,
-			_Utils_ap(
-				$author$project$Utils$styles.button,
-				_List_fromArray(
-					[
-						$mdgriffith$elm_ui$Element$htmlAttribute(
-						$author$project$Simulation$onClickNoProp(msg))
-					])),
-			{
-				label: $author$project$Utils$centeredText(text),
-				onPress: $elm$core$Maybe$Nothing
-			});
-	});
-var $author$project$Simulation$viewControlPanel = A2(
-	$mdgriffith$elm_ui$Element$row,
-	_List_fromArray(
-		[
-			$mdgriffith$elm_ui$Element$centerX,
-			$mdgriffith$elm_ui$Element$spacing(10)
-		]),
-	_List_fromArray(
-		[
-			A2(
-			$author$project$Simulation$viewButtonNoProp,
-			'Help',
-			$author$project$Simulation$ShowPopUp($author$project$Simulation$HelpPopUp)),
-			A2(
-			$author$project$Simulation$viewButtonNoProp,
-			'Settings',
-			$author$project$Simulation$ShowPopUp($author$project$Simulation$SettingsPopUp)),
-			A2(
-			$author$project$Simulation$viewButtonNoProp,
-			'Download',
-			$author$project$Simulation$ShowPopUp($author$project$Simulation$DownloadPopUp)),
-			A2(
-			$author$project$Simulation$viewButtonNoProp,
-			'Upload',
-			$author$project$Simulation$ShowPopUp($author$project$Simulation$UploadPopUp))
-		]));
 var $elm_community$typed_svg$TypedSvg$Types$Paint = function (a) {
 	return {$: 'Paint', a: a};
 };
@@ -15839,9 +15765,161 @@ var $author$project$Simulation$viewFieldSource = F2(
 						]))
 				]));
 	});
-var $author$project$Simulation$ApplySettingsToCurrentAndFutureFields = {$: 'ApplySettingsToCurrentAndFutureFields'};
-var $author$project$Simulation$ApplySettingsToFutureFields = {$: 'ApplySettingsToFutureFields'};
-var $author$project$Simulation$DoNothing = {$: 'DoNothing'};
+var $elm_community$typed_svg$TypedSvg$Attributes$width = function (length) {
+	return A2(
+		$elm_community$typed_svg$TypedSvg$Core$attribute,
+		'width',
+		$elm_community$typed_svg$TypedSvg$TypesToStrings$lengthToString(length));
+};
+var $author$project$Simulation$view = function (model) {
+	return A2(
+		$mdgriffith$elm_ui$Element$layout,
+		_List_fromArray(
+			[
+				$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill),
+				$mdgriffith$elm_ui$Element$height($mdgriffith$elm_ui$Element$fill),
+				$mdgriffith$elm_ui$Element$Events$onClick($author$project$Simulation$ClickedBackground),
+				$mdgriffith$elm_ui$Element$Font$size(16),
+				$mdgriffith$elm_ui$Element$Font$family(
+				_List_fromArray(
+					[$mdgriffith$elm_ui$Element$Font$monospace]))
+			]),
+		A2(
+			$mdgriffith$elm_ui$Element$el,
+			_List_fromArray(
+				[
+					$mdgriffith$elm_ui$Element$inFront(
+					$author$project$Simulation$viewContextMenu(model)),
+					$mdgriffith$elm_ui$Element$centerX,
+					$mdgriffith$elm_ui$Element$centerY,
+					A2($mdgriffith$elm_ui$Element$paddingXY, 0, 5)
+				]),
+			$mdgriffith$elm_ui$Element$html(
+				A2(
+					$elm_community$typed_svg$TypedSvg$svg,
+					_List_fromArray(
+						[
+							$elm_community$typed_svg$TypedSvg$Attributes$width(
+							$elm_community$typed_svg$TypedSvg$Types$px(model.width)),
+							$elm_community$typed_svg$TypedSvg$Attributes$height(
+							$elm_community$typed_svg$TypedSvg$Types$px(model.height)),
+							A4($elm_community$typed_svg$TypedSvg$Attributes$viewBox, 0, 0, model.width, model.height),
+							$elm_community$typed_svg$TypedSvg$Attributes$id('modelSvg'),
+							$mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onContextMenu($author$project$Simulation$ShowGeneralContextMenu)
+						]),
+					_Utils_ap(
+						A2($elm$core$List$map, $author$project$Simulation$viewFieldLines, model.fields),
+						A2(
+							$elm$core$List$map,
+							$author$project$Simulation$viewFieldSource(model.activeSourceId),
+							model.fields))))));
+};
+var $author$project$Main$DownloadPopUp = {$: 'DownloadPopUp'};
+var $author$project$Main$HelpPopUp = {$: 'HelpPopUp'};
+var $author$project$Main$SettingsPopUp = {$: 'SettingsPopUp'};
+var $author$project$Main$ShowPopUp = function (a) {
+	return {$: 'ShowPopUp', a: a};
+};
+var $author$project$Main$UploadPopUp = {$: 'UploadPopUp'};
+var $mdgriffith$elm_ui$Internal$Model$AsRow = {$: 'AsRow'};
+var $mdgriffith$elm_ui$Internal$Model$asRow = $mdgriffith$elm_ui$Internal$Model$AsRow;
+var $mdgriffith$elm_ui$Element$row = F2(
+	function (attrs, children) {
+		return A4(
+			$mdgriffith$elm_ui$Internal$Model$element,
+			$mdgriffith$elm_ui$Internal$Model$asRow,
+			$mdgriffith$elm_ui$Internal$Model$div,
+			A2(
+				$elm$core$List$cons,
+				$mdgriffith$elm_ui$Internal$Model$htmlClass($mdgriffith$elm_ui$Internal$Style$classes.contentLeft + (' ' + $mdgriffith$elm_ui$Internal$Style$classes.contentCenterY)),
+				A2(
+					$elm$core$List$cons,
+					$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$shrink),
+					A2(
+						$elm$core$List$cons,
+						$mdgriffith$elm_ui$Element$height($mdgriffith$elm_ui$Element$shrink),
+						attrs))),
+			$mdgriffith$elm_ui$Internal$Model$Unkeyed(children));
+	});
+var $mdgriffith$elm_ui$Internal$Model$SpacingStyle = F3(
+	function (a, b, c) {
+		return {$: 'SpacingStyle', a: a, b: b, c: c};
+	});
+var $mdgriffith$elm_ui$Internal$Flag$spacing = $mdgriffith$elm_ui$Internal$Flag$flag(3);
+var $mdgriffith$elm_ui$Internal$Model$spacingName = F2(
+	function (x, y) {
+		return 'spacing-' + ($elm$core$String$fromInt(x) + ('-' + $elm$core$String$fromInt(y)));
+	});
+var $mdgriffith$elm_ui$Element$spacing = function (x) {
+	return A2(
+		$mdgriffith$elm_ui$Internal$Model$StyleClass,
+		$mdgriffith$elm_ui$Internal$Flag$spacing,
+		A3(
+			$mdgriffith$elm_ui$Internal$Model$SpacingStyle,
+			A2($mdgriffith$elm_ui$Internal$Model$spacingName, x, x),
+			x,
+			x));
+};
+var $author$project$Utils$centeredText = function (text) {
+	return A2(
+		$mdgriffith$elm_ui$Element$el,
+		_List_fromArray(
+			[$mdgriffith$elm_ui$Element$centerX]),
+		$mdgriffith$elm_ui$Element$text(text));
+};
+var $mdgriffith$elm_ui$Element$htmlAttribute = $mdgriffith$elm_ui$Internal$Model$Attr;
+var $author$project$Main$onClickNoProp = function (msg) {
+	return A2(
+		$elm$html$Html$Events$custom,
+		'click',
+		$elm$json$Json$Decode$succeed(
+			{message: msg, preventDefault: false, stopPropagation: true}));
+};
+var $author$project$Main$viewButtonNoProp = F2(
+	function (text, msg) {
+		return A2(
+			$mdgriffith$elm_ui$Element$Input$button,
+			_Utils_ap(
+				$author$project$Utils$styles.button,
+				_List_fromArray(
+					[
+						$mdgriffith$elm_ui$Element$htmlAttribute(
+						$author$project$Main$onClickNoProp(msg))
+					])),
+			{
+				label: $author$project$Utils$centeredText(text),
+				onPress: $elm$core$Maybe$Nothing
+			});
+	});
+var $author$project$Main$viewControlPanel = A2(
+	$mdgriffith$elm_ui$Element$row,
+	_List_fromArray(
+		[
+			$mdgriffith$elm_ui$Element$centerX,
+			$mdgriffith$elm_ui$Element$spacing(10)
+		]),
+	_List_fromArray(
+		[
+			A2(
+			$author$project$Main$viewButtonNoProp,
+			'Help',
+			$author$project$Main$ShowPopUp($author$project$Main$HelpPopUp)),
+			A2(
+			$author$project$Main$viewButtonNoProp,
+			'Settings',
+			$author$project$Main$ShowPopUp($author$project$Main$SettingsPopUp)),
+			A2(
+			$author$project$Main$viewButtonNoProp,
+			'Download',
+			$author$project$Main$ShowPopUp($author$project$Main$DownloadPopUp)),
+			A2(
+			$author$project$Main$viewButtonNoProp,
+			'Upload',
+			$author$project$Main$ShowPopUp($author$project$Main$UploadPopUp))
+		]));
+var $author$project$Main$ApplySettingsToCurrentAndFutureFields = {$: 'ApplySettingsToCurrentAndFutureFields'};
+var $author$project$Main$ApplySettingsToFutureFields = {$: 'ApplySettingsToFutureFields'};
+var $author$project$Main$DoNothing = {$: 'DoNothing'};
 var $mdgriffith$elm_ui$Element$padding = function (x) {
 	return A2(
 		$mdgriffith$elm_ui$Internal$Model$StyleClass,
@@ -15883,7 +15961,7 @@ var $mdgriffith$elm_ui$Element$paddingEach = function (_v0) {
 			bottom,
 			left));
 };
-var $author$project$Simulation$viewPopUpOf = F3(
+var $author$project$Main$viewPopUpOf = F3(
 	function (title, attributes, content) {
 		return A2(
 			$mdgriffith$elm_ui$Element$column,
@@ -15898,7 +15976,7 @@ var $author$project$Simulation$viewPopUpOf = F3(
 						$mdgriffith$elm_ui$Element$Border$width(2),
 						$mdgriffith$elm_ui$Element$Border$color($author$project$Utils$colors.black),
 						$mdgriffith$elm_ui$Element$htmlAttribute(
-						$author$project$Simulation$onClickNoProp($author$project$Simulation$DoNothing))
+						$author$project$Main$onClickNoProp($author$project$Main$DoNothing))
 					]),
 				attributes),
 			_Utils_ap(
@@ -15916,11 +15994,11 @@ var $author$project$Simulation$viewPopUpOf = F3(
 					]),
 				content));
 	});
-var $author$project$Simulation$viewApplyOptions = function (model) {
+var $author$project$Main$viewApplyOptions = function (model) {
 	var _v0 = model.popUp;
 	if (_v0.$ === 'ApplyOptionsPopUp') {
 		return A3(
-			$author$project$Simulation$viewPopUpOf,
+			$author$project$Main$viewPopUpOf,
 			'Which fields do you want to apply to?',
 			_List_Nil,
 			_List_fromArray(
@@ -15935,7 +16013,7 @@ var $author$project$Simulation$viewApplyOptions = function (model) {
 							])),
 					{
 						label: $author$project$Utils$centeredText('Apply to future fields'),
-						onPress: $elm$core$Maybe$Just($author$project$Simulation$ApplySettingsToFutureFields)
+						onPress: $elm$core$Maybe$Just($author$project$Main$ApplySettingsToFutureFields)
 					}),
 					A2(
 					$mdgriffith$elm_ui$Element$Input$button,
@@ -15947,19 +16025,19 @@ var $author$project$Simulation$viewApplyOptions = function (model) {
 							])),
 					{
 						label: $author$project$Utils$centeredText('Apply to current and future fields'),
-						onPress: $elm$core$Maybe$Just($author$project$Simulation$ApplySettingsToCurrentAndFutureFields)
+						onPress: $elm$core$Maybe$Just($author$project$Main$ApplySettingsToCurrentAndFutureFields)
 					})
 				]));
 	} else {
 		return $mdgriffith$elm_ui$Element$none;
 	}
 };
-var $author$project$Simulation$CloseDownloadPopUp = {$: 'CloseDownloadPopUp'};
-var $author$project$Simulation$DownloadModelAsJson = {$: 'DownloadModelAsJson'};
-var $author$project$Simulation$DownloadModelAsSvg = {$: 'DownloadModelAsSvg'};
+var $author$project$Main$CloseDownloadPopUp = {$: 'CloseDownloadPopUp'};
+var $author$project$Main$DownloadModelAsJson = {$: 'DownloadModelAsJson'};
+var $author$project$Main$DownloadModelAsSvg = {$: 'DownloadModelAsSvg'};
 var $mdgriffith$elm_ui$Internal$Model$Right = {$: 'Right'};
 var $mdgriffith$elm_ui$Element$alignRight = $mdgriffith$elm_ui$Internal$Model$AlignX($mdgriffith$elm_ui$Internal$Model$Right);
-var $author$project$Simulation$textHeader = function (text) {
+var $author$project$Main$textHeader = function (text) {
 	return A2(
 		$mdgriffith$elm_ui$Element$el,
 		_List_fromArray(
@@ -15968,8 +16046,8 @@ var $author$project$Simulation$textHeader = function (text) {
 			]),
 		$mdgriffith$elm_ui$Element$text(text));
 };
-var $author$project$Simulation$viewDownloadPopUp = A3(
-	$author$project$Simulation$viewPopUpOf,
+var $author$project$Main$viewDownloadPopUp = A3(
+	$author$project$Main$viewPopUpOf,
 	'Download',
 	_List_fromArray(
 		[
@@ -15977,7 +16055,7 @@ var $author$project$Simulation$viewDownloadPopUp = A3(
 		]),
 	_List_fromArray(
 		[
-			$author$project$Simulation$textHeader('Which format do you want to download in?'),
+			$author$project$Main$textHeader('Which format do you want to download in?'),
 			$mdgriffith$elm_ui$Element$text('Pick SVG if you want to share or display the model.'),
 			A2(
 			$mdgriffith$elm_ui$Element$Input$button,
@@ -15989,7 +16067,7 @@ var $author$project$Simulation$viewDownloadPopUp = A3(
 					])),
 			{
 				label: $author$project$Utils$centeredText('Download as SVG'),
-				onPress: $elm$core$Maybe$Just($author$project$Simulation$DownloadModelAsSvg)
+				onPress: $elm$core$Maybe$Just($author$project$Main$DownloadModelAsSvg)
 			}),
 			$mdgriffith$elm_ui$Element$text('Pick JSON if you want to save the model for editing later.'),
 			A2(
@@ -16002,7 +16080,7 @@ var $author$project$Simulation$viewDownloadPopUp = A3(
 					])),
 			{
 				label: $author$project$Utils$centeredText('Downloas as JSON'),
-				onPress: $elm$core$Maybe$Just($author$project$Simulation$DownloadModelAsJson)
+				onPress: $elm$core$Maybe$Just($author$project$Main$DownloadModelAsJson)
 			}),
 			A2(
 			$mdgriffith$elm_ui$Element$el,
@@ -16017,17 +16095,17 @@ var $author$project$Simulation$viewDownloadPopUp = A3(
 				$author$project$Utils$styles.button,
 				{
 					label: $author$project$Utils$centeredText('Cancel'),
-					onPress: $elm$core$Maybe$Just($author$project$Simulation$CloseDownloadPopUp)
+					onPress: $elm$core$Maybe$Just($author$project$Main$CloseDownloadPopUp)
 				}))
 		]));
-var $author$project$Simulation$CloseHelpPopUp = {$: 'CloseHelpPopUp'};
-var $author$project$Simulation$viewHelpPopUp = A3(
-	$author$project$Simulation$viewPopUpOf,
+var $author$project$Main$CloseHelpPopUp = {$: 'CloseHelpPopUp'};
+var $author$project$Main$viewHelpPopUp = A3(
+	$author$project$Main$viewPopUpOf,
 	'Help',
 	_List_Nil,
 	_List_fromArray(
 		[
-			$author$project$Simulation$textHeader('When you mouse over a charge and ...'),
+			$author$project$Main$textHeader('When you mouse over a charge and ...'),
 			$mdgriffith$elm_ui$Element$text('  Single click: select charge'),
 			$mdgriffith$elm_ui$Element$text('  Double click: negate charge'),
 			$mdgriffith$elm_ui$Element$text('  Right click:  * delete charge'),
@@ -16035,7 +16113,7 @@ var $author$project$Simulation$viewHelpPopUp = A3(
 			$mdgriffith$elm_ui$Element$text('                * deselect charge'),
 			$mdgriffith$elm_ui$Element$text('  Scroll up:    increase charge magnitude'),
 			$mdgriffith$elm_ui$Element$text('  Scroll down:  decrease charge magnitude'),
-			$author$project$Simulation$textHeader('When you mouse over background and ...'),
+			$author$project$Main$textHeader('When you mouse over background and ...'),
 			$mdgriffith$elm_ui$Element$text('  Right Click:  * add + charge'),
 			$mdgriffith$elm_ui$Element$text('                * add - charge'),
 			A2(
@@ -16051,12 +16129,12 @@ var $author$project$Simulation$viewHelpPopUp = A3(
 				$author$project$Utils$styles.button,
 				{
 					label: $author$project$Utils$centeredText('Close'),
-					onPress: $elm$core$Maybe$Just($author$project$Simulation$CloseHelpPopUp)
+					onPress: $elm$core$Maybe$Just($author$project$Main$CloseHelpPopUp)
 				}))
 		]));
-var $author$project$Simulation$ApplyPendingSettings = {$: 'ApplyPendingSettings'};
-var $author$project$Simulation$CloseSettingsPopUp = {$: 'CloseSettingsPopUp'};
-var $author$project$Simulation$UpdatePendingSetting = F2(
+var $author$project$Main$ApplyPendingSettings = {$: 'ApplyPendingSettings'};
+var $author$project$Main$CloseSettingsPopUp = {$: 'CloseSettingsPopUp'};
+var $author$project$Main$UpdatePendingSetting = F2(
 	function (a, b) {
 		return {$: 'UpdatePendingSetting', a: a, b: b};
 	});
@@ -16868,15 +16946,15 @@ var $mdgriffith$elm_ui$Element$Input$text = $mdgriffith$elm_ui$Element$Input$tex
 		spellchecked: false,
 		type_: $mdgriffith$elm_ui$Element$Input$TextInputNode('text')
 	});
-var $author$project$Simulation$viewSettingsPopUp = function (model) {
+var $author$project$Main$viewSettingsPopUp = function (model) {
 	var settings = model.pendingSettings;
 	return A3(
-		$author$project$Simulation$viewPopUpOf,
+		$author$project$Main$viewPopUpOf,
 		'Settings',
 		_List_fromArray(
 			[
 				$mdgriffith$elm_ui$Element$inFront(
-				$author$project$Simulation$viewApplyOptions(model))
+				$author$project$Main$viewApplyOptions(model))
 			]),
 		_List_fromArray(
 			[
@@ -16889,7 +16967,7 @@ var $author$project$Simulation$viewSettingsPopUp = function (model) {
 						_List_fromArray(
 							[$mdgriffith$elm_ui$Element$centerY]),
 						$mdgriffith$elm_ui$Element$text('Charge radius (px)')),
-					onChange: $author$project$Simulation$UpdatePendingSetting('r'),
+					onChange: $author$project$Main$UpdatePendingSetting('r'),
 					placeholder: $elm$core$Maybe$Nothing,
 					text: $elm$core$String$fromFloat(settings.r)
 				}),
@@ -16902,7 +16980,7 @@ var $author$project$Simulation$viewSettingsPopUp = function (model) {
 						_List_fromArray(
 							[$mdgriffith$elm_ui$Element$centerY]),
 						$mdgriffith$elm_ui$Element$text('Field line density')),
-					onChange: $author$project$Simulation$UpdatePendingSetting('density'),
+					onChange: $author$project$Main$UpdatePendingSetting('density'),
 					placeholder: $elm$core$Maybe$Nothing,
 					text: $elm$core$String$fromInt(settings.density)
 				}),
@@ -16915,7 +16993,7 @@ var $author$project$Simulation$viewSettingsPopUp = function (model) {
 						_List_fromArray(
 							[$mdgriffith$elm_ui$Element$centerY]),
 						$mdgriffith$elm_ui$Element$text('Draw steps')),
-					onChange: $author$project$Simulation$UpdatePendingSetting('steps'),
+					onChange: $author$project$Main$UpdatePendingSetting('steps'),
 					placeholder: $elm$core$Maybe$Nothing,
 					text: $elm$core$String$fromInt(settings.steps)
 				}),
@@ -16928,7 +17006,7 @@ var $author$project$Simulation$viewSettingsPopUp = function (model) {
 						_List_fromArray(
 							[$mdgriffith$elm_ui$Element$centerY]),
 						$mdgriffith$elm_ui$Element$text('Draw step size (px)')),
-					onChange: $author$project$Simulation$UpdatePendingSetting('delta'),
+					onChange: $author$project$Main$UpdatePendingSetting('delta'),
 					placeholder: $elm$core$Maybe$Nothing,
 					text: $elm$core$String$fromFloat(settings.delta)
 				}),
@@ -16941,7 +17019,7 @@ var $author$project$Simulation$viewSettingsPopUp = function (model) {
 						_List_fromArray(
 							[$mdgriffith$elm_ui$Element$centerY]),
 						$mdgriffith$elm_ui$Element$text('Charge magnitude')),
-					onChange: $author$project$Simulation$UpdatePendingSetting('magnitude'),
+					onChange: $author$project$Main$UpdatePendingSetting('magnitude'),
 					placeholder: $elm$core$Maybe$Nothing,
 					text: $elm$core$String$fromFloat(settings.magnitude)
 				}),
@@ -16963,7 +17041,7 @@ var $author$project$Simulation$viewSettingsPopUp = function (model) {
 								[$mdgriffith$elm_ui$Element$alignLeft])),
 						{
 							label: $author$project$Utils$centeredText('Apply'),
-							onPress: $elm$core$Maybe$Just($author$project$Simulation$ApplyPendingSettings)
+							onPress: $elm$core$Maybe$Just($author$project$Main$ApplyPendingSettings)
 						}),
 						A2(
 						$mdgriffith$elm_ui$Element$Input$button,
@@ -16973,13 +17051,13 @@ var $author$project$Simulation$viewSettingsPopUp = function (model) {
 								[$mdgriffith$elm_ui$Element$alignRight])),
 						{
 							label: $author$project$Utils$centeredText('Cancel'),
-							onPress: $elm$core$Maybe$Just($author$project$Simulation$CloseSettingsPopUp)
+							onPress: $elm$core$Maybe$Just($author$project$Main$CloseSettingsPopUp)
 						})
 					]))
 			]));
 };
-var $author$project$Simulation$CloseUploadPopUp = {$: 'CloseUploadPopUp'};
-var $author$project$Simulation$JsonRequested = {$: 'JsonRequested'};
+var $author$project$Main$CloseUploadPopUp = {$: 'CloseUploadPopUp'};
+var $author$project$Main$JsonRequested = {$: 'JsonRequested'};
 var $elm$html$Html$pre = _VirtualDom_node('pre');
 var $elm$core$String$replace = F3(
 	function (before, after, string) {
@@ -16988,9 +17066,9 @@ var $elm$core$String$replace = F3(
 			after,
 			A2($elm$core$String$split, before, string));
 	});
-var $author$project$Simulation$viewUploadPopUp = function (model) {
+var $author$project$Main$viewUploadPopUp = function (model) {
 	return A3(
-		$author$project$Simulation$viewPopUpOf,
+		$author$project$Main$viewPopUpOf,
 		'Upload',
 		_List_fromArray(
 			[
@@ -16998,7 +17076,7 @@ var $author$project$Simulation$viewUploadPopUp = function (model) {
 			]),
 		_List_fromArray(
 			[
-				$author$project$Simulation$textHeader('Load a simulation from a local JSON file.'),
+				$author$project$Main$textHeader('Load a simulation from a local JSON file.'),
 				A2(
 				$mdgriffith$elm_ui$Element$Input$button,
 				_Utils_ap(
@@ -17009,7 +17087,7 @@ var $author$project$Simulation$viewUploadPopUp = function (model) {
 						])),
 				{
 					label: $author$project$Utils$centeredText('Upload from my computer'),
-					onPress: $elm$core$Maybe$Just($author$project$Simulation$JsonRequested)
+					onPress: $elm$core$Maybe$Just($author$project$Main$JsonRequested)
 				}),
 				function () {
 				var _v0 = model.uploadResult;
@@ -17047,78 +17125,26 @@ var $author$project$Simulation$viewUploadPopUp = function (model) {
 						[$mdgriffith$elm_ui$Element$alignRight])),
 				{
 					label: $author$project$Utils$centeredText('Close'),
-					onPress: $elm$core$Maybe$Just($author$project$Simulation$CloseUploadPopUp)
+					onPress: $elm$core$Maybe$Just($author$project$Main$CloseUploadPopUp)
 				})
 			]));
 };
-var $author$project$Simulation$viewPopUp = function (model) {
+var $author$project$Main$viewPopUp = function (model) {
 	var _v0 = model.popUp;
 	switch (_v0.$) {
 		case 'HelpPopUp':
-			return $author$project$Simulation$viewHelpPopUp;
+			return $author$project$Main$viewHelpPopUp;
 		case 'SettingsPopUp':
-			return $author$project$Simulation$viewSettingsPopUp(model);
+			return $author$project$Main$viewSettingsPopUp(model);
 		case 'ApplyOptionsPopUp':
-			return $author$project$Simulation$viewApplyOptions(model);
+			return $author$project$Main$viewApplyOptions(model);
 		case 'DownloadPopUp':
-			return $author$project$Simulation$viewDownloadPopUp;
+			return $author$project$Main$viewDownloadPopUp;
 		case 'UploadPopUp':
-			return $author$project$Simulation$viewUploadPopUp(model);
+			return $author$project$Main$viewUploadPopUp(model);
 		default:
 			return $mdgriffith$elm_ui$Element$none;
 	}
-};
-var $elm_community$typed_svg$TypedSvg$Attributes$width = function (length) {
-	return A2(
-		$elm_community$typed_svg$TypedSvg$Core$attribute,
-		'width',
-		$elm_community$typed_svg$TypedSvg$TypesToStrings$lengthToString(length));
-};
-var $author$project$Simulation$view = function (model) {
-	return A2(
-		$mdgriffith$elm_ui$Element$layout,
-		_List_fromArray(
-			[
-				$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill),
-				$mdgriffith$elm_ui$Element$height($mdgriffith$elm_ui$Element$fill),
-				$mdgriffith$elm_ui$Element$Events$onClick($author$project$Simulation$ClickedBackground),
-				$mdgriffith$elm_ui$Element$Font$size(16),
-				$mdgriffith$elm_ui$Element$Font$family(
-				_List_fromArray(
-					[$mdgriffith$elm_ui$Element$Font$monospace]))
-			]),
-		A2(
-			$mdgriffith$elm_ui$Element$el,
-			_List_fromArray(
-				[
-					$mdgriffith$elm_ui$Element$inFront(
-					$author$project$Simulation$viewContextMenu(model)),
-					$mdgriffith$elm_ui$Element$inFront(
-					$author$project$Simulation$viewPopUp(model)),
-					$mdgriffith$elm_ui$Element$below($author$project$Simulation$viewControlPanel),
-					$mdgriffith$elm_ui$Element$centerX,
-					$mdgriffith$elm_ui$Element$centerY,
-					A2($mdgriffith$elm_ui$Element$paddingXY, 0, 5)
-				]),
-			$mdgriffith$elm_ui$Element$html(
-				A2(
-					$elm_community$typed_svg$TypedSvg$svg,
-					_List_fromArray(
-						[
-							$elm_community$typed_svg$TypedSvg$Attributes$width(
-							$elm_community$typed_svg$TypedSvg$Types$px(model.width)),
-							$elm_community$typed_svg$TypedSvg$Attributes$height(
-							$elm_community$typed_svg$TypedSvg$Types$px(model.height)),
-							A4($elm_community$typed_svg$TypedSvg$Attributes$viewBox, 0, 0, model.width, model.height),
-							$elm_community$typed_svg$TypedSvg$Attributes$id('modelSvg'),
-							$mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onContextMenu($author$project$Simulation$ShowGeneralContextMenu)
-						]),
-					_Utils_ap(
-						A2($elm$core$List$map, $author$project$Simulation$viewFieldLines, model.fields),
-						A2(
-							$elm$core$List$map,
-							$author$project$Simulation$viewFieldSource(model.activeSourceId),
-							model.fields))))));
 };
 var $author$project$Main$ChangeActiveSimulation = function (a) {
 	return {$: 'ChangeActiveSimulation', a: a};
@@ -17236,6 +17262,9 @@ var $author$project$Main$view = function (model) {
 				[
 					$mdgriffith$elm_ui$Element$above(
 					$author$project$Main$viewTabs(model)),
+					$mdgriffith$elm_ui$Element$inFront(
+					$author$project$Main$viewPopUp(model)),
+					$mdgriffith$elm_ui$Element$below($author$project$Main$viewControlPanel),
 					$mdgriffith$elm_ui$Element$centerX,
 					$mdgriffith$elm_ui$Element$centerY
 				]),
