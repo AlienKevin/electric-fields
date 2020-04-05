@@ -7765,6 +7765,11 @@ var $author$project$Simulation$applySettingsToFutureFields = function (model) {
 		model,
 		{popUp: $author$project$Simulation$NoPopUp, settings: model.pendingSettings});
 };
+var $author$project$Simulation$closeDownloadPopUp = function (model) {
+	return _Utils_update(
+		model,
+		{popUp: $author$project$Simulation$NoPopUp});
+};
 var $author$project$Simulation$closeHelpPopUp = function (model) {
 	return _Utils_update(
 		model,
@@ -8406,17 +8411,17 @@ var $author$project$Simulation$update = F2(
 					$elm$core$Platform$Cmd$none);
 			case 'DownloadModelAsSvg':
 				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{popUp: $author$project$Simulation$NoPopUp}),
+					$author$project$Simulation$closeDownloadPopUp(model),
 					$author$project$Simulation$downloadModelAsSvg(_Utils_Tuple0));
 			case 'DownloadModelAsJson':
 				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{popUp: $author$project$Simulation$NoPopUp}),
+					$author$project$Simulation$closeDownloadPopUp(model),
 					$author$project$Simulation$downloadModelAsJson(
 						$author$project$Simulation$encodeModel(model)));
+			case 'CloseDownloadPopUp':
+				return _Utils_Tuple2(
+					$author$project$Simulation$closeDownloadPopUp(model),
+					$elm$core$Platform$Cmd$none);
 			default:
 				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 		}
@@ -15683,8 +15688,11 @@ var $author$project$Simulation$viewApplyOptions = function (model) {
 		return $mdgriffith$elm_ui$Element$none;
 	}
 };
+var $author$project$Simulation$CloseDownloadPopUp = {$: 'CloseDownloadPopUp'};
 var $author$project$Simulation$DownloadModelAsJson = {$: 'DownloadModelAsJson'};
 var $author$project$Simulation$DownloadModelAsSvg = {$: 'DownloadModelAsSvg'};
+var $mdgriffith$elm_ui$Internal$Model$Right = {$: 'Right'};
+var $mdgriffith$elm_ui$Element$alignRight = $mdgriffith$elm_ui$Internal$Model$AlignX($mdgriffith$elm_ui$Internal$Model$Right);
 var $author$project$Simulation$textHeader = function (text) {
 	return A2(
 		$mdgriffith$elm_ui$Element$el,
@@ -15697,7 +15705,10 @@ var $author$project$Simulation$textHeader = function (text) {
 var $author$project$Simulation$viewDownloadPopUp = A3(
 	$author$project$Simulation$viewPopUpOf,
 	'Download',
-	_List_Nil,
+	_List_fromArray(
+		[
+			$mdgriffith$elm_ui$Element$spacing(12)
+		]),
 	_List_fromArray(
 		[
 			$author$project$Simulation$textHeader('Which format do you want to download in?'),
@@ -15726,7 +15737,22 @@ var $author$project$Simulation$viewDownloadPopUp = A3(
 			{
 				label: $author$project$Utils$centeredText('Downloas as JSON'),
 				onPress: $elm$core$Maybe$Just($author$project$Simulation$DownloadModelAsJson)
-			})
+			}),
+			A2(
+			$mdgriffith$elm_ui$Element$el,
+			_List_fromArray(
+				[
+					$mdgriffith$elm_ui$Element$paddingEach(
+					{bottom: 0, left: 0, right: 0, top: 20}),
+					$mdgriffith$elm_ui$Element$alignRight
+				]),
+			A2(
+				$mdgriffith$elm_ui$Element$Input$button,
+				$author$project$Utils$styles.button,
+				{
+					label: $author$project$Utils$centeredText('Cancel'),
+					onPress: $elm$core$Maybe$Just($author$project$Simulation$CloseDownloadPopUp)
+				}))
 		]));
 var $author$project$Simulation$CloseHelpPopUp = {$: 'CloseHelpPopUp'};
 var $author$project$Simulation$viewHelpPopUp = A3(
@@ -15751,7 +15777,8 @@ var $author$project$Simulation$viewHelpPopUp = A3(
 			_List_fromArray(
 				[
 					$mdgriffith$elm_ui$Element$paddingEach(
-					{bottom: 0, left: 0, right: 0, top: 20})
+					{bottom: 0, left: 0, right: 0, top: 20}),
+					$mdgriffith$elm_ui$Element$alignRight
 				]),
 			A2(
 				$mdgriffith$elm_ui$Element$Input$button,
@@ -15769,8 +15796,6 @@ var $author$project$Simulation$UpdatePendingSetting = F2(
 	});
 var $mdgriffith$elm_ui$Internal$Model$Left = {$: 'Left'};
 var $mdgriffith$elm_ui$Element$alignLeft = $mdgriffith$elm_ui$Internal$Model$AlignX($mdgriffith$elm_ui$Internal$Model$Left);
-var $mdgriffith$elm_ui$Internal$Model$Right = {$: 'Right'};
-var $mdgriffith$elm_ui$Element$alignRight = $mdgriffith$elm_ui$Internal$Model$AlignX($mdgriffith$elm_ui$Internal$Model$Right);
 var $mdgriffith$elm_ui$Element$Input$Label = F3(
 	function (a, b, c) {
 		return {$: 'Label', a: a, b: b, c: c};
