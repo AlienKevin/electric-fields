@@ -16,6 +16,7 @@ toElmUiColor color =
 
 styles :
   { button : List (E.Attribute msg)
+  , tab : List (E.Attribute msg)
   }
 styles =
   { button =
@@ -26,6 +27,24 @@ styles =
     , E.width <| E.px 150
     , Border.widthXY 2 1
     , Border.color <| toElmUiColor Color.darkGrey
+    ]
+  , tab =
+    [ Background.color <| toElmUiColor Color.lightGrey
+    , E.mouseOver
+        [ Background.color <| toElmUiColor Color.grey ]
+    , Border.widthEach
+      { top = 1
+      , left = 1
+      , bottom = 0
+      , right = 1
+      }
+    , Border.color <| toElmUiColor Color.darkGrey
+    , Border.roundEach
+      { topLeft = 10
+      , topRight = 10
+      , bottomLeft = 0
+      , bottomRight = 0
+      }
     ]
   }
 

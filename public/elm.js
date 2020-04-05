@@ -14272,6 +14272,21 @@ var $mdgriffith$elm_ui$Internal$Model$Px = function (a) {
 	return {$: 'Px', a: a};
 };
 var $mdgriffith$elm_ui$Element$px = $mdgriffith$elm_ui$Internal$Model$Px;
+var $mdgriffith$elm_ui$Internal$Flag$borderRound = $mdgriffith$elm_ui$Internal$Flag$flag(17);
+var $mdgriffith$elm_ui$Element$Border$roundEach = function (_v0) {
+	var topLeft = _v0.topLeft;
+	var topRight = _v0.topRight;
+	var bottomLeft = _v0.bottomLeft;
+	var bottomRight = _v0.bottomRight;
+	return A2(
+		$mdgriffith$elm_ui$Internal$Model$StyleClass,
+		$mdgriffith$elm_ui$Internal$Flag$borderRound,
+		A3(
+			$mdgriffith$elm_ui$Internal$Model$Single,
+			'br-' + ($elm$core$String$fromInt(topLeft) + ('-' + ($elm$core$String$fromInt(topRight) + ($elm$core$String$fromInt(bottomLeft) + ('-' + $elm$core$String$fromInt(bottomRight)))))),
+			'border-radius',
+			$elm$core$String$fromInt(topLeft) + ('px ' + ($elm$core$String$fromInt(topRight) + ('px ' + ($elm$core$String$fromInt(bottomRight) + ('px ' + ($elm$core$String$fromInt(bottomLeft) + 'px'))))))));
+};
 var $mdgriffith$elm_ui$Element$rgba = $mdgriffith$elm_ui$Internal$Model$Rgba;
 var $avh4$elm_color$Color$toRgba = function (_v0) {
 	var r = _v0.a;
@@ -14292,6 +14307,18 @@ var $mdgriffith$elm_ui$Internal$Model$BorderWidth = F5(
 	function (a, b, c, d, e) {
 		return {$: 'BorderWidth', a: a, b: b, c: c, d: d, e: e};
 	});
+var $mdgriffith$elm_ui$Element$Border$width = function (v) {
+	return A2(
+		$mdgriffith$elm_ui$Internal$Model$StyleClass,
+		$mdgriffith$elm_ui$Internal$Flag$borderWidth,
+		A5(
+			$mdgriffith$elm_ui$Internal$Model$BorderWidth,
+			'b-' + $elm$core$String$fromInt(v),
+			v,
+			v,
+			v,
+			v));
+};
 var $mdgriffith$elm_ui$Element$Border$widthXY = F2(
 	function (x, y) {
 		return A2(
@@ -14305,6 +14332,22 @@ var $mdgriffith$elm_ui$Element$Border$widthXY = F2(
 				y,
 				x));
 	});
+var $mdgriffith$elm_ui$Element$Border$widthEach = function (_v0) {
+	var bottom = _v0.bottom;
+	var top = _v0.top;
+	var left = _v0.left;
+	var right = _v0.right;
+	return (_Utils_eq(top, bottom) && _Utils_eq(left, right)) ? (_Utils_eq(top, right) ? $mdgriffith$elm_ui$Element$Border$width(top) : A2($mdgriffith$elm_ui$Element$Border$widthXY, left, top)) : A2(
+		$mdgriffith$elm_ui$Internal$Model$StyleClass,
+		$mdgriffith$elm_ui$Internal$Flag$borderWidth,
+		A5(
+			$mdgriffith$elm_ui$Internal$Model$BorderWidth,
+			'b-' + ($elm$core$String$fromInt(top) + ('-' + ($elm$core$String$fromInt(right) + ('-' + ($elm$core$String$fromInt(bottom) + ('-' + $elm$core$String$fromInt(left))))))),
+			top,
+			right,
+			bottom,
+			left));
+};
 var $author$project$Utils$styles = {
 	button: _List_fromArray(
 		[
@@ -14322,6 +14365,23 @@ var $author$project$Utils$styles = {
 			A2($mdgriffith$elm_ui$Element$Border$widthXY, 2, 1),
 			$mdgriffith$elm_ui$Element$Border$color(
 			$author$project$Utils$toElmUiColor($avh4$elm_color$Color$darkGrey))
+		]),
+	tab: _List_fromArray(
+		[
+			$mdgriffith$elm_ui$Element$Background$color(
+			$author$project$Utils$toElmUiColor($avh4$elm_color$Color$lightGrey)),
+			$mdgriffith$elm_ui$Element$mouseOver(
+			_List_fromArray(
+				[
+					$mdgriffith$elm_ui$Element$Background$color(
+					$author$project$Utils$toElmUiColor($avh4$elm_color$Color$grey))
+				])),
+			$mdgriffith$elm_ui$Element$Border$widthEach(
+			{bottom: 0, left: 1, right: 1, top: 1}),
+			$mdgriffith$elm_ui$Element$Border$color(
+			$author$project$Utils$toElmUiColor($avh4$elm_color$Color$darkGrey)),
+			$mdgriffith$elm_ui$Element$Border$roundEach(
+			{bottomLeft: 0, bottomRight: 0, topLeft: 10, topRight: 10})
 		])
 };
 var $author$project$Simulation$DeleteActiveField = {$: 'DeleteActiveField'};
@@ -15254,18 +15314,6 @@ var $mdgriffith$elm_ui$Element$paddingEach = function (_v0) {
 			bottom,
 			left));
 };
-var $mdgriffith$elm_ui$Element$Border$width = function (v) {
-	return A2(
-		$mdgriffith$elm_ui$Internal$Model$StyleClass,
-		$mdgriffith$elm_ui$Internal$Flag$borderWidth,
-		A5(
-			$mdgriffith$elm_ui$Internal$Model$BorderWidth,
-			'b-' + $elm$core$String$fromInt(v),
-			v,
-			v,
-			v,
-			v));
-};
 var $author$project$Simulation$viewPopUpOf = F3(
 	function (title, attributes, content) {
 		return A2(
@@ -15515,7 +15563,6 @@ var $mdgriffith$elm_ui$Element$rgb = F3(
 	});
 var $mdgriffith$elm_ui$Element$Input$darkGrey = A3($mdgriffith$elm_ui$Element$rgb, 186 / 255, 189 / 255, 182 / 255);
 var $mdgriffith$elm_ui$Element$Input$defaultTextPadding = A2($mdgriffith$elm_ui$Element$paddingXY, 12, 12);
-var $mdgriffith$elm_ui$Internal$Flag$borderRound = $mdgriffith$elm_ui$Internal$Flag$flag(17);
 var $mdgriffith$elm_ui$Element$Border$rounded = function (radius) {
 	return A2(
 		$mdgriffith$elm_ui$Internal$Model$StyleClass,
@@ -16415,13 +16462,16 @@ var $author$project$Main$viewTabs = function (model) {
 				function (simulation) {
 					return _Utils_eq(simulation, model.activeSimulation) ? A2(
 						$mdgriffith$elm_ui$Element$Input$text,
-						_List_fromArray(
-							[
-								$mdgriffith$elm_ui$Element$width(
-								$mdgriffith$elm_ui$Element$px(150)),
-								$mdgriffith$elm_ui$Element$Background$color(
-								$author$project$Utils$toElmUiColor($avh4$elm_color$Color$lightGrey))
-							]),
+						_Utils_ap(
+							$author$project$Utils$styles.tab,
+							_List_fromArray(
+								[
+									$mdgriffith$elm_ui$Element$Background$color(
+									$author$project$Utils$toElmUiColor($avh4$elm_color$Color$grey)),
+									$mdgriffith$elm_ui$Element$padding(15),
+									$mdgriffith$elm_ui$Element$htmlAttribute(
+									A2($elm$html$Html$Attributes$style, 'text-align', 'center'))
+								])),
 						{
 							label: $mdgriffith$elm_ui$Element$Input$labelHidden('current simulation name'),
 							onChange: $author$project$Main$UpdateActiveSimulationName,
@@ -16429,9 +16479,15 @@ var $author$project$Main$viewTabs = function (model) {
 							text: simulation.name
 						}) : A2(
 						$mdgriffith$elm_ui$Element$Input$button,
-						$author$project$Utils$styles.button,
+						$author$project$Utils$styles.tab,
 						{
-							label: $mdgriffith$elm_ui$Element$text(simulation.name),
+							label: A2(
+								$mdgriffith$elm_ui$Element$el,
+								_List_fromArray(
+									[
+										$mdgriffith$elm_ui$Element$padding(15)
+									]),
+								$author$project$Utils$centeredText(simulation.name)),
 							onPress: $elm$core$Maybe$Just(
 								$author$project$Main$ChangeActiveSimulation(simulation))
 						});

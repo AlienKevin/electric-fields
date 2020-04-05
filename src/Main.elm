@@ -2,6 +2,7 @@ port module Main exposing (main)
 
 import Browser
 import Html exposing (Html)
+import Html.Attributes
 import Simulation
 import Element as E
 import Element.Input as Input
@@ -101,18 +102,20 @@ viewTabs model =
       (\simulation ->
         if simulation == model.activeSimulation then
           Input.text
-            [ E.width <| E.px 150
-            , Background.color <| toElmUiColor Color.lightGrey
-            ]
+            ( styles.tab
+              ++ [ Background.color <| toElmUiColor Color.grey
+              , E.padding 15, E.htmlAttribute <| Html.Attributes.style "text-align" "center"
+              ]
+            )
             { label = Input.labelHidden "current simulation name"
             , onChange = UpdateActiveSimulationName
             , placeholder = Nothing
             , text = simulation.name
             }
         else
-          Input.button styles.button
+          Input.button styles.tab
             { onPress = Just <| ChangeActiveSimulation simulation
-            , label = E.text simulation.name
+            , label = E.el [ E.padding 15 ] <| centeredText simulation.name
             }
       )
       model.simulations
