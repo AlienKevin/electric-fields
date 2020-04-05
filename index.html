@@ -8,19 +8,14 @@
   <script src="/public/elm.js"></script>
   <main></main>
   <script>
-    const localStorageKey = "electric-fields-simulation";
+    var localStorageKey = "electric-fields-simulation";
 
-    // load saved models from localStorage
-    var savedModels = Object.keys(localStorage)
-      .filter(function(key) {
-        key.startsWith(localStorageKey)
-      })
-      .map(function(key){
-        return localStorage.getItem(key)
-      });
+    // load saved project from localStorage
+    var savedProject = localStorage.getItem(localStorageKey);
+    console.log(savedProject);
 
     // initiate elm app
-    var app = Elm.Main.init({ node: document.querySelector('main'), flags: savedModels });
+    var app = Elm.Main.init({ node: document.querySelector('main'), flags: savedProject });
 
     // downloadMovel
     app.ports.downloadModel.subscribe(function() {
@@ -45,10 +40,10 @@
       document.body.removeChild(downloadLink);
     });
 
-    // saveMovel
-    app.ports.saveModel.subscribe(function([name, model]) {
-      var modelJson = JSON.stringify(model);
-      localStorage.setItem(localStorageKey + "-" + name, modelJson);
+    // save project
+    app.ports.saveProject.subscribe(function(project) {
+      var projectJson = JSON.stringify(project);
+      localStorage.setItem(localStorageKey, projectJson);
     });
 
     window.addEventListener("beforeunload", function() {

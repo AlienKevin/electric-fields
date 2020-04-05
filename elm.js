@@ -5406,6 +5406,10 @@ var _Bitwise_shiftRightZfBy = F2(function(offset, a)
 {
 	return a >>> offset;
 });
+var $elm$core$Maybe$Just = function (a) {
+	return {$: 'Just', a: a};
+};
+var $elm$core$Maybe$Nothing = {$: 'Nothing'};
 var $elm$core$Basics$EQ = {$: 'EQ'};
 var $elm$core$Basics$GT = {$: 'GT'};
 var $elm$core$Basics$LT = {$: 'LT'};
@@ -5509,10 +5513,6 @@ var $elm$json$Json$Decode$OneOf = function (a) {
 };
 var $elm$core$Basics$False = {$: 'False'};
 var $elm$core$Basics$add = _Basics_add;
-var $elm$core$Maybe$Just = function (a) {
-	return {$: 'Just', a: a};
-};
-var $elm$core$Maybe$Nothing = {$: 'Nothing'};
 var $elm$core$String$all = _String_all;
 var $elm$core$Basics$and = _Basics_and;
 var $elm$core$Basics$append = _Utils_append;
@@ -6195,19 +6195,29 @@ var $elm$core$Task$perform = F2(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
 var $elm$browser$Browser$element = _Browser_element;
-var $elm$core$List$head = function (list) {
-	if (list.b) {
-		var x = list.a;
-		var xs = list.b;
-		return $elm$core$Maybe$Just(x);
-	} else {
-		return $elm$core$Maybe$Nothing;
-	}
-};
 var $author$project$Simulation$Negative = {$: 'Negative'};
 var $author$project$Simulation$NoContextMenu = {$: 'NoContextMenu'};
 var $author$project$Simulation$NoPopUp = {$: 'NoPopUp'};
 var $author$project$Simulation$Positive = {$: 'Positive'};
+var $elm$json$Json$Decode$andThen = _Json_andThen;
+var $elm$json$Json$Decode$field = _Json_decodeField;
+var $elm$json$Json$Decode$oneOf = _Json_oneOf;
+var $elm$json$Json$Decode$maybe = function (decoder) {
+	return $elm$json$Json$Decode$oneOf(
+		_List_fromArray(
+			[
+				A2($elm$json$Json$Decode$map, $elm$core$Maybe$Just, decoder),
+				$elm$json$Json$Decode$succeed($elm$core$Maybe$Nothing)
+			]));
+};
+var $webbhuset$elm_json_decode$Json$Decode$Field$attempt = F3(
+	function (fieldName, valueDecoder, continuation) {
+		return A2(
+			$elm$json$Json$Decode$andThen,
+			continuation,
+			$elm$json$Json$Decode$maybe(
+				A2($elm$json$Json$Decode$field, fieldName, valueDecoder)));
+	});
 var $elm_explorations$linear_algebra$Math$Vector2$add = _MJS_v2add;
 var $elm$core$Basics$pow = _Basics_pow;
 var $elm$core$Basics$sqrt = _Basics_sqrt;
@@ -6378,25 +6388,6 @@ var $author$project$Simulation$calculateFields = F3(
 			},
 			fields);
 	});
-var $elm$json$Json$Decode$andThen = _Json_andThen;
-var $elm$json$Json$Decode$field = _Json_decodeField;
-var $elm$json$Json$Decode$oneOf = _Json_oneOf;
-var $elm$json$Json$Decode$maybe = function (decoder) {
-	return $elm$json$Json$Decode$oneOf(
-		_List_fromArray(
-			[
-				A2($elm$json$Json$Decode$map, $elm$core$Maybe$Just, decoder),
-				$elm$json$Json$Decode$succeed($elm$core$Maybe$Nothing)
-			]));
-};
-var $webbhuset$elm_json_decode$Json$Decode$Field$attempt = F3(
-	function (fieldName, valueDecoder, continuation) {
-		return A2(
-			$elm$json$Json$Decode$andThen,
-			continuation,
-			$elm$json$Json$Decode$maybe(
-				A2($elm$json$Json$Decode$field, fieldName, valueDecoder)));
-	});
 var $author$project$Simulation$defaultSettings = {delta: 1, density: 30, magnitude: 1.0, r: 10.0, steps: 900};
 var $elm$json$Json$Decode$fail = _Json_fail;
 var $elm$json$Json$Decode$float = _Json_decodeFloat;
@@ -6561,7 +6552,21 @@ var $author$project$Simulation$decodeModel = function () {
 														$elm$json$Json$Decode$float,
 														function (height) {
 															return $elm$json$Json$Decode$succeed(
-																{activeSourceId: activeSourceId, contextMenu: $author$project$Simulation$NoContextMenu, drag: $zaboco$elm_draggable$Draggable$init, fields: fields, height: height, isWheeling: false, isWheelingTimeOutCleared: false, name: name, nextId: nextId, pendingSettings: $author$project$Simulation$defaultSettings, popUp: $author$project$Simulation$NoPopUp, settings: settings, width: width});
+																{
+																	activeSourceId: activeSourceId,
+																	contextMenu: $author$project$Simulation$NoContextMenu,
+																	drag: $zaboco$elm_draggable$Draggable$init,
+																	fields: A3($author$project$Simulation$calculateFields, width, height, fields),
+																	height: height,
+																	isWheeling: false,
+																	isWheelingTimeOutCleared: false,
+																	name: name,
+																	nextId: nextId,
+																	pendingSettings: $author$project$Simulation$defaultSettings,
+																	popUp: $author$project$Simulation$NoPopUp,
+																	settings: settings,
+																	width: width
+																});
 														});
 												});
 										});
@@ -6570,11 +6575,32 @@ var $author$project$Simulation$decodeModel = function () {
 				});
 		});
 }();
+var $author$project$Main$decodeProject = A3(
+	$webbhuset$elm_json_decode$Json$Decode$Field$require,
+	'simulations',
+	$elm$json$Json$Decode$list($author$project$Simulation$decodeModel),
+	function (simulations) {
+		return A3(
+			$webbhuset$elm_json_decode$Json$Decode$Field$require,
+			'activeSimulation',
+			$author$project$Simulation$decodeModel,
+			function (activeSimulation) {
+				return A3(
+					$webbhuset$elm_json_decode$Json$Decode$Field$require,
+					'defaultSimulationIndex',
+					$elm$json$Json$Decode$int,
+					function (defaultSimulationIndex) {
+						return $elm$json$Json$Decode$succeed(
+							{activeSimulation: activeSimulation, defaultSimulationIndex: defaultSimulationIndex, simulations: simulations});
+					});
+			});
+	});
 var $elm$json$Json$Decode$decodeString = _Json_runOnString;
 var $author$project$Simulation$defaultName = 'Untitled Model';
-var $elm$core$Platform$Cmd$batch = _Platform_batch;
-var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
-var $author$project$Simulation$init = function (savedModel) {
+var $author$project$Main$getDefaultSimulationName = function (index) {
+	return $author$project$Simulation$defaultName + (' ' + $elm$core$String$fromInt(index));
+};
+var $author$project$Simulation$init = function () {
 	var defaultWidth = 1200;
 	var defaultHeight = 750;
 	var defaultFields = _List_fromArray(
@@ -6623,65 +6649,57 @@ var $author$project$Simulation$init = function (savedModel) {
 		settings: $author$project$Simulation$defaultSettings,
 		width: defaultWidth
 	};
-	return _Utils_Tuple2(
-		function () {
-			if (savedModel.$ === 'Just') {
-				var modelStr = savedModel.a;
-				var _v1 = A2($elm$json$Json$Decode$decodeString, $author$project$Simulation$decodeModel, modelStr);
-				if (_v1.$ === 'Ok') {
-					var model = _v1.a;
-					return _Utils_update(
-						model,
-						{
-							fields: A3($author$project$Simulation$calculateFields, model.width, model.height, model.fields)
-						});
-				} else {
-					return defaultModel;
-				}
-			} else {
-				return defaultModel;
-			}
-		}(),
-		$elm$core$Platform$Cmd$none);
-};
-var $author$project$Main$init = function (savedSimulations) {
-	var activeSimulation = $author$project$Simulation$init(
-		$elm$core$List$head(savedSimulations)).a;
-	var simulations = function () {
-		if (!savedSimulations.b) {
-			return _List_fromArray(
-				[activeSimulation]);
+	return defaultModel;
+}();
+var $elm$core$Platform$Cmd$batch = _Platform_batch;
+var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
+var $elm$core$Result$withDefault = F2(
+	function (def, result) {
+		if (result.$ === 'Ok') {
+			var a = result.a;
+			return a;
 		} else {
-			var tail = savedSimulations.b;
+			return def;
+		}
+	});
+var $author$project$Main$init = function (savedProject) {
+	var defaultActiveSimulation = function () {
+		var simulation = $author$project$Simulation$init;
+		return _Utils_eq(simulation.name, $author$project$Simulation$defaultName) ? _Utils_update(
+			simulation,
+			{
+				name: $author$project$Main$getDefaultSimulationName(1)
+			}) : simulation;
+	}();
+	var defaultSimulations = _List_fromArray(
+		[defaultActiveSimulation]);
+	var defaultProject = {activeSimulation: defaultActiveSimulation, defaultSimulationIndex: 1, simulations: defaultSimulations};
+	var project = function () {
+		if (savedProject.$ === 'Just') {
+			var projectJson = savedProject.a;
 			return A2(
-				$elm$core$List$cons,
-				activeSimulation,
-				A2(
-					$elm$core$List$map,
-					function (simulation) {
-						return $author$project$Simulation$init(
-							$elm$core$Maybe$Just(simulation)).a;
-					},
-					tail));
+				$elm$core$Result$withDefault,
+				defaultProject,
+				A2($elm$json$Json$Decode$decodeString, $author$project$Main$decodeProject, projectJson));
+		} else {
+			return defaultProject;
 		}
 	}();
-	return _Utils_Tuple2(
-		{activeSimulation: activeSimulation, simulations: simulations},
-		$elm$core$Platform$Cmd$none);
+	return _Utils_Tuple2(project, $elm$core$Platform$Cmd$none);
 };
+var $elm$json$Json$Decode$null = _Json_decodeNull;
+var $author$project$Main$SaveProject = {$: 'SaveProject'};
 var $author$project$Main$SimulationMsg = function (a) {
 	return {$: 'SimulationMsg', a: a};
 };
+var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$map = _Platform_map;
+var $author$project$Main$pageWillClose = _Platform_incomingPort(
+	'pageWillClose',
+	$elm$json$Json$Decode$null(_Utils_Tuple0));
 var $author$project$Simulation$DragMsg = function (a) {
 	return {$: 'DragMsg', a: a};
 };
-var $author$project$Simulation$SaveModel = {$: 'SaveModel'};
-var $elm$core$Platform$Sub$batch = _Platform_batch;
-var $elm$json$Json$Decode$null = _Json_decodeNull;
-var $author$project$Simulation$pageWillClose = _Platform_incomingPort(
-	'pageWillClose',
-	$elm$json$Json$Decode$null(_Utils_Tuple0));
 var $zaboco$elm_draggable$Internal$DragAt = function (a) {
 	return {$: 'DragAt', a: a};
 };
@@ -7134,21 +7152,41 @@ var $zaboco$elm_draggable$Draggable$subscriptions = F2(
 	});
 var $author$project$Simulation$subscriptions = function (_v0) {
 	var drag = _v0.drag;
+	return A2($zaboco$elm_draggable$Draggable$subscriptions, $author$project$Simulation$DragMsg, drag);
+};
+var $author$project$Main$subscriptions = function (model) {
 	return $elm$core$Platform$Sub$batch(
 		_List_fromArray(
 			[
-				A2($zaboco$elm_draggable$Draggable$subscriptions, $author$project$Simulation$DragMsg, drag),
-				$author$project$Simulation$pageWillClose(
-				function (_v1) {
-					return $author$project$Simulation$SaveModel;
+				A2(
+				$elm$core$Platform$Sub$map,
+				$author$project$Main$SimulationMsg,
+				$author$project$Simulation$subscriptions(model.activeSimulation)),
+				$author$project$Main$pageWillClose(
+				function (_v0) {
+					return $author$project$Main$SaveProject;
 				})
 			]));
 };
-var $author$project$Main$subscriptions = function (model) {
-	return A2(
-		$elm$core$Platform$Sub$map,
-		$author$project$Main$SimulationMsg,
-		$author$project$Simulation$subscriptions(model.activeSimulation));
+var $author$project$Main$addSimulation = function (model) {
+	var newDefaultSimulationIndex = model.defaultSimulationIndex + 1;
+	var defaultSimulationName = $author$project$Main$getDefaultSimulationName(newDefaultSimulationIndex);
+	var newSimulation = function () {
+		var simulation = $author$project$Simulation$init;
+		return _Utils_update(
+			simulation,
+			{name: defaultSimulationName});
+	}();
+	return _Utils_update(
+		model,
+		{
+			activeSimulation: newSimulation,
+			defaultSimulationIndex: newDefaultSimulationIndex,
+			simulations: _Utils_ap(
+				model.simulations,
+				_List_fromArray(
+					[newSimulation]))
+		});
 };
 var $author$project$Main$changeActiveSimulation = F2(
 	function (newSimulation, model) {
@@ -7156,247 +7194,6 @@ var $author$project$Main$changeActiveSimulation = F2(
 			model,
 			{activeSimulation: newSimulation});
 	});
-var $author$project$Main$updateActiveSimulation = F2(
-	function (newActiveSimulation, model) {
-		return _Utils_update(
-			model,
-			{
-				activeSimulation: newActiveSimulation,
-				simulations: A2(
-					$elm$core$List$map,
-					function (simulation) {
-						return _Utils_eq(simulation, model.activeSimulation) ? newActiveSimulation : simulation;
-					},
-					model.simulations)
-			});
-	});
-var $author$project$Main$updateActiveSimulationName = F2(
-	function (newName, model) {
-		var oldActiveSimulation = model.activeSimulation;
-		var newActiveSimulation = _Utils_update(
-			oldActiveSimulation,
-			{
-				name: (newName === '') ? $author$project$Simulation$defaultName : newName
-			});
-		return A2($author$project$Main$updateActiveSimulation, newActiveSimulation, model);
-	});
-var $elm$core$Platform$Cmd$map = _Platform_map;
-var $author$project$Simulation$addCharge = F3(
-	function (sign, _v0, model) {
-		var x = _v0.a;
-		var y = _v0.b;
-		var newCharge = {id: model.nextId, magnitude: model.settings.magnitude, r: model.settings.r, sign: sign, x: x, y: y};
-		var newField = {delta: model.settings.delta, density: model.settings.density, lines: _List_Nil, source: newCharge, steps: model.settings.steps};
-		var newFields = A2($elm$core$List$cons, newField, model.fields);
-		return _Utils_update(
-			model,
-			{
-				fields: A3($author$project$Simulation$calculateFields, model.width, model.height, newFields),
-				nextId: model.nextId + 1
-			});
-	});
-var $author$project$Simulation$ApplyOptionsPopUp = {$: 'ApplyOptionsPopUp'};
-var $author$project$Simulation$applyPendingSettings = function (model) {
-	return _Utils_update(
-		model,
-		{popUp: $author$project$Simulation$ApplyOptionsPopUp});
-};
-var $author$project$Simulation$applySettingsToCurrentAndFutureFields = function (model) {
-	var newSettings = model.pendingSettings;
-	var newFields = A2(
-		$elm$core$List$map,
-		function (field) {
-			var source = field.source;
-			return _Utils_update(
-				field,
-				{
-					delta: newSettings.delta,
-					density: newSettings.density,
-					source: _Utils_update(
-						source,
-						{magnitude: newSettings.magnitude, r: newSettings.r}),
-					steps: newSettings.steps
-				});
-		},
-		model.fields);
-	return _Utils_update(
-		model,
-		{
-			fields: A3($author$project$Simulation$calculateFields, model.width, model.height, newFields),
-			popUp: $author$project$Simulation$NoPopUp,
-			settings: newSettings
-		});
-};
-var $author$project$Simulation$applySettingsToFutureFields = function (model) {
-	return _Utils_update(
-		model,
-		{popUp: $author$project$Simulation$NoPopUp, settings: model.pendingSettings});
-};
-var $author$project$Simulation$closeHelpPopUp = function (model) {
-	return _Utils_update(
-		model,
-		{popUp: $author$project$Simulation$NoPopUp});
-};
-var $author$project$Simulation$closeSettingsPopUp = function (model) {
-	return _Utils_update(
-		model,
-		{pendingSettings: model.settings, popUp: $author$project$Simulation$NoPopUp});
-};
-var $elm$core$List$filter = F2(
-	function (isGood, list) {
-		return A3(
-			$elm$core$List$foldr,
-			F2(
-				function (x, xs) {
-					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
-				}),
-			_List_Nil,
-			list);
-	});
-var $elm$core$Basics$neq = _Utils_notEqual;
-var $author$project$Simulation$deleteActiveField = function (model) {
-	var newFields = function () {
-		var _v0 = model.activeSourceId;
-		if (_v0.$ === 'Nothing') {
-			return model.fields;
-		} else {
-			var id = _v0.a;
-			return A2(
-				$elm$core$List$filter,
-				function (field) {
-					return !_Utils_eq(field.source.id, id);
-				},
-				model.fields);
-		}
-	}();
-	return _Utils_update(
-		model,
-		{
-			activeSourceId: $elm$core$Maybe$Nothing,
-			contextMenu: $author$project$Simulation$NoContextMenu,
-			fields: A3($author$project$Simulation$calculateFields, model.width, model.height, newFields)
-		});
-};
-var $author$project$Simulation$deselectActiveField = function (model) {
-	return _Utils_update(
-		model,
-		{activeSourceId: $elm$core$Maybe$Nothing});
-};
-var $elm$json$Json$Encode$null = _Json_encodeNull;
-var $author$project$Simulation$downloadModel = _Platform_outgoingPort(
-	'downloadModel',
-	function ($) {
-		return $elm$json$Json$Encode$null;
-	});
-var $author$project$Simulation$ActivateSource = function (a) {
-	return {$: 'ActivateSource', a: a};
-};
-var $author$project$Simulation$EndDragging = {$: 'EndDragging'};
-var $author$project$Simulation$OnDragBy = function (a) {
-	return {$: 'OnDragBy', a: a};
-};
-var $author$project$Simulation$StartDragging = function (a) {
-	return {$: 'StartDragging', a: a};
-};
-var $zaboco$elm_draggable$Draggable$Config = function (a) {
-	return {$: 'Config', a: a};
-};
-var $zaboco$elm_draggable$Internal$defaultConfig = {
-	onClick: function (_v0) {
-		return $elm$core$Maybe$Nothing;
-	},
-	onDragBy: function (_v1) {
-		return $elm$core$Maybe$Nothing;
-	},
-	onDragEnd: $elm$core$Maybe$Nothing,
-	onDragStart: function (_v2) {
-		return $elm$core$Maybe$Nothing;
-	},
-	onMouseDown: function (_v3) {
-		return $elm$core$Maybe$Nothing;
-	}
-};
-var $zaboco$elm_draggable$Draggable$customConfig = function (events) {
-	return $zaboco$elm_draggable$Draggable$Config(
-		A3($elm$core$List$foldl, $elm$core$Basics$apL, $zaboco$elm_draggable$Internal$defaultConfig, events));
-};
-var $zaboco$elm_draggable$Draggable$Events$onClick = F2(
-	function (toMsg, config) {
-		return _Utils_update(
-			config,
-			{
-				onClick: A2($elm$core$Basics$composeL, $elm$core$Maybe$Just, toMsg)
-			});
-	});
-var $zaboco$elm_draggable$Draggable$Events$onDragBy = F2(
-	function (toMsg, config) {
-		return _Utils_update(
-			config,
-			{
-				onDragBy: A2($elm$core$Basics$composeL, $elm$core$Maybe$Just, toMsg)
-			});
-	});
-var $zaboco$elm_draggable$Draggable$Events$onDragEnd = F2(
-	function (toMsg, config) {
-		return _Utils_update(
-			config,
-			{
-				onDragEnd: $elm$core$Maybe$Just(toMsg)
-			});
-	});
-var $zaboco$elm_draggable$Draggable$Events$onDragStart = F2(
-	function (toMsg, config) {
-		return _Utils_update(
-			config,
-			{
-				onDragStart: A2($elm$core$Basics$composeL, $elm$core$Maybe$Just, toMsg)
-			});
-	});
-var $author$project$Simulation$dragConfig = $zaboco$elm_draggable$Draggable$customConfig(
-	_List_fromArray(
-		[
-			$zaboco$elm_draggable$Draggable$Events$onDragBy($author$project$Simulation$OnDragBy),
-			$zaboco$elm_draggable$Draggable$Events$onDragStart($author$project$Simulation$StartDragging),
-			$zaboco$elm_draggable$Draggable$Events$onDragEnd($author$project$Simulation$EndDragging),
-			$zaboco$elm_draggable$Draggable$Events$onClick($author$project$Simulation$ActivateSource)
-		]));
-var $author$project$Simulation$getActiveFields = function (model) {
-	var _v0 = model.activeSourceId;
-	if (_v0.$ === 'Just') {
-		var id = _v0.a;
-		return A2(
-			$elm$core$List$filter,
-			function (field) {
-				return _Utils_eq(field.source.id, id);
-			},
-			model.fields);
-	} else {
-		return _List_Nil;
-	}
-};
-var $author$project$Simulation$duplicateActiveField = function (model) {
-	var duplicatedFields = A2(
-		$elm$core$List$indexedMap,
-		F2(
-			function (index, field) {
-				var source = field.source;
-				return _Utils_update(
-					field,
-					{
-						source: _Utils_update(
-							source,
-							{id: model.nextId + index, x: (source.x + (source.r * 2)) + 15})
-					});
-			}),
-		$author$project$Simulation$getActiveFields(model));
-	var newFields = _Utils_ap(model.fields, duplicatedFields);
-	return _Utils_update(
-		model,
-		{
-			fields: A3($author$project$Simulation$calculateFields, model.width, model.height, newFields),
-			nextId: model.nextId + $elm$core$List$length(duplicatedFields)
-		});
-};
 var $elm$json$Json$Encode$float = _Json_wrap;
 var $elm$json$Json$Encode$int = _Json_wrap;
 var $elm$json$Json$Encode$list = F2(
@@ -7408,6 +7205,7 @@ var $elm$json$Json$Encode$list = F2(
 				_Json_emptyArray(_Utils_Tuple0),
 				entries));
 	});
+var $elm$json$Json$Encode$null = _Json_encodeNull;
 var $elm$json$Json$Encode$object = function (pairs) {
 	return _Json_wrap(
 		A3(
@@ -7549,6 +7347,262 @@ var $author$project$Simulation$encodeModel = function (_v0) {
 				$elm$json$Json$Encode$float(height))
 			]));
 };
+var $author$project$Main$encodeProject = function (model) {
+	return $elm$json$Json$Encode$object(
+		_List_fromArray(
+			[
+				_Utils_Tuple2(
+				'simulations',
+				A2($elm$json$Json$Encode$list, $author$project$Simulation$encodeModel, model.simulations)),
+				_Utils_Tuple2(
+				'activeSimulation',
+				$author$project$Simulation$encodeModel(model.activeSimulation)),
+				_Utils_Tuple2(
+				'defaultSimulationIndex',
+				$elm$json$Json$Encode$int(model.defaultSimulationIndex))
+			]));
+};
+var $author$project$Main$saveProject = _Platform_outgoingPort('saveProject', $elm$core$Basics$identity);
+var $author$project$Main$updateActiveSimulation = F2(
+	function (newActiveSimulation, model) {
+		return _Utils_update(
+			model,
+			{
+				activeSimulation: newActiveSimulation,
+				simulations: A2(
+					$elm$core$List$map,
+					function (simulation) {
+						return _Utils_eq(simulation, model.activeSimulation) ? newActiveSimulation : simulation;
+					},
+					model.simulations)
+			});
+	});
+var $author$project$Main$updateActiveSimulationName = F2(
+	function (newName, model) {
+		var oldActiveSimulation = model.activeSimulation;
+		var newActiveSimulation = _Utils_update(
+			oldActiveSimulation,
+			{
+				name: (newName === '') ? $author$project$Main$getDefaultSimulationName(model.defaultSimulationIndex) : newName
+			});
+		return A2($author$project$Main$updateActiveSimulation, newActiveSimulation, model);
+	});
+var $elm$core$Platform$Cmd$map = _Platform_map;
+var $author$project$Simulation$addCharge = F3(
+	function (sign, _v0, model) {
+		var x = _v0.a;
+		var y = _v0.b;
+		var newCharge = {id: model.nextId, magnitude: model.settings.magnitude, r: model.settings.r, sign: sign, x: x, y: y};
+		var newField = {delta: model.settings.delta, density: model.settings.density, lines: _List_Nil, source: newCharge, steps: model.settings.steps};
+		var newFields = A2($elm$core$List$cons, newField, model.fields);
+		return _Utils_update(
+			model,
+			{
+				fields: A3($author$project$Simulation$calculateFields, model.width, model.height, newFields),
+				nextId: model.nextId + 1
+			});
+	});
+var $author$project$Simulation$ApplyOptionsPopUp = {$: 'ApplyOptionsPopUp'};
+var $author$project$Simulation$applyPendingSettings = function (model) {
+	return _Utils_update(
+		model,
+		{popUp: $author$project$Simulation$ApplyOptionsPopUp});
+};
+var $author$project$Simulation$applySettingsToCurrentAndFutureFields = function (model) {
+	var newSettings = model.pendingSettings;
+	var newFields = A2(
+		$elm$core$List$map,
+		function (field) {
+			var source = field.source;
+			return _Utils_update(
+				field,
+				{
+					delta: newSettings.delta,
+					density: newSettings.density,
+					source: _Utils_update(
+						source,
+						{magnitude: newSettings.magnitude, r: newSettings.r}),
+					steps: newSettings.steps
+				});
+		},
+		model.fields);
+	return _Utils_update(
+		model,
+		{
+			fields: A3($author$project$Simulation$calculateFields, model.width, model.height, newFields),
+			popUp: $author$project$Simulation$NoPopUp,
+			settings: newSettings
+		});
+};
+var $author$project$Simulation$applySettingsToFutureFields = function (model) {
+	return _Utils_update(
+		model,
+		{popUp: $author$project$Simulation$NoPopUp, settings: model.pendingSettings});
+};
+var $author$project$Simulation$closeHelpPopUp = function (model) {
+	return _Utils_update(
+		model,
+		{popUp: $author$project$Simulation$NoPopUp});
+};
+var $author$project$Simulation$closeSettingsPopUp = function (model) {
+	return _Utils_update(
+		model,
+		{pendingSettings: model.settings, popUp: $author$project$Simulation$NoPopUp});
+};
+var $elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
+	});
+var $elm$core$Basics$neq = _Utils_notEqual;
+var $author$project$Simulation$deleteActiveField = function (model) {
+	var newFields = function () {
+		var _v0 = model.activeSourceId;
+		if (_v0.$ === 'Nothing') {
+			return model.fields;
+		} else {
+			var id = _v0.a;
+			return A2(
+				$elm$core$List$filter,
+				function (field) {
+					return !_Utils_eq(field.source.id, id);
+				},
+				model.fields);
+		}
+	}();
+	return _Utils_update(
+		model,
+		{
+			activeSourceId: $elm$core$Maybe$Nothing,
+			contextMenu: $author$project$Simulation$NoContextMenu,
+			fields: A3($author$project$Simulation$calculateFields, model.width, model.height, newFields)
+		});
+};
+var $author$project$Simulation$deselectActiveField = function (model) {
+	return _Utils_update(
+		model,
+		{activeSourceId: $elm$core$Maybe$Nothing});
+};
+var $author$project$Simulation$downloadModel = _Platform_outgoingPort(
+	'downloadModel',
+	function ($) {
+		return $elm$json$Json$Encode$null;
+	});
+var $author$project$Simulation$ActivateSource = function (a) {
+	return {$: 'ActivateSource', a: a};
+};
+var $author$project$Simulation$EndDragging = {$: 'EndDragging'};
+var $author$project$Simulation$OnDragBy = function (a) {
+	return {$: 'OnDragBy', a: a};
+};
+var $author$project$Simulation$StartDragging = function (a) {
+	return {$: 'StartDragging', a: a};
+};
+var $zaboco$elm_draggable$Draggable$Config = function (a) {
+	return {$: 'Config', a: a};
+};
+var $zaboco$elm_draggable$Internal$defaultConfig = {
+	onClick: function (_v0) {
+		return $elm$core$Maybe$Nothing;
+	},
+	onDragBy: function (_v1) {
+		return $elm$core$Maybe$Nothing;
+	},
+	onDragEnd: $elm$core$Maybe$Nothing,
+	onDragStart: function (_v2) {
+		return $elm$core$Maybe$Nothing;
+	},
+	onMouseDown: function (_v3) {
+		return $elm$core$Maybe$Nothing;
+	}
+};
+var $zaboco$elm_draggable$Draggable$customConfig = function (events) {
+	return $zaboco$elm_draggable$Draggable$Config(
+		A3($elm$core$List$foldl, $elm$core$Basics$apL, $zaboco$elm_draggable$Internal$defaultConfig, events));
+};
+var $zaboco$elm_draggable$Draggable$Events$onClick = F2(
+	function (toMsg, config) {
+		return _Utils_update(
+			config,
+			{
+				onClick: A2($elm$core$Basics$composeL, $elm$core$Maybe$Just, toMsg)
+			});
+	});
+var $zaboco$elm_draggable$Draggable$Events$onDragBy = F2(
+	function (toMsg, config) {
+		return _Utils_update(
+			config,
+			{
+				onDragBy: A2($elm$core$Basics$composeL, $elm$core$Maybe$Just, toMsg)
+			});
+	});
+var $zaboco$elm_draggable$Draggable$Events$onDragEnd = F2(
+	function (toMsg, config) {
+		return _Utils_update(
+			config,
+			{
+				onDragEnd: $elm$core$Maybe$Just(toMsg)
+			});
+	});
+var $zaboco$elm_draggable$Draggable$Events$onDragStart = F2(
+	function (toMsg, config) {
+		return _Utils_update(
+			config,
+			{
+				onDragStart: A2($elm$core$Basics$composeL, $elm$core$Maybe$Just, toMsg)
+			});
+	});
+var $author$project$Simulation$dragConfig = $zaboco$elm_draggable$Draggable$customConfig(
+	_List_fromArray(
+		[
+			$zaboco$elm_draggable$Draggable$Events$onDragBy($author$project$Simulation$OnDragBy),
+			$zaboco$elm_draggable$Draggable$Events$onDragStart($author$project$Simulation$StartDragging),
+			$zaboco$elm_draggable$Draggable$Events$onDragEnd($author$project$Simulation$EndDragging),
+			$zaboco$elm_draggable$Draggable$Events$onClick($author$project$Simulation$ActivateSource)
+		]));
+var $author$project$Simulation$getActiveFields = function (model) {
+	var _v0 = model.activeSourceId;
+	if (_v0.$ === 'Just') {
+		var id = _v0.a;
+		return A2(
+			$elm$core$List$filter,
+			function (field) {
+				return _Utils_eq(field.source.id, id);
+			},
+			model.fields);
+	} else {
+		return _List_Nil;
+	}
+};
+var $author$project$Simulation$duplicateActiveField = function (model) {
+	var duplicatedFields = A2(
+		$elm$core$List$indexedMap,
+		F2(
+			function (index, field) {
+				var source = field.source;
+				return _Utils_update(
+					field,
+					{
+						source: _Utils_update(
+							source,
+							{id: model.nextId + index, x: (source.x + (source.r * 2)) + 15})
+					});
+			}),
+		$author$project$Simulation$getActiveFields(model));
+	var newFields = _Utils_ap(model.fields, duplicatedFields);
+	return _Utils_update(
+		model,
+		{
+			fields: A3($author$project$Simulation$calculateFields, model.width, model.height, newFields),
+			nextId: model.nextId + $elm$core$List$length(duplicatedFields)
+		});
+};
 var $author$project$Simulation$deoptimizeModel = function (model) {
 	return _Utils_update(
 		model,
@@ -7617,20 +7671,6 @@ var $author$project$Simulation$resetState = function (model) {
 				model,
 				{contextMenu: $author$project$Simulation$NoContextMenu})));
 };
-var $author$project$Simulation$saveModel = _Platform_outgoingPort(
-	'saveModel',
-	function ($) {
-		var a = $.a;
-		var b = $.b;
-		return A2(
-			$elm$json$Json$Encode$list,
-			$elm$core$Basics$identity,
-			_List_fromArray(
-				[
-					$elm$json$Json$Encode$string(a),
-					$elm$core$Basics$identity(b)
-				]));
-	});
 var $author$project$Simulation$StopWheelingTimeOut = {$: 'StopWheelingTimeOut'};
 var $elm$core$Basics$min = F2(
 	function (x, y) {
@@ -8072,13 +8112,6 @@ var $author$project$Simulation$update = F2(
 				return _Utils_Tuple2(
 					model,
 					$author$project$Simulation$downloadModel(_Utils_Tuple0));
-			case 'SaveModel':
-				return _Utils_Tuple2(
-					model,
-					$author$project$Simulation$saveModel(
-						_Utils_Tuple2(
-							model.name,
-							$author$project$Simulation$encodeModel(model))));
 			default:
 				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 		}
@@ -8105,9 +8138,18 @@ var $author$project$Main$update = F2(
 				return _Utils_Tuple2(
 					A2($author$project$Main$changeActiveSimulation, newSimulation, model),
 					$elm$core$Platform$Cmd$none);
-			default:
+			case 'SimulationMsg':
 				var msg = message.a;
 				return A2($author$project$Main$updateActiveSimulationWithMsg, msg, model);
+			case 'AddSimulation':
+				return _Utils_Tuple2(
+					$author$project$Main$addSimulation(model),
+					$elm$core$Platform$Cmd$none);
+			default:
+				return _Utils_Tuple2(
+					model,
+					$author$project$Main$saveProject(
+						$author$project$Main$encodeProject(model)));
 		}
 	});
 var $mdgriffith$elm_ui$Internal$Model$Above = {$: 'Above'};
@@ -14421,6 +14463,15 @@ var $mdgriffith$elm_ui$Element$column = F2(
 						attrs))),
 			$mdgriffith$elm_ui$Internal$Model$Unkeyed(children));
 	});
+var $elm$core$List$head = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(x);
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
 var $mdgriffith$elm_ui$Internal$Model$MoveY = function (a) {
 	return {$: 'MoveY', a: a};
 };
@@ -14586,7 +14637,7 @@ var $mdgriffith$elm_ui$Element$spacing = function (x) {
 			x,
 			x));
 };
-var $author$project$Simulation$centeredText = function (text) {
+var $author$project$Utils$centeredText = function (text) {
 	return A2(
 		$mdgriffith$elm_ui$Element$el,
 		_List_fromArray(
@@ -14613,7 +14664,7 @@ var $author$project$Simulation$viewButtonNoProp = F2(
 						$author$project$Simulation$onClickNoProp(msg))
 					])),
 			{
-				label: $author$project$Simulation$centeredText(text),
+				label: $author$project$Utils$centeredText(text),
 				onPress: $elm$core$Maybe$Nothing
 			});
 	});
@@ -15268,7 +15319,7 @@ var $author$project$Simulation$viewApplyOptions = function (model) {
 								$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill)
 							])),
 					{
-						label: $author$project$Simulation$centeredText('Apply to future fields'),
+						label: $author$project$Utils$centeredText('Apply to future fields'),
 						onPress: $elm$core$Maybe$Just($author$project$Simulation$ApplySettingsToFutureFields)
 					}),
 					A2(
@@ -15280,7 +15331,7 @@ var $author$project$Simulation$viewApplyOptions = function (model) {
 								$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill)
 							])),
 					{
-						label: $author$project$Simulation$centeredText('Apply to current and future fields'),
+						label: $author$project$Utils$centeredText('Apply to current and future fields'),
 						onPress: $elm$core$Maybe$Just($author$project$Simulation$ApplySettingsToCurrentAndFutureFields)
 					})
 				]));
@@ -15326,7 +15377,7 @@ var $author$project$Simulation$viewHelpPopUp = A3(
 				$mdgriffith$elm_ui$Element$Input$button,
 				$author$project$Utils$styles.button,
 				{
-					label: $author$project$Simulation$centeredText('Close'),
+					label: $author$project$Utils$centeredText('Close'),
 					onPress: $elm$core$Maybe$Just($author$project$Simulation$CloseHelpPopUp)
 				}))
 		]));
@@ -16245,7 +16296,7 @@ var $author$project$Simulation$viewSettingsPopUp = function (model) {
 							_List_fromArray(
 								[$mdgriffith$elm_ui$Element$alignLeft])),
 						{
-							label: $author$project$Simulation$centeredText('Apply'),
+							label: $author$project$Utils$centeredText('Apply'),
 							onPress: $elm$core$Maybe$Just($author$project$Simulation$ApplyPendingSettings)
 						}),
 						A2(
@@ -16255,7 +16306,7 @@ var $author$project$Simulation$viewSettingsPopUp = function (model) {
 							_List_fromArray(
 								[$mdgriffith$elm_ui$Element$alignRight])),
 						{
-							label: $author$project$Simulation$centeredText('Cancel'),
+							label: $author$project$Utils$centeredText('Cancel'),
 							onPress: $elm$core$Maybe$Just($author$project$Simulation$CloseSettingsPopUp)
 						})
 					]))
@@ -16336,37 +16387,58 @@ var $mdgriffith$elm_ui$Element$Input$HiddenLabel = function (a) {
 	return {$: 'HiddenLabel', a: a};
 };
 var $mdgriffith$elm_ui$Element$Input$labelHidden = $mdgriffith$elm_ui$Element$Input$HiddenLabel;
+var $author$project$Main$AddSimulation = {$: 'AddSimulation'};
+var $author$project$Main$viewAddTab = A2(
+	$mdgriffith$elm_ui$Element$Input$button,
+	_Utils_ap(
+		$author$project$Utils$styles.button,
+		_List_fromArray(
+			[
+				$mdgriffith$elm_ui$Element$width(
+				$mdgriffith$elm_ui$Element$px(20)),
+				$mdgriffith$elm_ui$Element$Border$rounded(20)
+			])),
+	{
+		label: $author$project$Utils$centeredText('+'),
+		onPress: $elm$core$Maybe$Just($author$project$Main$AddSimulation)
+	});
 var $author$project$Main$viewTabs = function (model) {
 	return A2(
 		$mdgriffith$elm_ui$Element$row,
-		_List_Nil,
-		A2(
-			$elm$core$List$map,
-			function (simulation) {
-				return _Utils_eq(simulation, model.activeSimulation) ? A2(
-					$mdgriffith$elm_ui$Element$Input$text,
-					_List_fromArray(
-						[
-							$mdgriffith$elm_ui$Element$width(
-							$mdgriffith$elm_ui$Element$px(150)),
-							$mdgriffith$elm_ui$Element$Background$color(
-							$author$project$Utils$toElmUiColor($avh4$elm_color$Color$lightGrey))
-						]),
-					{
-						label: $mdgriffith$elm_ui$Element$Input$labelHidden('current simulation name'),
-						onChange: $author$project$Main$UpdateActiveSimulationName,
-						placeholder: $elm$core$Maybe$Nothing,
-						text: simulation.name
-					}) : A2(
-					$mdgriffith$elm_ui$Element$Input$button,
-					$author$project$Utils$styles.button,
-					{
-						label: $mdgriffith$elm_ui$Element$text(simulation.name),
-						onPress: $elm$core$Maybe$Just(
-							$author$project$Main$ChangeActiveSimulation(simulation))
-					});
-			},
-			model.simulations));
+		_List_fromArray(
+			[
+				$mdgriffith$elm_ui$Element$spacing(10)
+			]),
+		_Utils_ap(
+			A2(
+				$elm$core$List$map,
+				function (simulation) {
+					return _Utils_eq(simulation, model.activeSimulation) ? A2(
+						$mdgriffith$elm_ui$Element$Input$text,
+						_List_fromArray(
+							[
+								$mdgriffith$elm_ui$Element$width(
+								$mdgriffith$elm_ui$Element$px(150)),
+								$mdgriffith$elm_ui$Element$Background$color(
+								$author$project$Utils$toElmUiColor($avh4$elm_color$Color$lightGrey))
+							]),
+						{
+							label: $mdgriffith$elm_ui$Element$Input$labelHidden('current simulation name'),
+							onChange: $author$project$Main$UpdateActiveSimulationName,
+							placeholder: $elm$core$Maybe$Nothing,
+							text: simulation.name
+						}) : A2(
+						$mdgriffith$elm_ui$Element$Input$button,
+						$author$project$Utils$styles.button,
+						{
+							label: $mdgriffith$elm_ui$Element$text(simulation.name),
+							onPress: $elm$core$Maybe$Just(
+								$author$project$Main$ChangeActiveSimulation(simulation))
+						});
+				},
+				model.simulations),
+			_List_fromArray(
+				[$author$project$Main$viewAddTab])));
 };
 var $author$project$Main$view = function (model) {
 	return A2(
@@ -16398,4 +16470,9 @@ var $author$project$Main$view = function (model) {
 var $author$project$Main$main = $elm$browser$Browser$element(
 	{init: $author$project$Main$init, subscriptions: $author$project$Main$subscriptions, update: $author$project$Main$update, view: $author$project$Main$view});
 _Platform_export({'Main':{'init':$author$project$Main$main(
-	$elm$json$Json$Decode$list($elm$json$Json$Decode$string))(0)}});}(this));
+	$elm$json$Json$Decode$oneOf(
+		_List_fromArray(
+			[
+				$elm$json$Json$Decode$null($elm$core$Maybe$Nothing),
+				A2($elm$json$Json$Decode$map, $elm$core$Maybe$Just, $elm$json$Json$Decode$string)
+			])))(0)}});}(this));
