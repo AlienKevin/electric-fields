@@ -5406,10 +5406,6 @@ var _Bitwise_shiftRightZfBy = F2(function(offset, a)
 {
 	return a >>> offset;
 });
-var $elm$core$Maybe$Just = function (a) {
-	return {$: 'Just', a: a};
-};
-var $elm$core$Maybe$Nothing = {$: 'Nothing'};
 var $elm$core$Basics$EQ = {$: 'EQ'};
 var $elm$core$Basics$GT = {$: 'GT'};
 var $elm$core$Basics$LT = {$: 'LT'};
@@ -5513,6 +5509,10 @@ var $elm$json$Json$Decode$OneOf = function (a) {
 };
 var $elm$core$Basics$False = {$: 'False'};
 var $elm$core$Basics$add = _Basics_add;
+var $elm$core$Maybe$Just = function (a) {
+	return {$: 'Just', a: a};
+};
+var $elm$core$Maybe$Nothing = {$: 'Nothing'};
 var $elm$core$String$all = _String_all;
 var $elm$core$Basics$and = _Basics_and;
 var $elm$core$Basics$append = _Utils_append;
@@ -6195,6 +6195,15 @@ var $elm$core$Task$perform = F2(
 				A2($elm$core$Task$map, toMessage, task)));
 	});
 var $elm$browser$Browser$element = _Browser_element;
+var $elm$core$List$head = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(x);
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
 var $author$project$Simulation$Negative = {$: 'Negative'};
 var $author$project$Simulation$NoContextMenu = {$: 'NoContextMenu'};
 var $author$project$Simulation$NoPopUp = {$: 'NoPopUp'};
@@ -6635,18 +6644,31 @@ var $author$project$Simulation$init = function (savedModel) {
 		}(),
 		$elm$core$Platform$Cmd$none);
 };
-var $author$project$Main$init = function (savedSimulation) {
-	var _v0 = $author$project$Simulation$init(savedSimulation);
-	var simulation = _v0.a;
+var $author$project$Main$init = function (savedSimulations) {
+	var activeSimulation = $author$project$Simulation$init(
+		$elm$core$List$head(savedSimulations)).a;
+	var simulations = function () {
+		if (!savedSimulations.b) {
+			return _List_fromArray(
+				[activeSimulation]);
+		} else {
+			var tail = savedSimulations.b;
+			return A2(
+				$elm$core$List$cons,
+				activeSimulation,
+				A2(
+					$elm$core$List$map,
+					function (simulation) {
+						return $author$project$Simulation$init(
+							$elm$core$Maybe$Just(simulation)).a;
+					},
+					tail));
+		}
+	}();
 	return _Utils_Tuple2(
-		{
-			activeSimulation: simulation,
-			simulations: _List_fromArray(
-				[simulation])
-		},
+		{activeSimulation: activeSimulation, simulations: simulations},
 		$elm$core$Platform$Cmd$none);
 };
-var $elm$json$Json$Decode$null = _Json_decodeNull;
 var $author$project$Main$SimulationMsg = function (a) {
 	return {$: 'SimulationMsg', a: a};
 };
@@ -6656,6 +6678,7 @@ var $author$project$Simulation$DragMsg = function (a) {
 };
 var $author$project$Simulation$SaveModel = {$: 'SaveModel'};
 var $elm$core$Platform$Sub$batch = _Platform_batch;
+var $elm$json$Json$Decode$null = _Json_decodeNull;
 var $author$project$Simulation$pageWillClose = _Platform_incomingPort(
 	'pageWillClose',
 	$elm$json$Json$Decode$null(_Utils_Tuple0));
@@ -7127,10 +7150,8 @@ var $author$project$Main$subscriptions = function (model) {
 		$author$project$Main$SimulationMsg,
 		$author$project$Simulation$subscriptions(model.activeSimulation));
 };
-var $elm$core$Debug$log = _Debug_log;
 var $author$project$Main$changeActiveSimulation = F2(
 	function (newSimulation, model) {
-		var _v0 = A2($elm$core$Debug$log, 'AL -> newSimulation.name', newSimulation.name);
 		return _Utils_update(
 			model,
 			{activeSimulation: newSimulation});
@@ -7596,7 +7617,20 @@ var $author$project$Simulation$resetState = function (model) {
 				model,
 				{contextMenu: $author$project$Simulation$NoContextMenu})));
 };
-var $author$project$Simulation$saveModel = _Platform_outgoingPort('saveModel', $elm$core$Basics$identity);
+var $author$project$Simulation$saveModel = _Platform_outgoingPort(
+	'saveModel',
+	function ($) {
+		var a = $.a;
+		var b = $.b;
+		return A2(
+			$elm$json$Json$Encode$list,
+			$elm$core$Basics$identity,
+			_List_fromArray(
+				[
+					$elm$json$Json$Encode$string(a),
+					$elm$core$Basics$identity(b)
+				]));
+	});
 var $author$project$Simulation$StopWheelingTimeOut = {$: 'StopWheelingTimeOut'};
 var $elm$core$Basics$min = F2(
 	function (x, y) {
@@ -8042,7 +8076,9 @@ var $author$project$Simulation$update = F2(
 				return _Utils_Tuple2(
 					model,
 					$author$project$Simulation$saveModel(
-						$author$project$Simulation$encodeModel(model)));
+						_Utils_Tuple2(
+							model.name,
+							$author$project$Simulation$encodeModel(model))));
 			default:
 				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 		}
@@ -14385,15 +14421,6 @@ var $mdgriffith$elm_ui$Element$column = F2(
 						attrs))),
 			$mdgriffith$elm_ui$Internal$Model$Unkeyed(children));
 	});
-var $elm$core$List$head = function (list) {
-	if (list.b) {
-		var x = list.a;
-		var xs = list.b;
-		return $elm$core$Maybe$Just(x);
-	} else {
-		return $elm$core$Maybe$Nothing;
-	}
-};
 var $mdgriffith$elm_ui$Internal$Model$MoveY = function (a) {
 	return {$: 'MoveY', a: a};
 };
@@ -16371,9 +16398,4 @@ var $author$project$Main$view = function (model) {
 var $author$project$Main$main = $elm$browser$Browser$element(
 	{init: $author$project$Main$init, subscriptions: $author$project$Main$subscriptions, update: $author$project$Main$update, view: $author$project$Main$view});
 _Platform_export({'Main':{'init':$author$project$Main$main(
-	$elm$json$Json$Decode$oneOf(
-		_List_fromArray(
-			[
-				$elm$json$Json$Decode$null($elm$core$Maybe$Nothing),
-				A2($elm$json$Json$Decode$map, $elm$core$Maybe$Just, $elm$json$Json$Decode$string)
-			])))(0)}});}(this));
+	$elm$json$Json$Decode$list($elm$json$Json$Decode$string))(0)}});}(this));
