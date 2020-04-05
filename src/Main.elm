@@ -23,16 +23,26 @@ type Msg
 
 
 
-init : (Maybe String) -> (Model, Cmd Msg)
-init savedSimulation =
+init : (List String) -> (Model, Cmd Msg)
+init savedSimulations =
   let
-    (simulation, _) =
-      Simulation.init savedSimulation
+    activeSimulation =
+      Tuple.first <| Simulation.init <| List.head savedSimulations
+    simulations =
+      case savedSimulations of
+        [] ->
+          [ activeSimulation ]
+        _ :: tail ->
+          activeSimulation :: List.map
+          (\simulation ->
+            Tuple.first <| Simulation.init (Just simulation)
+          )
+          tail
   in
   ({ simulations =
-    [ simulation ]
+    simulations
   , activeSimulation =
-    simulation
+    activeSimulation
   }
   , Cmd.none
   )
@@ -112,9 +122,6 @@ updateActiveSimulationName newName model =
 
 changeActiveSimulation : Simulation.Model -> Model -> Model
 changeActiveSimulation newSimulation model =
-  let
-    _ = Debug.log "AL -> newSimulation.name" <| newSimulation.name
-  in
   { model
     | activeSimulation =
       newSimulation
@@ -154,7 +161,7 @@ subscriptions model =
   Sub.map SimulationMsg <| Simulation.subscriptions model.activeSimulation
 
   
-main : Program (Maybe String) Model Msg
+main : Program (List String) Model Msg
 main =
   Browser.element
     { init = init

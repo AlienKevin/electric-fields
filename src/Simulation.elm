@@ -28,7 +28,7 @@ import Utils exposing (toElmUiColor, styles)
 
 
 port downloadModel : () -> Cmd msg
-port saveModel : Encode.Value -> Cmd msg
+port saveModel : (String, Encode.Value) -> Cmd msg
 port pageWillClose : (() -> msg) -> Sub msg
 
 
@@ -416,7 +416,7 @@ update msg model =
       (model, downloadModel ())
 
     SaveModel ->
-      (model, saveModel <| encodeModel model)
+      (model, saveModel (model.name, encodeModel model))
 
     DoNothing ->
       (model, Cmd.none)
