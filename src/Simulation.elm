@@ -612,7 +612,7 @@ scaleSourceMagnitude delta model =
             source =
               { source |
                 magnitude =
-                  min 20 <| max 0.5 <| source.magnitude + toFloat delta * -0.01
+                  min 20 <| max 0.5 <| source.magnitude + either -0.5 0.5 (toFloat delta * -0.01)
               }
           }
         )
@@ -1060,6 +1060,14 @@ lerp min1 max1 min2 max2 num =
       abs <| (num - min1) / (max1 - min1)
   in
   min2 + ratio * (max2 - min2)
+
+
+either : Float -> Float -> Float -> Float
+either minimum maximum value =
+  if value < 0 then
+    minimum
+  else
+    maximum
 
 
 foldlWhile : (a -> b -> (b, Bool)) -> b -> List a -> b
