@@ -21,6 +21,7 @@ import Element.Events
 import Html.Events.Extra.Mouse as Mouse
 import Process
 import Task
+import Round
 import Utils exposing (styles)
 
 
@@ -45,6 +46,7 @@ type alias Settings =
   , steps : Int
   , delta : Float
   , magnitude : Float
+  , showSourceValue : Bool
   }
 
 
@@ -95,6 +97,7 @@ defaultSettings =
   , steps = 900
   , delta = 1
   , magnitude = 1.0
+  , showSourceValue = True
   }
 
 defaultName : String
@@ -521,6 +524,7 @@ decodeModel =
       Field.require "density" Decode.int <| \density ->
       Field.require "steps" Decode.int <| \steps ->
       Field.require "delta" Decode.float <| \delta ->
+      Field.require "showSourceValue" Decode.bool <| \showSourceValue ->
 
       Decode.succeed
         { r = r
@@ -528,6 +532,7 @@ decodeModel =
         , density = density
         , steps = steps
         , delta = delta
+        , showSourceValue = showSourceValue
         }
     
   in
@@ -825,7 +830,7 @@ view model =
         , Mouse.onContextMenu ShowGeneralContextMenu
         ] <|
         List.map viewFieldLines model.fields
-        ++ List.map (viewFieldSource model.activeSourceId) model.fields
+        ++ List.map (viewFieldSource model.activeSourceId model.settings) model.fields
       )
 
 
@@ -906,8 +911,8 @@ viewGeneralContextMenu menuItemstyless (x, y) =
     ]
 
 
-viewFieldSource : Maybe Id -> Field -> Svg Msg
-viewFieldSource activeSourceId field =
+viewFieldSource : Maybe Id -> Settings -> Field -> Svg Msg
+viewFieldSource activeSourceId settings field =
   let
     fill =
       signToColor field.source.sign
@@ -965,6 +970,20 @@ viewFieldSource activeSourceId field =
       , Attributes.repeatCount TypedSvg.Types.RepeatIndefinite
       ] []
     ]
+  , case activeSourceId of
+    Just id ->
+      if field.source.id == id && settings.showSourceValue then
+        Svg.text_
+          [ Attributes.x (px <| field.source.x - field.source.r)
+          , Attributes.y (px <| field.source.y - field.source.r - 10)
+          , Attributes.stroke <| Paint Color.black
+          ]
+          [ TypedSvg.Core.text (signToString field.source.sign ++ Round.round 1 field.source.magnitude)
+          ]
+      else
+        Svg.g [] []
+    Nothing ->
+      Svg.g [] []
   ]
 
 
@@ -1002,6 +1021,15 @@ signToColor sign =
       Color.orange
     Negative ->
       Color.blue
+
+
+signToString : Sign -> String
+signToString sign =
+  case sign of
+    Positive ->
+      "+"
+    Negative ->
+      "-"
 
 
 setAlpha : Float -> Color -> Color

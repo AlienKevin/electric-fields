@@ -1,6 +1,7 @@
 module Utils exposing (styles, colors, centeredText)
 
 import Color
+import Html.Attributes
 import Element as E
 import Element.Background as Background
 import Element.Border as Border
@@ -29,6 +30,7 @@ colors =
 styles :
   { button : List (E.Attribute msg)
   , tab : List (E.Attribute msg)
+  , padTop : E.Attribute msg
   }
 styles =
   { button =
@@ -58,6 +60,8 @@ styles =
       , bottomRight = 0
       }
     ]
+  , padTop =
+      E.htmlAttribute <| Html.Attributes.style "margin-top" "20px"
   }
 
 

@@ -4,6 +4,7 @@ import Browser
 import Browser.Dom
 import Browser.Events
 import Html exposing (Html)
+import Html.Attributes
 import Html.Events
 import Simulation
 import Element as E
@@ -77,6 +78,7 @@ type Msg
   | CloseUploadPopUp
   | GotViewport Browser.Dom.Viewport
   | WindowResized Int Int
+  | ToggleShowSourceValue Bool
   | DoNothing
   
 
@@ -285,6 +287,9 @@ update message model =
 
     WindowResized newWidth newHeight ->
       (updateSimulationSize (toFloat newWidth - 50) (toFloat newHeight - 110) model, Cmd.none)
+
+    ToggleShowSourceValue newChecked ->
+      (toggleShowSourceValue newChecked model, Cmd.none)
 
     DoNothing ->
       (model, Cmd.none)
@@ -500,7 +505,8 @@ viewSettingsPopUp model =
   viewPopUpOf "Settings"
     [ E.inFront <| viewApplyOptions model
     ]
-    [ Input.text []
+    [ textHeader "Electric Field Settings"
+    , Input.text []
       { onChange = UpdatePendingSetting "r"
        , text = String.fromFloat settings.r
        , placeholder = Nothing
@@ -532,8 +538,7 @@ viewSettingsPopUp model =
     }
   , E.row
     [ E.width E.fill
-    , E.paddingEach
-      { top = 20, right = 0, bottom = 0, left = 0 }
+    , styles.padTop
     ]
     [ Input.button (styles.button ++ [E.alignLeft])
       { onPress =
@@ -548,6 +553,22 @@ viewSettingsPopUp model =
         centeredText "Cancel"
       }
     ]
+  , textHeader "Global Settings"
+  , E.text "Global settings are immediately applied to all electric fields."
+  , Input.checkbox []
+    { onChange = ToggleShowSourceValue
+    , icon = Input.defaultCheckbox
+    , checked = settings.showSourceValue
+    , label =
+        Input.labelRight [] <|
+          E.text "Show source charge's value"
+    }
+  , E.el [ styles.padTop, E.alignRight ] <|
+      Input.button
+        styles.button
+        { onPress = Just CloseSettingsPopUp
+        , label = centeredText "Close"
+        }
   ]
 
 
@@ -585,7 +606,7 @@ viewHelpPopUp =
     , textHeader "When you mouse over background and ..."
     , E.text "  Right Click:  * add + charge"
     , E.text "                * add - charge"
-    , E.el [ E.paddingEach { top = 20, right = 0, bottom = 0, left = 0 }, E.alignRight ] <|
+    , E.el [ styles.padTop, E.alignRight ] <|
       Input.button
         styles.button
         { onPress = Just CloseHelpPopUp
@@ -611,8 +632,7 @@ viewDownloadPopUp =
       , label = centeredText "Downloas as JSON"
       }
     , E.el
-      [ E.paddingEach
-        { top = 20, right = 0, bottom = 0, left = 0 }
+      [ styles.padTop
       , E.alignRight
       ] <|
       Input.button styles.button
@@ -647,7 +667,7 @@ viewUploadPopUp model =
             ]
       UploadPending ->
         E.none
-    , Input.button (styles.button ++ [E.alignRight])
+    , Input.button (styles.button ++ [ styles.padTop, E.alignRight])
       { onPress =
         Just CloseUploadPopUp
       , label =
@@ -684,7 +704,8 @@ viewPopUpOf title attributes content =
 textHeader : String -> E.Element Msg
 textHeader text =
   E.el
-    [ E.paddingXY 0 6
+    [ styles.padTop
+    , Font.bold
     ] <|
     E.text text
 
@@ -893,6 +914,35 @@ updateSimulationSize newWidth newHeight model =
     , activeSimulation =
       updateSize model.activeSimulation
   }
+
+
+toggleShowSourceValue : Bool -> Model -> Model
+toggleShowSourceValue newChecked model =
+  let
+    settings =
+      model.activeSimulation.settings
+    pendingSettings =
+      model.pendingSettings
+    updatedModel =
+      applySettingsToCurrentAndFutureFields
+        { model
+          | pendingSettings =
+            { settings
+              | showSourceValue =
+                newChecked
+            }
+        }
+  in
+  { updatedModel
+    | pendingSettings =
+      { pendingSettings
+        | showSourceValue =
+          newChecked
+      }
+    , popUp =
+      SettingsPopUp
+  }
+
 
 
 encodeProject : Model -> Encode.Value
