@@ -1,6 +1,8 @@
 port module Main exposing (main)
 
 import Browser
+import Browser.Dom
+import Browser.Events
 import Html exposing (Html)
 import Html.Events
 import Simulation
@@ -32,6 +34,8 @@ type alias Model =
   , uploadResult : UploadResult
   , popUp : PopUp
   , pendingSettings : Simulation.Settings
+  , simulationWidth : Float
+  , simulationHeight : Float
   }
 
 
@@ -71,8 +75,19 @@ type Msg
   | JsonSelected File
   | JsonLoaded String
   | CloseUploadPopUp
+  | GotViewport Browser.Dom.Viewport
+  | WindowResized Int Int
   | DoNothing
   
+
+defaultSimulationWidth : Float
+defaultSimulationWidth =
+  1200
+
+
+defaultSimulationHeight : Float
+defaultSimulationHeight =
+  750
 
 
 init : (Maybe String) -> (Model, Cmd Msg)
@@ -88,7 +103,7 @@ init savedProject =
     defaultActiveSimulation =
       let
         simulation =
-          Simulation.init
+          Simulation.init defaultSimulationWidth defaultSimulationHeight
       in
       if simulation.name == Simulation.defaultName then
         { simulation
@@ -111,10 +126,12 @@ init savedProject =
       , uploadResult = UploadPending
       , popUp = NoPopUp
       , pendingSettings = Simulation.defaultSettings
+      , simulationWidth = defaultSimulationWidth
+      , simulationHeight = defaultSimulationHeight
       }
   in
   ( project
-  , Cmd.none
+  , Task.perform GotViewport Browser.Dom.getViewport
   )
 
 
@@ -263,6 +280,12 @@ update message model =
     CloseUploadPopUp ->
       ( closeUploadPopUp model, Cmd.none)
 
+    GotViewport viewport ->
+      (updateSimulationSize (viewport.viewport.width - 50) (viewport.viewport.height - 110) model, Cmd.none)
+
+    WindowResized newWidth newHeight ->
+      (updateSimulationSize (toFloat newWidth - 50) (toFloat newHeight - 110) model, Cmd.none)
+
     DoNothing ->
       (model, Cmd.none)
 
@@ -358,7 +381,7 @@ addSimulation model =
     newSimulation =
       let
         simulation =
-          Simulation.init
+          Simulation.init model.simulationWidth model.simulationHeight
       in
       { simulation
         | name =
@@ -848,6 +871,30 @@ showPopUp popUp model =
   }
 
 
+updateSimulationSize : Float -> Float -> Model -> Model
+updateSimulationSize newWidth newHeight model =
+  let
+    updateSize =
+      \simulation ->
+        if simulation.width /= newWidth || simulation.height /= newHeight then
+          Simulation.init newWidth newHeight
+        else
+          simulation
+  in
+  { model
+    | simulationWidth =
+      newWidth
+    , simulationHeight =
+      newHeight
+    , simulations =
+      List.map
+        updateSize
+        model.simulations
+    , activeSimulation =
+      updateSize model.activeSimulation
+  }
+
+
 encodeProject : Model -> Encode.Value
 encodeProject model =
   Encode.object
@@ -871,6 +918,8 @@ decodeProject =
     , uploadResult = UploadPending
     , popUp = NoPopUp
     , pendingSettings = Simulation.defaultSettings
+    , simulationWidth = defaultSimulationWidth
+    , simulationHeight = defaultSimulationHeight
     }
 
 
@@ -879,6 +928,7 @@ subscriptions model =
   Sub.batch
     [ Sub.map SimulationMsg <| Simulation.subscriptions model.activeSimulation
     , pageWillClose (\_ -> SaveProject)
+    , Browser.Events.onResize WindowResized
     ]
 
   

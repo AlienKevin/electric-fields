@@ -121,8 +121,8 @@ type Msg
   | StopWheelingTimeOut
 
 
-init : Model
-init =
+init : Float -> Float -> Model
+init width height =
   let
     defaultFields =
       [{ source = { id = 0, sign = Negative, magnitude = 3.0, x = 465.0, y = 270.0, r = 10.0 }
@@ -151,14 +151,10 @@ init =
       }
       ]
 
-    defaultWidth = 1200
-
-    defaultHeight = 750
-
     defaultModel =
       { name = defaultName
       , fields =
-        calculateFields defaultWidth defaultHeight defaultFields
+        calculateFields width height defaultFields
       , activeSourceId = if List.length defaultFields > 0 then Just 0 else Nothing
       , nextId = List.length defaultFields
       , drag = Draggable.init
@@ -166,8 +162,8 @@ init =
       , settings = defaultSettings
       , isWheeling = False
       , isWheelingTimeOutCleared = False
-      , width = defaultWidth
-      , height = defaultHeight
+      , width = width
+      , height = height
       }
   in
   defaultModel
