@@ -8317,6 +8317,10 @@ var $author$project$Simulation$resetState = function (model) {
 		{contextMenu: $author$project$Simulation$NoContextMenu});
 };
 var $author$project$Simulation$StopWheelingTimeOut = {$: 'StopWheelingTimeOut'};
+var $author$project$Simulation$either = F3(
+	function (minimum, maximum, value) {
+		return (value < 0) ? minimum : maximum;
+	});
 var $elm$core$Basics$min = F2(
 	function (x, y) {
 		return (_Utils_cmp(x, y) < 0) ? x : y;
@@ -8365,7 +8369,10 @@ var $author$project$Simulation$scaleSourceMagnitude = F2(
 								magnitude: A2(
 									$elm$core$Basics$min,
 									20,
-									A2($elm$core$Basics$max, 0.5, source.magnitude + (delta * (-0.01))))
+									A2(
+										$elm$core$Basics$max,
+										0.5,
+										source.magnitude + A3($author$project$Simulation$either, -0.5, 0.5, delta * (-0.01))))
 							})
 					});
 			},
