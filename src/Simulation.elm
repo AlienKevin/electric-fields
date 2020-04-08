@@ -17,12 +17,13 @@ import Json.Encode as Encode
 import Element as E
 import Element.Input as Input
 import Element.Font as Font
+import Element.Background as Background
 import Element.Events
 import Html.Events.Extra.Mouse as Mouse
 import Process
 import Task
 import Round
-import Utils exposing (styles)
+import Utils exposing (styles, toElmUiColor)
 
 
 type alias Model =
@@ -56,6 +57,7 @@ type alias SettingColors =
   , negativeCharge: Color
   , positiveLine : Color
   , negativeLine : Color
+  , background : Color
   }
 
 
@@ -112,6 +114,7 @@ defaultSettings =
     , negativeCharge = Color.blue
     , positiveLine = Color.black
     , negativeLine = Color.black
+    , background = Color.white
     }
   }
 
@@ -472,12 +475,13 @@ encodeModel { name, fields, activeSourceId, nextId, settings, width, height } =
         ]
 
     encodeSettingColors : SettingColors -> Encode.Value
-    encodeSettingColors { positiveCharge, negativeCharge, positiveLine, negativeLine } =
+    encodeSettingColors { positiveCharge, negativeCharge, positiveLine, negativeLine, background } =
       Encode.object
       [ ("positiveCharge", encodeColor positiveCharge)
       , ("negativeCharge", encodeColor negativeCharge)
       , ("positiveLine", encodeColor positiveLine)
       , ("negativeLine", encodeColor negativeLine)
+      , ("background", encodeColor background)
       ]
 
     encodeSettings : Settings -> Encode.Value
@@ -575,12 +579,14 @@ decodeModel =
       Field.require "negativeCharge" decodeColorRgba <| \negativeCharge ->
       Field.require "positiveLine" decodeColorRgba <| \positiveLine ->
       Field.require "negativeLine" decodeColorRgba <| \negativeLine ->
+      Field.require "background" decodeColorRgba <| \background ->
 
       Decode.succeed
         { positiveCharge = positiveCharge
         , negativeCharge = negativeCharge
         , positiveLine = positiveLine
         , negativeLine = negativeLine
+        , background = background
         }
 
     decodeSettings =
@@ -882,6 +888,7 @@ view model =
     , Font.family
       [ Font.monospace
       ]
+    , Background.color <| toElmUiColor model.settings.colors.background
     ] <|
     E.el
       [ E.inFront <| viewContextMenu model

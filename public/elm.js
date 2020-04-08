@@ -6656,8 +6656,14 @@ var $author$project$Simulation$decodeModel = function () {
 								'negativeLine',
 								decodeColorRgba,
 								function (negativeLine) {
-									return $elm$json$Json$Decode$succeed(
-										{negativeCharge: negativeCharge, negativeLine: negativeLine, positiveCharge: positiveCharge, positiveLine: positiveLine});
+									return A3(
+										$webbhuset$elm_json_decode$Json$Decode$Field$require,
+										'background',
+										decodeColorRgba,
+										function (background) {
+											return $elm$json$Json$Decode$succeed(
+												{background: background, negativeCharge: negativeCharge, negativeLine: negativeLine, positiveCharge: positiveCharge, positiveLine: positiveLine});
+										});
 								});
 						});
 				});
@@ -6830,8 +6836,9 @@ var $author$project$Simulation$decodeModel = function () {
 var $avh4$elm_color$Color$black = A4($avh4$elm_color$Color$RgbaSpace, 0 / 255, 0 / 255, 0 / 255, 1.0);
 var $avh4$elm_color$Color$blue = A4($avh4$elm_color$Color$RgbaSpace, 52 / 255, 101 / 255, 164 / 255, 1.0);
 var $avh4$elm_color$Color$orange = A4($avh4$elm_color$Color$RgbaSpace, 245 / 255, 121 / 255, 0 / 255, 1.0);
+var $avh4$elm_color$Color$white = A4($avh4$elm_color$Color$RgbaSpace, 255 / 255, 255 / 255, 255 / 255, 1.0);
 var $author$project$Simulation$defaultSettings = {
-	colors: {negativeCharge: $avh4$elm_color$Color$blue, negativeLine: $avh4$elm_color$Color$black, positiveCharge: $avh4$elm_color$Color$orange, positiveLine: $avh4$elm_color$Color$black},
+	colors: {background: $avh4$elm_color$Color$white, negativeCharge: $avh4$elm_color$Color$blue, negativeLine: $avh4$elm_color$Color$black, positiveCharge: $avh4$elm_color$Color$orange, positiveLine: $avh4$elm_color$Color$black},
 	delta: 1,
 	density: 30,
 	magnitude: 1.0,
@@ -7677,6 +7684,7 @@ var $author$project$Simulation$encodeModel = function (_v0) {
 		var negativeCharge = _v4.negativeCharge;
 		var positiveLine = _v4.positiveLine;
 		var negativeLine = _v4.negativeLine;
+		var background = _v4.background;
 		return $elm$json$Json$Encode$object(
 			_List_fromArray(
 				[
@@ -7691,7 +7699,10 @@ var $author$project$Simulation$encodeModel = function (_v0) {
 					encodeColor(positiveLine)),
 					_Utils_Tuple2(
 					'negativeLine',
-					encodeColor(negativeLine))
+					encodeColor(negativeLine)),
+					_Utils_Tuple2(
+					'background',
+					encodeColor(background))
 				]));
 	};
 	var encodeSettings = function (_v3) {
@@ -14998,6 +15009,16 @@ var $author$project$Simulation$ClickedBackground = {$: 'ClickedBackground'};
 var $author$project$Simulation$ShowGeneralContextMenu = function (a) {
 	return {$: 'ShowGeneralContextMenu', a: a};
 };
+var $mdgriffith$elm_ui$Element$Background$color = function (clr) {
+	return A2(
+		$mdgriffith$elm_ui$Internal$Model$StyleClass,
+		$mdgriffith$elm_ui$Internal$Flag$bgColor,
+		A3(
+			$mdgriffith$elm_ui$Internal$Model$Colored,
+			'bg-' + $mdgriffith$elm_ui$Internal$Model$formatColorClass(clr),
+			'background-color',
+			clr));
+};
 var $elm_community$typed_svg$TypedSvg$Core$attribute = $elm$virtual_dom$VirtualDom$attribute;
 var $elm_community$typed_svg$TypedSvg$TypesToStrings$lengthToString = function (length) {
 	switch (length.$) {
@@ -15198,6 +15219,15 @@ var $elm$virtual_dom$VirtualDom$nodeNS = function (tag) {
 };
 var $elm_community$typed_svg$TypedSvg$Core$node = $elm$virtual_dom$VirtualDom$nodeNS('http://www.w3.org/2000/svg');
 var $elm_community$typed_svg$TypedSvg$svg = $elm_community$typed_svg$TypedSvg$Core$node('svg');
+var $mdgriffith$elm_ui$Element$rgba = $mdgriffith$elm_ui$Internal$Model$Rgba;
+var $author$project$Utils$toElmUiColor = function (color) {
+	var _v0 = $avh4$elm_color$Color$toRgba(color);
+	var red = _v0.red;
+	var green = _v0.green;
+	var blue = _v0.blue;
+	var alpha = _v0.alpha;
+	return A4($mdgriffith$elm_ui$Element$rgba, red, green, blue, alpha);
+};
 var $elm_community$typed_svg$TypedSvg$Attributes$viewBox = F4(
 	function (minX, minY, vWidth, vHeight) {
 		return A2(
@@ -15215,16 +15245,6 @@ var $elm_community$typed_svg$TypedSvg$Attributes$viewBox = F4(
 var $mdgriffith$elm_ui$Element$htmlAttribute = $mdgriffith$elm_ui$Internal$Model$Attr;
 var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
 var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
-var $mdgriffith$elm_ui$Element$Background$color = function (clr) {
-	return A2(
-		$mdgriffith$elm_ui$Internal$Model$StyleClass,
-		$mdgriffith$elm_ui$Internal$Flag$bgColor,
-		A3(
-			$mdgriffith$elm_ui$Internal$Model$Colored,
-			'bg-' + $mdgriffith$elm_ui$Internal$Model$formatColorClass(clr),
-			'background-color',
-			clr));
-};
 var $mdgriffith$elm_ui$Internal$Flag$borderColor = $mdgriffith$elm_ui$Internal$Flag$flag(28);
 var $mdgriffith$elm_ui$Element$Border$color = function (clr) {
 	return A2(
@@ -15241,15 +15261,6 @@ var $mdgriffith$elm_ui$Element$rgb = F3(
 	function (r, g, b) {
 		return A4($mdgriffith$elm_ui$Internal$Model$Rgba, r, g, b, 1);
 	});
-var $mdgriffith$elm_ui$Element$rgba = $mdgriffith$elm_ui$Internal$Model$Rgba;
-var $author$project$Utils$toElmUiColor = function (color) {
-	var _v0 = $avh4$elm_color$Color$toRgba(color);
-	var red = _v0.red;
-	var green = _v0.green;
-	var blue = _v0.blue;
-	var alpha = _v0.alpha;
-	return A4($mdgriffith$elm_ui$Element$rgba, red, green, blue, alpha);
-};
 var $author$project$Utils$colors = {
 	black: $author$project$Utils$toElmUiColor($avh4$elm_color$Color$black),
 	darkGrey: $author$project$Utils$toElmUiColor($avh4$elm_color$Color$darkGrey),
@@ -16571,7 +16582,9 @@ var $author$project$Simulation$view = function (model) {
 				$mdgriffith$elm_ui$Element$Font$size(16),
 				$mdgriffith$elm_ui$Element$Font$family(
 				_List_fromArray(
-					[$mdgriffith$elm_ui$Element$Font$monospace]))
+					[$mdgriffith$elm_ui$Element$Font$monospace])),
+				$mdgriffith$elm_ui$Element$Background$color(
+				$author$project$Utils$toElmUiColor(model.settings.colors.background))
 			]),
 		A2(
 			$mdgriffith$elm_ui$Element$el,

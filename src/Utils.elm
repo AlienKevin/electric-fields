@@ -1,4 +1,4 @@
-module Utils exposing (styles, colors, centeredText)
+module Utils exposing (styles, colors, centeredText, toElmUiColor)
 
 import Color
 import Html.Attributes
