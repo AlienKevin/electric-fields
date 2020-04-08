@@ -33,11 +33,6 @@
       download(modelName + ".svg", "image/svg+xml;charset=utf-8", svgData);
     });
 
-    // download model as json
-    app.ports.downloadModelAsJson.subscribe(function([modelName, json]) {
-      download(modelName + ".json", "application/json", JSON.stringify(json,undefined,2));
-    });
-
     function download(fileName, type, data) {
       var blob = new Blob([data], {type: type});
       var url = URL.createObjectURL(blob);

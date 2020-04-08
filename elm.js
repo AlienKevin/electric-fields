@@ -7584,6 +7584,11 @@ var $author$project$Main$closeUploadPopUp = function (model) {
 		model,
 		{popUp: $author$project$Main$NoPopUp, uploadResult: $author$project$Main$UploadPending});
 };
+var $elm$json$Json$Encode$string = _Json_wrap;
+var $author$project$Main$downloadModelAsSvg = _Platform_outgoingPort('downloadModelAsSvg', $elm$json$Json$Encode$string);
+var $elm$json$Json$Encode$bool = _Json_wrap;
+var $elm$json$Json$Encode$float = _Json_wrap;
+var $elm$json$Json$Encode$int = _Json_wrap;
 var $elm$json$Json$Encode$list = F2(
 	function (func, entries) {
 		return _Json_wrap(
@@ -7593,25 +7598,6 @@ var $elm$json$Json$Encode$list = F2(
 				_Json_emptyArray(_Utils_Tuple0),
 				entries));
 	});
-var $elm$json$Json$Encode$string = _Json_wrap;
-var $author$project$Main$downloadModelAsJson = _Platform_outgoingPort(
-	'downloadModelAsJson',
-	function ($) {
-		var a = $.a;
-		var b = $.b;
-		return A2(
-			$elm$json$Json$Encode$list,
-			$elm$core$Basics$identity,
-			_List_fromArray(
-				[
-					$elm$json$Json$Encode$string(a),
-					$elm$core$Basics$identity(b)
-				]));
-	});
-var $author$project$Main$downloadModelAsSvg = _Platform_outgoingPort('downloadModelAsSvg', $elm$json$Json$Encode$string);
-var $elm$json$Json$Encode$bool = _Json_wrap;
-var $elm$json$Json$Encode$float = _Json_wrap;
-var $elm$json$Json$Encode$int = _Json_wrap;
 var $elm$json$Json$Encode$null = _Json_encodeNull;
 var $elm$json$Json$Encode$object = function (pairs) {
 	return _Json_wrap(
@@ -8517,6 +8503,13 @@ var $author$project$Main$showPopUp = F2(
 			model,
 			{popUp: popUp});
 	});
+var $elm$file$File$Download$string = F3(
+	function (name, mime, content) {
+		return A2(
+			$elm$core$Task$perform,
+			$elm$core$Basics$never,
+			A3(_File_download, name, mime, content));
+	});
 var $elm$file$File$toString = _File_toString;
 var $author$project$Main$toggleShowSourceValue = F2(
 	function (newChecked, model) {
@@ -9248,9 +9241,13 @@ var $author$project$Main$update = F2(
 			case 'DownloadModelAsJson':
 				return _Utils_Tuple2(
 					$author$project$Main$closeDownloadPopUp(model),
-					$author$project$Main$downloadModelAsJson(
-						_Utils_Tuple2(
-							model.activeSimulation.name,
+					A3(
+						$elm$file$File$Download$string,
+						model.activeSimulation.name,
+						'application/json',
+						A2(
+							$elm$json$Json$Encode$encode,
+							2,
 							$author$project$Simulation$encodeModel(model.activeSimulation))));
 			case 'CloseDownloadPopUp':
 				return _Utils_Tuple2(
