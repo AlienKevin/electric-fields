@@ -78,6 +78,8 @@ The electric field simulation is fairly intense in calculations. Each point on t
 
 ![shelter](./media/shelter.png)
 
+![doubled](./media/doubled.svg)
+
 Like what you are seeing? Create some cool electric field art yourself @ https://alienkevin.github.io/electric-fields/
 
 # Development
