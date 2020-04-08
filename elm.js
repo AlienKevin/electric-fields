@@ -6870,7 +6870,7 @@ var $author$project$Main$decodeProject = A3(
 					$elm$json$Json$Decode$int,
 					function (defaultSimulationIndex) {
 						return $elm$json$Json$Decode$succeed(
-							{activeSimulation: activeSimulation, defaultSimulationIndex: defaultSimulationIndex, negativeChargeColorPicker: $simonh1000$elm_colorpicker$ColorPicker$empty, negativeLineColorPicker: $simonh1000$elm_colorpicker$ColorPicker$empty, pendingSettings: $author$project$Simulation$defaultSettings, popUp: $author$project$Main$NoPopUp, positiveChargeColorPicker: $simonh1000$elm_colorpicker$ColorPicker$empty, positiveLineColorPicker: $simonh1000$elm_colorpicker$ColorPicker$empty, simulationHeight: $author$project$Main$defaultSimulationHeight, simulationWidth: $author$project$Main$defaultSimulationWidth, simulations: simulations, uploadResult: $author$project$Main$UploadPending});
+							{activeSimulation: activeSimulation, backgroundColorPicker: $simonh1000$elm_colorpicker$ColorPicker$empty, defaultSimulationIndex: defaultSimulationIndex, negativeChargeColorPicker: $simonh1000$elm_colorpicker$ColorPicker$empty, negativeLineColorPicker: $simonh1000$elm_colorpicker$ColorPicker$empty, pendingSettings: $author$project$Simulation$defaultSettings, popUp: $author$project$Main$NoPopUp, positiveChargeColorPicker: $simonh1000$elm_colorpicker$ColorPicker$empty, positiveLineColorPicker: $simonh1000$elm_colorpicker$ColorPicker$empty, simulationHeight: $author$project$Main$defaultSimulationHeight, simulationWidth: $author$project$Main$defaultSimulationWidth, simulations: simulations, uploadResult: $author$project$Main$UploadPending});
 					});
 			});
 	});
@@ -6948,7 +6948,7 @@ var $author$project$Main$init = function (savedProject) {
 	}();
 	var defaultSimulations = _List_fromArray(
 		[defaultActiveSimulation]);
-	var defaultProject = {activeSimulation: defaultActiveSimulation, defaultSimulationIndex: 1, negativeChargeColorPicker: $simonh1000$elm_colorpicker$ColorPicker$empty, negativeLineColorPicker: $simonh1000$elm_colorpicker$ColorPicker$empty, pendingSettings: $author$project$Simulation$defaultSettings, popUp: $author$project$Main$NoPopUp, positiveChargeColorPicker: $simonh1000$elm_colorpicker$ColorPicker$empty, positiveLineColorPicker: $simonh1000$elm_colorpicker$ColorPicker$empty, simulationHeight: $author$project$Main$defaultSimulationHeight, simulationWidth: $author$project$Main$defaultSimulationWidth, simulations: defaultSimulations, uploadResult: $author$project$Main$UploadPending};
+	var defaultProject = {activeSimulation: defaultActiveSimulation, backgroundColorPicker: $simonh1000$elm_colorpicker$ColorPicker$empty, defaultSimulationIndex: 1, negativeChargeColorPicker: $simonh1000$elm_colorpicker$ColorPicker$empty, negativeLineColorPicker: $simonh1000$elm_colorpicker$ColorPicker$empty, pendingSettings: $author$project$Simulation$defaultSettings, popUp: $author$project$Main$NoPopUp, positiveChargeColorPicker: $simonh1000$elm_colorpicker$ColorPicker$empty, positiveLineColorPicker: $simonh1000$elm_colorpicker$ColorPicker$empty, simulationHeight: $author$project$Main$defaultSimulationHeight, simulationWidth: $author$project$Main$defaultSimulationWidth, simulations: defaultSimulations, uploadResult: $author$project$Main$UploadPending};
 	var project = function () {
 		if (savedProject.$ === 'Just') {
 			var projectJson = savedProject.a;
@@ -8118,6 +8118,8 @@ var $author$project$Main$pickSimulationColors = F3(
 					return _Utils_Tuple2(oldColors.positiveLine, model.positiveLineColorPicker);
 				case 'negativeLine':
 					return _Utils_Tuple2(oldColors.negativeLine, model.negativeLineColorPicker);
+				case 'background':
+					return _Utils_Tuple2(oldColors.background, model.backgroundColorPicker);
 				default:
 					return _Utils_Tuple2($avh4$elm_color$Color$black, model.positiveChargeColorPicker);
 			}
@@ -8145,6 +8147,10 @@ var $author$project$Main$pickSimulationColors = F3(
 					return _Utils_update(
 						model,
 						{negativeLineColorPicker: newColorPicker});
+				case 'background':
+					return _Utils_update(
+						model,
+						{backgroundColorPicker: newColorPicker});
 				default:
 					return model;
 			}
@@ -8175,6 +8181,10 @@ var $author$project$Main$pickSimulationColors = F3(
 									return _Utils_update(
 										colors,
 										{negativeLine: newColor});
+								case 'background':
+									return _Utils_update(
+										colors,
+										{background: newColor});
 								default:
 									return colors;
 							}
@@ -9328,6 +9338,46 @@ var $mdgriffith$elm_ui$Internal$Model$AlignY = function (a) {
 };
 var $mdgriffith$elm_ui$Internal$Model$CenterY = {$: 'CenterY'};
 var $mdgriffith$elm_ui$Element$centerY = $mdgriffith$elm_ui$Internal$Model$AlignY($mdgriffith$elm_ui$Internal$Model$CenterY);
+var $mdgriffith$elm_ui$Internal$Model$Colored = F3(
+	function (a, b, c) {
+		return {$: 'Colored', a: a, b: b, c: c};
+	});
+var $mdgriffith$elm_ui$Internal$Model$StyleClass = F2(
+	function (a, b) {
+		return {$: 'StyleClass', a: a, b: b};
+	});
+var $mdgriffith$elm_ui$Internal$Flag$Flag = function (a) {
+	return {$: 'Flag', a: a};
+};
+var $mdgriffith$elm_ui$Internal$Flag$Second = function (a) {
+	return {$: 'Second', a: a};
+};
+var $elm$core$Bitwise$shiftLeftBy = _Bitwise_shiftLeftBy;
+var $mdgriffith$elm_ui$Internal$Flag$flag = function (i) {
+	return (i > 31) ? $mdgriffith$elm_ui$Internal$Flag$Second(1 << (i - 32)) : $mdgriffith$elm_ui$Internal$Flag$Flag(1 << i);
+};
+var $mdgriffith$elm_ui$Internal$Flag$bgColor = $mdgriffith$elm_ui$Internal$Flag$flag(8);
+var $mdgriffith$elm_ui$Internal$Model$floatClass = function (x) {
+	return $elm$core$String$fromInt(
+		$elm$core$Basics$round(x * 255));
+};
+var $mdgriffith$elm_ui$Internal$Model$formatColorClass = function (_v0) {
+	var red = _v0.a;
+	var green = _v0.b;
+	var blue = _v0.c;
+	var alpha = _v0.d;
+	return $mdgriffith$elm_ui$Internal$Model$floatClass(red) + ('-' + ($mdgriffith$elm_ui$Internal$Model$floatClass(green) + ('-' + ($mdgriffith$elm_ui$Internal$Model$floatClass(blue) + ('-' + $mdgriffith$elm_ui$Internal$Model$floatClass(alpha))))));
+};
+var $mdgriffith$elm_ui$Element$Background$color = function (clr) {
+	return A2(
+		$mdgriffith$elm_ui$Internal$Model$StyleClass,
+		$mdgriffith$elm_ui$Internal$Flag$bgColor,
+		A3(
+			$mdgriffith$elm_ui$Internal$Model$Colored,
+			'bg-' + $mdgriffith$elm_ui$Internal$Model$formatColorClass(clr),
+			'background-color',
+			clr));
+};
 var $mdgriffith$elm_ui$Internal$Model$Unkeyed = function (a) {
 	return {$: 'Unkeyed', a: a};
 };
@@ -9435,16 +9485,6 @@ var $mdgriffith$elm_ui$Internal$Model$addKeyedChildren = F3(
 	});
 var $mdgriffith$elm_ui$Internal$Model$AsParagraph = {$: 'AsParagraph'};
 var $mdgriffith$elm_ui$Internal$Model$asParagraph = $mdgriffith$elm_ui$Internal$Model$AsParagraph;
-var $mdgriffith$elm_ui$Internal$Flag$Flag = function (a) {
-	return {$: 'Flag', a: a};
-};
-var $mdgriffith$elm_ui$Internal$Flag$Second = function (a) {
-	return {$: 'Second', a: a};
-};
-var $elm$core$Bitwise$shiftLeftBy = _Bitwise_shiftLeftBy;
-var $mdgriffith$elm_ui$Internal$Flag$flag = function (i) {
-	return (i > 31) ? $mdgriffith$elm_ui$Internal$Flag$Second(1 << (i - 32)) : $mdgriffith$elm_ui$Internal$Flag$Flag(1 << i);
-};
 var $mdgriffith$elm_ui$Internal$Flag$alignBottom = $mdgriffith$elm_ui$Internal$Flag$flag(41);
 var $mdgriffith$elm_ui$Internal$Flag$alignRight = $mdgriffith$elm_ui$Internal$Flag$flag(40);
 var $mdgriffith$elm_ui$Internal$Flag$centerX = $mdgriffith$elm_ui$Internal$Flag$flag(42);
@@ -9485,10 +9525,6 @@ var $mdgriffith$elm_ui$Internal$Model$lengthClassName = function (x) {
 var $elm$core$Tuple$second = function (_v0) {
 	var y = _v0.b;
 	return y;
-};
-var $mdgriffith$elm_ui$Internal$Model$floatClass = function (x) {
-	return $elm$core$String$fromInt(
-		$elm$core$Basics$round(x * 255));
 };
 var $mdgriffith$elm_ui$Internal$Model$transformClass = function (transform) {
 	switch (transform.$) {
@@ -14692,10 +14728,6 @@ var $mdgriffith$elm_ui$Internal$Model$FontFamily = F2(
 	function (a, b) {
 		return {$: 'FontFamily', a: a, b: b};
 	});
-var $mdgriffith$elm_ui$Internal$Model$StyleClass = F2(
-	function (a, b) {
-		return {$: 'StyleClass', a: a, b: b};
-	});
 var $mdgriffith$elm_ui$Internal$Flag$fontFamily = $mdgriffith$elm_ui$Internal$Flag$flag(5);
 var $elm$core$String$toLower = _String_toLower;
 var $elm$core$String$words = _String_words;
@@ -14914,10 +14946,6 @@ var $mdgriffith$elm_ui$Internal$Model$renderRoot = F3(
 					_List_fromArray(
 						[child]))));
 	});
-var $mdgriffith$elm_ui$Internal$Model$Colored = F3(
-	function (a, b, c) {
-		return {$: 'Colored', a: a, b: b, c: c};
-	});
 var $mdgriffith$elm_ui$Internal$Model$FontSize = function (a) {
 	return {$: 'FontSize', a: a};
 };
@@ -14925,16 +14953,8 @@ var $mdgriffith$elm_ui$Internal$Model$SansSerif = {$: 'SansSerif'};
 var $mdgriffith$elm_ui$Internal$Model$Typeface = function (a) {
 	return {$: 'Typeface', a: a};
 };
-var $mdgriffith$elm_ui$Internal$Flag$bgColor = $mdgriffith$elm_ui$Internal$Flag$flag(8);
 var $mdgriffith$elm_ui$Internal$Flag$fontColor = $mdgriffith$elm_ui$Internal$Flag$flag(14);
 var $mdgriffith$elm_ui$Internal$Flag$fontSize = $mdgriffith$elm_ui$Internal$Flag$flag(4);
-var $mdgriffith$elm_ui$Internal$Model$formatColorClass = function (_v0) {
-	var red = _v0.a;
-	var green = _v0.b;
-	var blue = _v0.c;
-	var alpha = _v0.d;
-	return $mdgriffith$elm_ui$Internal$Model$floatClass(red) + ('-' + ($mdgriffith$elm_ui$Internal$Model$floatClass(green) + ('-' + ($mdgriffith$elm_ui$Internal$Model$floatClass(blue) + ('-' + $mdgriffith$elm_ui$Internal$Model$floatClass(alpha))))));
-};
 var $mdgriffith$elm_ui$Internal$Model$rootStyle = function () {
 	var families = _List_fromArray(
 		[
@@ -15005,19 +15025,18 @@ var $mdgriffith$elm_ui$Element$Font$size = function (i) {
 		$mdgriffith$elm_ui$Internal$Flag$fontSize,
 		$mdgriffith$elm_ui$Internal$Model$FontSize(i));
 };
+var $mdgriffith$elm_ui$Element$rgba = $mdgriffith$elm_ui$Internal$Model$Rgba;
+var $author$project$Utils$toElmUiColor = function (color) {
+	var _v0 = $avh4$elm_color$Color$toRgba(color);
+	var red = _v0.red;
+	var green = _v0.green;
+	var blue = _v0.blue;
+	var alpha = _v0.alpha;
+	return A4($mdgriffith$elm_ui$Element$rgba, red, green, blue, alpha);
+};
 var $author$project$Simulation$ClickedBackground = {$: 'ClickedBackground'};
 var $author$project$Simulation$ShowGeneralContextMenu = function (a) {
 	return {$: 'ShowGeneralContextMenu', a: a};
-};
-var $mdgriffith$elm_ui$Element$Background$color = function (clr) {
-	return A2(
-		$mdgriffith$elm_ui$Internal$Model$StyleClass,
-		$mdgriffith$elm_ui$Internal$Flag$bgColor,
-		A3(
-			$mdgriffith$elm_ui$Internal$Model$Colored,
-			'bg-' + $mdgriffith$elm_ui$Internal$Model$formatColorClass(clr),
-			'background-color',
-			clr));
 };
 var $elm_community$typed_svg$TypedSvg$Core$attribute = $elm$virtual_dom$VirtualDom$attribute;
 var $elm_community$typed_svg$TypedSvg$TypesToStrings$lengthToString = function (length) {
@@ -15219,15 +15238,6 @@ var $elm$virtual_dom$VirtualDom$nodeNS = function (tag) {
 };
 var $elm_community$typed_svg$TypedSvg$Core$node = $elm$virtual_dom$VirtualDom$nodeNS('http://www.w3.org/2000/svg');
 var $elm_community$typed_svg$TypedSvg$svg = $elm_community$typed_svg$TypedSvg$Core$node('svg');
-var $mdgriffith$elm_ui$Element$rgba = $mdgriffith$elm_ui$Internal$Model$Rgba;
-var $author$project$Utils$toElmUiColor = function (color) {
-	var _v0 = $avh4$elm_color$Color$toRgba(color);
-	var red = _v0.red;
-	var green = _v0.green;
-	var blue = _v0.blue;
-	var alpha = _v0.alpha;
-	return A4($mdgriffith$elm_ui$Element$rgba, red, green, blue, alpha);
-};
 var $elm_community$typed_svg$TypedSvg$Attributes$viewBox = F4(
 	function (minX, minY, vWidth, vHeight) {
 		return A2(
@@ -18622,6 +18632,18 @@ var $author$project$Main$viewSettingsPopUp = function (model) {
 							]))
 					])),
 				A2(
+				$mdgriffith$elm_ui$Element$column,
+				_List_Nil,
+				_List_fromArray(
+					[
+						$mdgriffith$elm_ui$Element$text('Background'),
+						$mdgriffith$elm_ui$Element$html(
+						A2(
+							$elm$html$Html$map,
+							$author$project$Main$PickSimulationColors('background'),
+							A2($simonh1000$elm_colorpicker$ColorPicker$view, settings.colors.background, model.backgroundColorPicker)))
+					])),
+				A2(
 				$mdgriffith$elm_ui$Element$el,
 				_List_fromArray(
 					[$author$project$Utils$styles.padTop, $mdgriffith$elm_ui$Element$alignRight]),
@@ -18832,7 +18854,9 @@ var $author$project$Main$view = function (model) {
 				$mdgriffith$elm_ui$Element$Font$size(16),
 				$mdgriffith$elm_ui$Element$Font$family(
 				_List_fromArray(
-					[$mdgriffith$elm_ui$Element$Font$monospace]))
+					[$mdgriffith$elm_ui$Element$Font$monospace])),
+				$mdgriffith$elm_ui$Element$Background$color(
+				$author$project$Utils$toElmUiColor(model.activeSimulation.settings.colors.background))
 			]),
 		A2(
 			$mdgriffith$elm_ui$Element$el,
