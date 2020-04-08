@@ -473,6 +473,7 @@ viewControlPanel =
   E.row
     [ E.centerX
     , E.spacing 10
+    , styles.padTop
     ]
     [ viewButtonNoProp "Help" <| ShowPopUp HelpPopUp
     , viewButtonNoProp "Settings" <| ShowPopUp SettingsPopUp
