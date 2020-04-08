@@ -7602,6 +7602,7 @@ var $author$project$Main$downloadModelAsJson = _Platform_outgoingPort(
 				]));
 	});
 var $author$project$Main$downloadModelAsSvg = _Platform_outgoingPort('downloadModelAsSvg', $elm$json$Json$Encode$string);
+var $elm$json$Json$Encode$bool = _Json_wrap;
 var $elm$json$Json$Encode$float = _Json_wrap;
 var $elm$json$Json$Encode$int = _Json_wrap;
 var $elm$json$Json$Encode$null = _Json_encodeNull;
@@ -7699,6 +7700,7 @@ var $author$project$Simulation$encodeModel = function (_v0) {
 		var density = _v3.density;
 		var steps = _v3.steps;
 		var delta = _v3.delta;
+		var showSourceValue = _v3.showSourceValue;
 		var colors = _v3.colors;
 		return $elm$json$Json$Encode$object(
 			_List_fromArray(
@@ -7718,6 +7720,9 @@ var $author$project$Simulation$encodeModel = function (_v0) {
 					_Utils_Tuple2(
 					'delta',
 					$elm$json$Json$Encode$float(delta)),
+					_Utils_Tuple2(
+					'showSourceValue',
+					$elm$json$Json$Encode$bool(showSourceValue)),
 					_Utils_Tuple2(
 					'colors',
 					encodeSettingColors(colors))
@@ -8087,7 +8092,7 @@ var $author$project$Main$updateGlobalSettings = F2(
 				{pendingSettings: updatedSettings}));
 		return _Utils_update(
 			updatedModel,
-			{pendingSettings: updatedSettings, popUp: $author$project$Main$SettingsPopUp});
+			{popUp: $author$project$Main$SettingsPopUp});
 	});
 var $author$project$Main$pickSimulationColors = F3(
 	function (part, msg, model) {
@@ -15494,7 +15499,6 @@ var $author$project$Simulation$DeleteActiveField = {$: 'DeleteActiveField'};
 var $author$project$Simulation$DeselectActiveField = {$: 'DeselectActiveField'};
 var $author$project$Simulation$DuplicateActiveField = {$: 'DuplicateActiveField'};
 var $mdgriffith$elm_ui$Internal$Model$Button = {$: 'Button'};
-var $elm$json$Json$Encode$bool = _Json_wrap;
 var $elm$html$Html$Attributes$boolProperty = F2(
 	function (key, bool) {
 		return A2(
