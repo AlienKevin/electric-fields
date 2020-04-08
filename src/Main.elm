@@ -17,6 +17,7 @@ import Json.Decode.Field as Field
 import List.Extra
 import File exposing (File)
 import File.Select
+import File.Download
 import Task
 import ColorPicker
 import Color
@@ -26,7 +27,6 @@ import Utils exposing (styles, colors, centeredText, toElmUiColor)
 port pageWillClose : (() -> msg) -> Sub msg
 port saveProject : Encode.Value -> Cmd msg
 port downloadModelAsSvg : String -> Cmd msg
-port downloadModelAsJson : (String, Encode.Value) -> Cmd msg
 
 
 type alias Model =
@@ -277,7 +277,7 @@ update message model =
 
     DownloadModelAsJson ->
       ( closeDownloadPopUp model
-      , downloadModelAsJson (model.activeSimulation.name, Simulation.encodeModel model.activeSimulation)
+      , File.Download.string model.activeSimulation.name "application/json" (Encode.encode 2 <| Simulation.encodeModel model.activeSimulation)
       )
 
     CloseDownloadPopUp ->
