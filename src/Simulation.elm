@@ -71,10 +71,10 @@ type alias Line =
   List Point
 
 type alias Point =
-  (Float, Float)
+  (Float, Float, Float)
 
 type alias Position =
-  Point
+  (Float, Float)
 
 type Sign
   = Positive
@@ -90,12 +90,24 @@ type alias Charge =
   }
 
 
+maxChargeMagnitude : Float
+maxChargeMagnitude =
+  20
+
+
 defaultSettings : Settings
 defaultSettings =
+  -- { r = 10.0
+  -- , density = 30
+  -- , steps = 900
+  -- , delta = 1
+  -- , magnitude = 1.0
+  -- , showSourceValue = True
+  -- }
   { r = 10.0
-  , density = 30
-  , steps = 900
-  , delta = 1
+  , density = 10
+  , steps = 300
+  , delta = 10
   , magnitude = 1.0
   , showSourceValue = True
   }
@@ -194,8 +206,8 @@ calculateFields width height fields =
                 { charges = List.map .source fields
                 , steps = field.steps
                 , delta = field.delta
-                , sourceSign = field.source.sign
-                , start = (x, y)
+                , source = field.source
+                , start = (x, y, chargeToFloat field.source)
                 , xBound = width
                 , yBound = height
                 }
@@ -213,21 +225,25 @@ calculateFieldLine :
   { charges : List Charge
   , steps : Int
   , delta : Float
-  , sourceSign : Sign
+  , source : Charge
   , start : Point
   , xBound : Float
   , yBound : Float
   } -> Line
-calculateFieldLine { charges, steps, delta, sourceSign, start, xBound, yBound } =
+calculateFieldLine { charges, steps, delta, source, start, xBound, yBound } =
+  let
+    maxFieldMagnitude =
+      source.magnitude / (source.r / 100) ^ 2
+  in
   foldlWhile
     (\_ line ->
       let
-        (x, y) =
+        (x, y, scale) =
           case line of
             prev :: _ ->
               prev
             _ ->
-              (0, 0) -- impossible
+              (0, 0, 0) -- impossible
         outOfBounds =
           x > xBound || x < 0 || y > yBound || y < 0
         netField =
@@ -258,13 +274,13 @@ calculateFieldLine { charges, steps, delta, sourceSign, start, xBound, yBound } 
             charges
         next =
           if outOfBounds then
-            (x, y)
+            (x, y, scale)
           else
             let
-              vec =
+              field =
                 Vector2.add
                   (Vector2.vec2 x y)
-                  ((case sourceSign of
+                  ((case source.sign of
                     Positive ->
                       identity
                     Negative ->
@@ -273,8 +289,12 @@ calculateFieldLine { charges, steps, delta, sourceSign, start, xBound, yBound } 
                     Vector2.scale delta <|
                       Vector2.normalize netField
                   )
+              fieldMagnitude =
+                lerp 0 maxFieldMagnitude 0 1 <| Vector2.length field
+              fieldSign =
+                signToFloat source.sign
             in
-            (Vector2.getX vec, Vector2.getY vec)
+            (Vector2.getX field, Vector2.getY field, fieldSign * fieldMagnitude)
       in
       (next :: line, outOfBounds)
   )
@@ -282,7 +302,7 @@ calculateFieldLine { charges, steps, delta, sourceSign, start, xBound, yBound } 
   (List.range 0 (steps - 1))
 
 
-distance : Point -> Point -> Float
+distance : Position -> Position -> Float
 distance (x1, y1) (x2, y2) =
   sqrt ((x2 - x1) ^ 2 + (y2 - y1) ^ 2)
 
@@ -612,7 +632,7 @@ scaleSourceMagnitude delta model =
             source =
               { source |
                 magnitude =
-                  min 20 <| max 0.5 <| source.magnitude + either -0.5 0.5 (toFloat delta * -0.01)
+                  min maxChargeMagnitude <| max 0.5 <| source.magnitude + either -0.5 0.5 (toFloat delta * -0.01)
               }
           }
         )
@@ -936,7 +956,7 @@ viewFieldSource activeSourceId settings field =
   , Svg.circle
     [ Attributes.cx (px field.source.x)
     , Attributes.cy (px field.source.y)
-    , Attributes.r (px <| lerp 0 20 10 40 (min 20 field.source.r * field.source.magnitude / 10))
+    , Attributes.r (px <| lerp 0 maxChargeMagnitude 10 40 (min maxChargeMagnitude field.source.r * field.source.magnitude / 10))
     , Attributes.fill <| Reference gradientId
     , Html.Attributes.style "pointer-events" "none"
     ]
@@ -991,11 +1011,49 @@ viewFieldLines : Field -> Svg Msg
 viewFieldLines field =
   Svg.g [] <|
     List.map
-      (\line -> Svg.polyline
-        [ Attributes.fill PaintNone, Attributes.stroke <| Paint Color.black, Attributes.points line ]
-        []
+      (\line ->
+        let
+          nextPoints =
+            Maybe.withDefault [] <| List.tail line
+
+          weavedLines =
+            List.map2 Tuple.pair line nextPoints
+        in
+        Svg.g [] <| List.map
+        (\((x1, y1, s1), (x2, y2, s2)) ->
+          Svg.line
+          [ Attributes.fill PaintNone
+          , Attributes.stroke <| Paint <| scaleToColor <| (s1 + s2) / 2
+          , Attributes.strokeWidth <| px <| lerp 0 1 0 2 (abs s1)
+          , Attributes.x1 <| px x1
+          , Attributes.y1 <| px y1
+          , Attributes.x2 <| px x2
+          , Attributes.y2 <| px y2
+          ]
+          []
+        )
+        weavedLines
       )
       field.lines
+
+
+scaleToColor : Float -> Color
+scaleToColor scale =
+  let
+    original =
+      Color.toHsla <| signToColor <|
+        if scale >= 0 then Positive else Negative
+    _ = Debug.log "scale" scale
+  in
+  Color.fromHsla { original
+    | saturation =
+      abs (scale)
+  }
+
+
+chargeToFloat : Charge -> Float
+chargeToFloat charge =
+  signToFloat charge.sign * charge.magnitude
 
 
 onWheel : (Int -> msg) -> Html.Attribute msg
@@ -1030,6 +1088,15 @@ signToString sign =
       "+"
     Negative ->
       "-"
+
+
+signToFloat : Sign -> Float
+signToFloat sign =
+  case sign of
+    Positive ->
+      1
+    Negative ->
+      -1
 
 
 setAlpha : Float -> Color -> Color
