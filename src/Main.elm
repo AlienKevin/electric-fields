@@ -517,6 +517,7 @@ viewSettingsPopUp model =
   in
   viewPopUpOf "Settings"
     [ E.inFront <| viewApplyOptions model
+    , E.scrollbarY
     ]
     [ textHeader "Electric Field Settings"
     , Input.text []
