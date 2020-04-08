@@ -20,7 +20,7 @@ import File.Select
 import Task
 import ColorPicker
 import Color
-import Utils exposing (styles, colors, centeredText)
+import Utils exposing (styles, colors, centeredText, toElmUiColor)
 
 
 port pageWillClose : (() -> msg) -> Sub msg
@@ -42,6 +42,7 @@ type alias Model =
   , positiveLineColorPicker : ColorPicker.State
   , negativeChargeColorPicker : ColorPicker.State
   , negativeLineColorPicker : ColorPicker.State
+  , backgroundColorPicker : ColorPicker.State
   }
 
 
@@ -140,6 +141,7 @@ init savedProject =
       , positiveLineColorPicker = ColorPicker.empty
       , negativeChargeColorPicker = ColorPicker.empty
       , negativeLineColorPicker = ColorPicker.empty
+      , backgroundColorPicker = ColorPicker.empty
       }
   in
   ( project
@@ -156,6 +158,7 @@ view model =
     , Font.family
       [ Font.monospace
       ]
+    , Background.color <| toElmUiColor model.activeSimulation.settings.colors.background
     ] <|
     E.el
       [ E.above <| viewTabs model
@@ -605,6 +608,11 @@ viewSettingsPopUp model =
         |> Html.map (PickSimulationColors "negativeLine"))
       ]
     ]
+  , E.column []
+    [ E.text "Background"
+    , E.html <| (ColorPicker.view settings.colors.background model.backgroundColorPicker
+      |> Html.map (PickSimulationColors "background"))
+    ]
   , E.el [ styles.padTop, E.alignRight ] <|
       Input.button
         styles.button
@@ -985,6 +993,8 @@ pickSimulationColors part msg model =
           (oldColors.positiveLine, model.positiveLineColorPicker)
         "negativeLine" ->
           (oldColors.negativeLine, model.negativeLineColorPicker)
+        "background" ->
+          (oldColors.background, model.backgroundColorPicker)
         _ ->
           (Color.black, model.positiveChargeColorPicker) -- impossible
     ( newColorPicker, newMaybeColor ) =
@@ -1001,6 +1011,8 @@ pickSimulationColors part msg model =
           { model | positiveLineColorPicker = newColorPicker }
         "negativeLine" ->
           { model | negativeLineColorPicker = newColorPicker }
+        "background" ->
+          { model | backgroundColorPicker = newColorPicker }
         _ ->
           model
   in
@@ -1021,6 +1033,8 @@ pickSimulationColors part msg model =
                 { colors | positiveLine = newColor }
               "negativeLine" ->
                 { colors | negativeLine = newColor }
+              "background" ->
+                { colors | background = newColor }
               _ ->
                 colors
       }
@@ -1079,6 +1093,7 @@ decodeProject =
     , positiveLineColorPicker = ColorPicker.empty
     , negativeChargeColorPicker = ColorPicker.empty
     , negativeLineColorPicker = ColorPicker.empty
+    , backgroundColorPicker = ColorPicker.empty
     }
 
 
