@@ -47,6 +47,15 @@ type alias Settings =
   , delta : Float
   , magnitude : Float
   , showSourceValue : Bool
+  , colors : SettingColors
+  }
+
+
+type alias SettingColors =
+  { positiveCharge: Color
+  , negativeCharge: Color
+  , positiveLine : Color
+  , negativeLine : Color
   }
 
 
@@ -98,6 +107,12 @@ defaultSettings =
   , delta = 1
   , magnitude = 1.0
   , showSourceValue = True
+  , colors =
+    { positiveCharge = Color.orange
+    , negativeCharge = Color.blue
+    , positiveLine = Color.black
+    , negativeLine = Color.black
+    }
   }
 
 defaultName : String
@@ -443,6 +458,28 @@ encodeModel { name, fields, activeSourceId, nextId, settings, width, height } =
       , ("delta", Encode.float delta)
       ]
 
+    encodeColor : Color -> Encode.Value
+    encodeColor color =
+      let
+        { red, green, blue, alpha } =
+          Color.toRgba color
+      in
+      Encode.object
+        [ ("red", Encode.float red)
+        , ("green", Encode.float green)
+        , ("blue", Encode.float blue)
+        , ("alpha", Encode.float alpha)
+        ]
+
+    encodeSettingColors : SettingColors -> Encode.Value
+    encodeSettingColors { positiveCharge, negativeCharge, positiveLine, negativeLine } =
+      Encode.object
+      [ ("positiveCharge", encodeColor positiveCharge)
+      , ("negativeCharge", encodeColor negativeCharge)
+      , ("positiveLine", encodeColor positiveLine)
+      , ("negativeLine", encodeColor negativeLine)
+      ]
+
     encodeSettings : Settings -> Encode.Value
     encodeSettings { magnitude, r, density, steps, delta} =
       Encode.object
@@ -518,6 +555,32 @@ decodeModel =
         , lines = []
         }
 
+    decodeColorRgba =
+      Field.require "red" Decode.float <| \red ->
+      Field.require "green" Decode.float <| \green ->
+      Field.require "blue" Decode.float <| \blue ->
+      Field.require "alpha" Decode.float <| \alpha ->
+
+      Decode.succeed <|
+        Color.fromRgba { red = red
+        , green = green
+        , blue = blue
+        , alpha = alpha
+        }
+
+    decodeSettingColors =
+      Field.require "positiveCharge" decodeColorRgba <| \positiveCharge ->
+      Field.require "negativeCharge" decodeColorRgba <| \negativeCharge ->
+      Field.require "positiveLine" decodeColorRgba <| \positiveLine ->
+      Field.require "negativeLine" decodeColorRgba <| \negativeLine ->
+
+      Decode.succeed
+        { positiveCharge = positiveCharge
+        , negativeCharge = negativeCharge
+        , positiveLine = positiveLine
+        , negativeLine = negativeLine
+        }
+
     decodeSettings =
       Field.require "r" Decode.float <| \r ->
       Field.require "magnitude" Decode.float <| \magnitude ->
@@ -525,6 +588,7 @@ decodeModel =
       Field.require "steps" Decode.int <| \steps ->
       Field.require "delta" Decode.float <| \delta ->
       Field.require "showSourceValue" Decode.bool <| \showSourceValue ->
+      Field.require "colors" decodeSettingColors <| \colors ->
 
       Decode.succeed
         { r = r
@@ -533,6 +597,7 @@ decodeModel =
         , steps = steps
         , delta = delta
         , showSourceValue = showSourceValue
+        , colors = colors
         }
     
   in
@@ -829,7 +894,7 @@ view model =
         , Attributes.id "modelSvg"
         , Mouse.onContextMenu ShowGeneralContextMenu
         ] <|
-        List.map viewFieldLines model.fields
+        List.map (viewFieldLines model.settings) model.fields
         ++ List.map (viewFieldSource model.activeSourceId model.settings) model.fields
       )
 
@@ -915,7 +980,11 @@ viewFieldSource : Maybe Id -> Settings -> Field -> Svg Msg
 viewFieldSource activeSourceId settings field =
   let
     fill =
-      signToColor field.source.sign
+      case field.source.sign of
+        Positive ->
+          settings.colors.positiveCharge
+        Negative ->
+          settings.colors.negativeCharge
     gradientId =
       "gradient" ++ String.fromInt field.source.id
   in
@@ -987,12 +1056,20 @@ viewFieldSource activeSourceId settings field =
   ]
 
 
-viewFieldLines : Field -> Svg Msg
-viewFieldLines field =
+viewFieldLines : Settings -> Field -> Svg Msg
+viewFieldLines settings field =
+  let
+    lineColor =
+      case field.source.sign of
+        Positive ->
+          settings.colors.positiveLine
+        Negative ->
+          settings.colors.negativeLine
+  in
   Svg.g [] <|
     List.map
       (\line -> Svg.polyline
-        [ Attributes.fill PaintNone, Attributes.stroke <| Paint Color.black, Attributes.points line ]
+        [ Attributes.fill PaintNone, Attributes.stroke <| Paint lineColor, Attributes.points line ]
         []
       )
       field.lines
@@ -1012,15 +1089,6 @@ onRightClick msg =
       , preventDefault = True
       }
     )
-
-
-signToColor : Sign -> Color
-signToColor sign =
-  case sign of
-    Positive ->
-      Color.orange
-    Negative ->
-      Color.blue
 
 
 signToString : Sign -> String
