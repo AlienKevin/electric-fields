@@ -4,7 +4,6 @@ import Browser
 import Browser.Dom
 import Browser.Events
 import Html exposing (Html)
-import Html.Attributes
 import Html.Events
 import Simulation
 import Element as E
@@ -19,6 +18,8 @@ import List.Extra
 import File exposing (File)
 import File.Select
 import Task
+import ColorPicker
+import Color
 import Utils exposing (styles, colors, centeredText)
 
 
@@ -37,6 +38,10 @@ type alias Model =
   , pendingSettings : Simulation.Settings
   , simulationWidth : Float
   , simulationHeight : Float
+  , positiveChargeColorPicker : ColorPicker.State
+  , positiveLineColorPicker : ColorPicker.State
+  , negativeChargeColorPicker : ColorPicker.State
+  , negativeLineColorPicker : ColorPicker.State
   }
 
 
@@ -79,6 +84,7 @@ type Msg
   | GotViewport Browser.Dom.Viewport
   | WindowResized Int Int
   | ToggleShowSourceValue Bool
+  | PickSimulationColors String ColorPicker.Msg
   | DoNothing
   
 
@@ -130,6 +136,10 @@ init savedProject =
       , pendingSettings = Simulation.defaultSettings
       , simulationWidth = defaultSimulationWidth
       , simulationHeight = defaultSimulationHeight
+      , positiveChargeColorPicker = ColorPicker.empty
+      , positiveLineColorPicker = ColorPicker.empty
+      , negativeChargeColorPicker = ColorPicker.empty
+      , negativeLineColorPicker = ColorPicker.empty
       }
   in
   ( project
@@ -290,6 +300,9 @@ update message model =
 
     ToggleShowSourceValue newChecked ->
       (toggleShowSourceValue newChecked model, Cmd.none)
+
+    PickSimulationColors part msg ->
+      (pickSimulationColors part msg model, Cmd.none)
 
     DoNothing ->
       (model, Cmd.none)
@@ -563,6 +576,33 @@ viewSettingsPopUp model =
         Input.labelRight [] <|
           E.text "Show source charge's value"
     }
+  , E.text "Pick colors for:"
+  , E.row
+    [ E.spacing 20 ]
+    [ E.column []
+      [ E.text "Positive charges"
+      , E.html <| (ColorPicker.view settings.colors.positiveCharge model.positiveChargeColorPicker
+        |> Html.map (PickSimulationColors "positiveCharge"))
+      ]
+    , E.column []
+      [ E.text "Positive field lines"
+      , E.html <| (ColorPicker.view settings.colors.positiveLine model.positiveLineColorPicker
+        |> Html.map (PickSimulationColors "positiveLine"))
+      ]
+    ]
+  , E.row
+    [ E.spacing 20 ]
+    [ E.column []
+      [ E.text "Negative charges"
+      , E.html <| (ColorPicker.view settings.colors.negativeCharge model.negativeChargeColorPicker
+        |> Html.map (PickSimulationColors "negativeCharge"))
+      ]
+    , E.column []
+      [ E.text "Negative field lines"
+      , E.html <| (ColorPicker.view settings.colors.negativeLine model.negativeLineColorPicker
+        |> Html.map (PickSimulationColors "negativeLine"))
+      ]
+    ]
   , E.el [ styles.padTop, E.alignRight ] <|
       Input.button
         styles.button
@@ -918,27 +958,92 @@ updateSimulationSize newWidth newHeight model =
 
 toggleShowSourceValue : Bool -> Model -> Model
 toggleShowSourceValue newChecked model =
-  let
-    settings =
-      model.activeSimulation.settings
-    pendingSettings =
-      model.pendingSettings
-    updatedModel =
-      applySettingsToCurrentAndFutureFields
-        { model
-          | pendingSettings =
-            { settings
-              | showSourceValue =
-                newChecked
-            }
-        }
-  in
-  { updatedModel
-    | pendingSettings =
-      { pendingSettings
+  updateGlobalSettings
+    (\settings ->
+      { settings
         | showSourceValue =
           newChecked
       }
+    )
+    model
+
+
+pickSimulationColors : String -> ColorPicker.Msg -> Model -> Model
+pickSimulationColors part msg model =
+  let
+    oldColors =
+      model.pendingSettings.colors
+    (oldColor, oldColorPicker) =
+      case part of
+        "positiveCharge" ->
+          (oldColors.positiveCharge, model.positiveChargeColorPicker)
+        "negativeCharge" ->
+          (oldColors.negativeCharge, model.negativeChargeColorPicker)
+        "positiveLine" ->
+          (oldColors.positiveLine, model.positiveLineColorPicker)
+        "negativeLine" ->
+          (oldColors.negativeLine, model.negativeLineColorPicker)
+        _ ->
+          (Color.black, model.positiveChargeColorPicker) -- impossible
+    ( newColorPicker, newMaybeColor ) =
+      ColorPicker.update msg oldColor oldColorPicker
+    newColor =
+      Maybe.withDefault oldColor <| newMaybeColor
+    updatedModel =
+      case part of
+        "positiveCharge" ->
+          { model | positiveChargeColorPicker = newColorPicker }
+        "negativeCharge" ->
+          { model | negativeChargeColorPicker = newColorPicker }
+        "positiveLine" ->
+          { model | positiveLineColorPicker = newColorPicker }
+        "negativeLine" ->
+          { model | negativeLineColorPicker = newColorPicker }
+        _ ->
+          model
+  in
+  updateGlobalSettings
+    (\settings ->
+      let
+        colors =
+          settings.colors
+      in
+      { settings
+        | colors =
+            case part of
+              "positiveCharge" ->
+                { colors | positiveCharge = newColor}
+              "negativeCharge" ->
+                { colors | negativeCharge = newColor }
+              "positiveLine" ->
+                { colors | positiveLine = newColor }
+              "negativeLine" ->
+                { colors | negativeLine = newColor }
+              _ ->
+                colors
+      }
+    )
+    updatedModel
+
+
+
+updateGlobalSettings : (Simulation.Settings -> Simulation.Settings) -> Model -> Model
+updateGlobalSettings func model =
+  let
+    settings =
+      model.activeSimulation.settings
+    updatedSettings =
+      func settings
+    updatedModel =
+      applySettingsToCurrentAndFutureFields
+      { model
+        | pendingSettings =
+          updatedSettings
+      }
+  in
+  { updatedModel
+    | pendingSettings =
+      updatedSettings
     , popUp =
       SettingsPopUp
   }
@@ -970,6 +1075,10 @@ decodeProject =
     , pendingSettings = Simulation.defaultSettings
     , simulationWidth = defaultSimulationWidth
     , simulationHeight = defaultSimulationHeight
+    , positiveChargeColorPicker = ColorPicker.empty
+    , positiveLineColorPicker = ColorPicker.empty
+    , negativeChargeColorPicker = ColorPicker.empty
+    , negativeLineColorPicker = ColorPicker.empty
     }
 
 

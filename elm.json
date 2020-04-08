@@ -18,11 +18,13 @@
             "mdgriffith/elm-ui": "1.1.5",
             "mpizenberg/elm-pointer-events": "4.0.1",
             "myrho/elm-round": "1.0.4",
+            "simonh1000/elm-colorpicker": "2.0.2",
             "webbhuset/elm-json-decode": "1.1.0",
             "zaboco/elm-draggable": "4.0.5"
         },
         "indirect": {
             "elm/bytes": "1.0.8",
+            "elm/svg": "1.0.1",
             "elm/time": "1.0.0",
             "elm/url": "1.0.0",
             "elm/virtual-dom": "1.0.2"

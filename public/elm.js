@@ -6841,6 +6841,12 @@ var $author$project$Simulation$defaultSettings = {
 };
 var $author$project$Main$defaultSimulationHeight = 750;
 var $author$project$Main$defaultSimulationWidth = 1200;
+var $simonh1000$elm_colorpicker$ColorPicker$State = function (a) {
+	return {$: 'State', a: a};
+};
+var $simonh1000$elm_colorpicker$ColorPicker$Unpressed = {$: 'Unpressed'};
+var $simonh1000$elm_colorpicker$ColorPicker$blankModel = {hue: $elm$core$Maybe$Nothing, mouseTarget: $simonh1000$elm_colorpicker$ColorPicker$Unpressed};
+var $simonh1000$elm_colorpicker$ColorPicker$empty = $simonh1000$elm_colorpicker$ColorPicker$State($simonh1000$elm_colorpicker$ColorPicker$blankModel);
 var $author$project$Main$decodeProject = A3(
 	$webbhuset$elm_json_decode$Json$Decode$Field$require,
 	'simulations',
@@ -6857,7 +6863,7 @@ var $author$project$Main$decodeProject = A3(
 					$elm$json$Json$Decode$int,
 					function (defaultSimulationIndex) {
 						return $elm$json$Json$Decode$succeed(
-							{activeSimulation: activeSimulation, defaultSimulationIndex: defaultSimulationIndex, pendingSettings: $author$project$Simulation$defaultSettings, popUp: $author$project$Main$NoPopUp, simulationHeight: $author$project$Main$defaultSimulationHeight, simulationWidth: $author$project$Main$defaultSimulationWidth, simulations: simulations, uploadResult: $author$project$Main$UploadPending});
+							{activeSimulation: activeSimulation, defaultSimulationIndex: defaultSimulationIndex, negativeChargeColorPicker: $simonh1000$elm_colorpicker$ColorPicker$empty, negativeLineColorPicker: $simonh1000$elm_colorpicker$ColorPicker$empty, pendingSettings: $author$project$Simulation$defaultSettings, popUp: $author$project$Main$NoPopUp, positiveChargeColorPicker: $simonh1000$elm_colorpicker$ColorPicker$empty, positiveLineColorPicker: $simonh1000$elm_colorpicker$ColorPicker$empty, simulationHeight: $author$project$Main$defaultSimulationHeight, simulationWidth: $author$project$Main$defaultSimulationWidth, simulations: simulations, uploadResult: $author$project$Main$UploadPending});
 					});
 			});
 	});
@@ -6935,7 +6941,7 @@ var $author$project$Main$init = function (savedProject) {
 	}();
 	var defaultSimulations = _List_fromArray(
 		[defaultActiveSimulation]);
-	var defaultProject = {activeSimulation: defaultActiveSimulation, defaultSimulationIndex: 1, pendingSettings: $author$project$Simulation$defaultSettings, popUp: $author$project$Main$NoPopUp, simulationHeight: $author$project$Main$defaultSimulationHeight, simulationWidth: $author$project$Main$defaultSimulationWidth, simulations: defaultSimulations, uploadResult: $author$project$Main$UploadPending};
+	var defaultProject = {activeSimulation: defaultActiveSimulation, defaultSimulationIndex: 1, negativeChargeColorPicker: $simonh1000$elm_colorpicker$ColorPicker$empty, negativeLineColorPicker: $simonh1000$elm_colorpicker$ColorPicker$empty, pendingSettings: $author$project$Simulation$defaultSettings, popUp: $author$project$Main$NoPopUp, positiveChargeColorPicker: $simonh1000$elm_colorpicker$ColorPicker$empty, positiveLineColorPicker: $simonh1000$elm_colorpicker$ColorPicker$empty, simulationHeight: $author$project$Main$defaultSimulationHeight, simulationWidth: $author$project$Main$defaultSimulationWidth, simulations: defaultSimulations, uploadResult: $author$project$Main$UploadPending};
 	var project = function () {
 		if (savedProject.$ === 'Just') {
 			var projectJson = savedProject.a;
@@ -7634,32 +7640,6 @@ var $author$project$Simulation$encodeModel = function (_v0) {
 			return $elm$json$Json$Encode$string('Negative');
 		}
 	};
-	var encodeSettings = function (_v6) {
-		var magnitude = _v6.magnitude;
-		var r = _v6.r;
-		var density = _v6.density;
-		var steps = _v6.steps;
-		var delta = _v6.delta;
-		return $elm$json$Json$Encode$object(
-			_List_fromArray(
-				[
-					_Utils_Tuple2(
-					'magnitude',
-					$elm$json$Json$Encode$float(magnitude)),
-					_Utils_Tuple2(
-					'r',
-					$elm$json$Json$Encode$float(r)),
-					_Utils_Tuple2(
-					'density',
-					$elm$json$Json$Encode$int(density)),
-					_Utils_Tuple2(
-					'steps',
-					$elm$json$Json$Encode$int(steps)),
-					_Utils_Tuple2(
-					'delta',
-					$elm$json$Json$Encode$float(delta))
-				]));
-	};
 	var encodeMaybeId = function (maybeId) {
 		if (maybeId.$ === 'Just') {
 			var id = maybeId.a;
@@ -7669,11 +7649,11 @@ var $author$project$Simulation$encodeModel = function (_v0) {
 		}
 	};
 	var encodeColor = function (color) {
-		var _v4 = $avh4$elm_color$Color$toRgba(color);
-		var red = _v4.red;
-		var green = _v4.green;
-		var blue = _v4.blue;
-		var alpha = _v4.alpha;
+		var _v5 = $avh4$elm_color$Color$toRgba(color);
+		var red = _v5.red;
+		var green = _v5.green;
+		var blue = _v5.blue;
+		var alpha = _v5.alpha;
 		return $elm$json$Json$Encode$object(
 			_List_fromArray(
 				[
@@ -7691,11 +7671,11 @@ var $author$project$Simulation$encodeModel = function (_v0) {
 					$elm$json$Json$Encode$float(alpha))
 				]));
 	};
-	var encodeSettingColors = function (_v3) {
-		var positiveCharge = _v3.positiveCharge;
-		var negativeCharge = _v3.negativeCharge;
-		var positiveLine = _v3.positiveLine;
-		var negativeLine = _v3.negativeLine;
+	var encodeSettingColors = function (_v4) {
+		var positiveCharge = _v4.positiveCharge;
+		var negativeCharge = _v4.negativeCharge;
+		var positiveLine = _v4.positiveLine;
+		var negativeLine = _v4.negativeLine;
 		return $elm$json$Json$Encode$object(
 			_List_fromArray(
 				[
@@ -7711,6 +7691,36 @@ var $author$project$Simulation$encodeModel = function (_v0) {
 					_Utils_Tuple2(
 					'negativeLine',
 					encodeColor(negativeLine))
+				]));
+	};
+	var encodeSettings = function (_v3) {
+		var magnitude = _v3.magnitude;
+		var r = _v3.r;
+		var density = _v3.density;
+		var steps = _v3.steps;
+		var delta = _v3.delta;
+		var colors = _v3.colors;
+		return $elm$json$Json$Encode$object(
+			_List_fromArray(
+				[
+					_Utils_Tuple2(
+					'magnitude',
+					$elm$json$Json$Encode$float(magnitude)),
+					_Utils_Tuple2(
+					'r',
+					$elm$json$Json$Encode$float(r)),
+					_Utils_Tuple2(
+					'density',
+					$elm$json$Json$Encode$int(density)),
+					_Utils_Tuple2(
+					'steps',
+					$elm$json$Json$Encode$int(steps)),
+					_Utils_Tuple2(
+					'delta',
+					$elm$json$Json$Encode$float(delta)),
+					_Utils_Tuple2(
+					'colors',
+					encodeSettingColors(colors))
 				]));
 	};
 	var encodeCharge = function (_v2) {
@@ -7847,6 +7857,316 @@ var $author$project$Main$loadSimulation = F2(
 	});
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
+var $elm$core$Tuple$mapFirst = F2(
+	function (func, _v0) {
+		var x = _v0.a;
+		var y = _v0.b;
+		return _Utils_Tuple2(
+			func(x),
+			y);
+	});
+var $avh4$elm_color$Color$hsla = F4(
+	function (hue, sat, light, alpha) {
+		var _v0 = _Utils_Tuple3(hue, sat, light);
+		var h = _v0.a;
+		var s = _v0.b;
+		var l = _v0.c;
+		var m2 = (l <= 0.5) ? (l * (s + 1)) : ((l + s) - (l * s));
+		var m1 = (l * 2) - m2;
+		var hueToRgb = function (h__) {
+			var h_ = (h__ < 0) ? (h__ + 1) : ((h__ > 1) ? (h__ - 1) : h__);
+			return ((h_ * 6) < 1) ? (m1 + (((m2 - m1) * h_) * 6)) : (((h_ * 2) < 1) ? m2 : (((h_ * 3) < 2) ? (m1 + (((m2 - m1) * ((2 / 3) - h_)) * 6)) : m1));
+		};
+		var b = hueToRgb(h - (1 / 3));
+		var g = hueToRgb(h);
+		var r = hueToRgb(h + (1 / 3));
+		return A4($avh4$elm_color$Color$RgbaSpace, r, g, b, alpha);
+	});
+var $avh4$elm_color$Color$fromHsla = function (_v0) {
+	var hue = _v0.hue;
+	var saturation = _v0.saturation;
+	var lightness = _v0.lightness;
+	var alpha = _v0.alpha;
+	return A4($avh4$elm_color$Color$hsla, hue, saturation, lightness, alpha);
+};
+var $elm$core$Basics$isNaN = _Basics_isNaN;
+var $elm$core$Basics$min = F2(
+	function (x, y) {
+		return (_Utils_cmp(x, y) < 0) ? x : y;
+	});
+var $avh4$elm_color$Color$toHsla = function (_v0) {
+	var r = _v0.a;
+	var g = _v0.b;
+	var b = _v0.c;
+	var a = _v0.d;
+	var minColor = A2(
+		$elm$core$Basics$min,
+		r,
+		A2($elm$core$Basics$min, g, b));
+	var maxColor = A2(
+		$elm$core$Basics$max,
+		r,
+		A2($elm$core$Basics$max, g, b));
+	var l = (minColor + maxColor) / 2;
+	var s = _Utils_eq(minColor, maxColor) ? 0 : ((l < 0.5) ? ((maxColor - minColor) / (maxColor + minColor)) : ((maxColor - minColor) / ((2 - maxColor) - minColor)));
+	var h1 = _Utils_eq(maxColor, r) ? ((g - b) / (maxColor - minColor)) : (_Utils_eq(maxColor, g) ? (2 + ((b - r) / (maxColor - minColor))) : (4 + ((r - g) / (maxColor - minColor))));
+	var h2 = h1 * (1 / 6);
+	var h3 = $elm$core$Basics$isNaN(h2) ? 0 : ((h2 < 0) ? (h2 + 1) : h2);
+	return {alpha: a, hue: h3, lightness: l, saturation: s};
+};
+var $simonh1000$elm_colorpicker$ColorPicker$widgetWidth = 200;
+var $simonh1000$elm_colorpicker$ColorPicker$calcHue = F2(
+	function (col, _v0) {
+		var x = _v0.x;
+		var mousePressed = _v0.mousePressed;
+		var hue = x / $simonh1000$elm_colorpicker$ColorPicker$widgetWidth;
+		var hsla = $avh4$elm_color$Color$toHsla(col);
+		var saturation = hsla.saturation;
+		var lightness = hsla.lightness;
+		var alpha = hsla.alpha;
+		var newCol = ((!saturation) && (lightness < 0.02)) ? _Utils_update(
+			hsla,
+			{hue: hue, lightness: 0.5, saturation: 0.5}) : _Utils_update(
+			hsla,
+			{hue: hue});
+		return $avh4$elm_color$Color$fromHsla(newCol);
+	});
+var $simonh1000$elm_colorpicker$ColorPicker$calcOpacity = F3(
+	function (col, _v0, _v1) {
+		var x = _v1.x;
+		var mousePressed = _v1.mousePressed;
+		var hsla = $avh4$elm_color$Color$toHsla(col);
+		return $avh4$elm_color$Color$fromHsla(
+			_Utils_update(
+				hsla,
+				{alpha: x / $simonh1000$elm_colorpicker$ColorPicker$widgetWidth}));
+	});
+var $simonh1000$elm_colorpicker$ColorPicker$widgetHeight = 150;
+var $simonh1000$elm_colorpicker$ColorPicker$calcSatLight = F3(
+	function (col, currHue, _v0) {
+		var x = _v0.x;
+		var y = _v0.y;
+		var mousePressed = _v0.mousePressed;
+		var hsla = $avh4$elm_color$Color$toHsla(col);
+		return $avh4$elm_color$Color$fromHsla(
+			_Utils_update(
+				hsla,
+				{hue: currHue, lightness: 1 - (y / $simonh1000$elm_colorpicker$ColorPicker$widgetHeight), saturation: x / $simonh1000$elm_colorpicker$ColorPicker$widgetWidth}));
+	});
+var $elm$core$Basics$not = _Basics_not;
+var $elm$core$Maybe$withDefault = F2(
+	function (_default, maybe) {
+		if (maybe.$ === 'Just') {
+			var value = maybe.a;
+			return value;
+		} else {
+			return _default;
+		}
+	});
+var $simonh1000$elm_colorpicker$ColorPicker$setHue = F3(
+	function (mouseTarget, mouseInfo, model) {
+		switch (mouseTarget.$) {
+			case 'SatLight':
+				var hue = mouseTarget.a;
+				return _Utils_update(
+					model,
+					{
+						hue: $elm$core$Maybe$Just(
+							A2($elm$core$Maybe$withDefault, hue, model.hue))
+					});
+			case 'HueSlider':
+				return _Utils_update(
+					model,
+					{
+						hue: $elm$core$Maybe$Just(mouseInfo.x / $simonh1000$elm_colorpicker$ColorPicker$widgetWidth)
+					});
+			case 'OpacitySlider':
+				var hue = mouseTarget.a;
+				return _Utils_update(
+					model,
+					{
+						hue: $elm$core$Maybe$Just(
+							A2($elm$core$Maybe$withDefault, hue, model.hue))
+					});
+			default:
+				return model;
+		}
+	});
+var $simonh1000$elm_colorpicker$ColorPicker$setMouseTarget = F2(
+	function (mouseTarget, model) {
+		return _Utils_update(
+			model,
+			{mouseTarget: mouseTarget});
+	});
+var $simonh1000$elm_colorpicker$ColorPicker$update_ = F3(
+	function (message, col, model) {
+		var calcNewColour = function (mouseTarget) {
+			switch (mouseTarget.$) {
+				case 'SatLight':
+					var hue = mouseTarget.a;
+					return A2(
+						$elm$core$Basics$composeL,
+						$elm$core$Maybe$Just,
+						A2(
+							$simonh1000$elm_colorpicker$ColorPicker$calcSatLight,
+							col,
+							A2($elm$core$Maybe$withDefault, hue, model.hue)));
+				case 'HueSlider':
+					return A2(
+						$elm$core$Basics$composeL,
+						$elm$core$Maybe$Just,
+						$simonh1000$elm_colorpicker$ColorPicker$calcHue(col));
+				case 'OpacitySlider':
+					var hue = mouseTarget.a;
+					return A2(
+						$elm$core$Basics$composeL,
+						$elm$core$Maybe$Just,
+						A2(
+							$simonh1000$elm_colorpicker$ColorPicker$calcOpacity,
+							col,
+							A2($elm$core$Maybe$withDefault, hue, model.hue)));
+				default:
+					return function (_v2) {
+						return $elm$core$Maybe$Nothing;
+					};
+			}
+		};
+		var handleMouseMove = F2(
+			function (mouseTarget, mouseInfo) {
+				return (mouseInfo.mousePressed && _Utils_eq(model.mouseTarget, mouseTarget)) ? _Utils_Tuple2(
+					A3($simonh1000$elm_colorpicker$ColorPicker$setHue, mouseTarget, mouseInfo, model),
+					A2(calcNewColour, mouseTarget, mouseInfo)) : (((!mouseInfo.mousePressed) && _Utils_eq(model.mouseTarget, mouseTarget)) ? _Utils_Tuple2(
+					A2($simonh1000$elm_colorpicker$ColorPicker$setMouseTarget, $simonh1000$elm_colorpicker$ColorPicker$Unpressed, model),
+					$elm$core$Maybe$Nothing) : _Utils_Tuple2(model, $elm$core$Maybe$Nothing));
+			});
+		switch (message.$) {
+			case 'OnMouseDown':
+				var mouseTarget = message.a;
+				var mouseInfo = message.b;
+				return _Utils_Tuple2(
+					A3(
+						$simonh1000$elm_colorpicker$ColorPicker$setHue,
+						mouseTarget,
+						mouseInfo,
+						A2($simonh1000$elm_colorpicker$ColorPicker$setMouseTarget, mouseTarget, model)),
+					A2(calcNewColour, mouseTarget, mouseInfo));
+			case 'OnMouseMove':
+				var mouseTarget = message.a;
+				var mouseInfo = message.b;
+				return A2(handleMouseMove, mouseTarget, mouseInfo);
+			case 'OnClick':
+				var mouseTarget = message.a;
+				var mouseInfo = message.b;
+				return _Utils_Tuple2(
+					A3($simonh1000$elm_colorpicker$ColorPicker$setHue, mouseTarget, mouseInfo, model),
+					A2(calcNewColour, mouseTarget, mouseInfo));
+			case 'OnMouseUp':
+				return _Utils_Tuple2(
+					A2($simonh1000$elm_colorpicker$ColorPicker$setMouseTarget, $simonh1000$elm_colorpicker$ColorPicker$Unpressed, model),
+					$elm$core$Maybe$Nothing);
+			default:
+				return _Utils_Tuple2(model, $elm$core$Maybe$Nothing);
+		}
+	});
+var $simonh1000$elm_colorpicker$ColorPicker$update = F3(
+	function (message, col, _v0) {
+		var model = _v0.a;
+		return A2(
+			$elm$core$Tuple$mapFirst,
+			$simonh1000$elm_colorpicker$ColorPicker$State,
+			A3($simonh1000$elm_colorpicker$ColorPicker$update_, message, col, model));
+	});
+var $author$project$Main$SettingsPopUp = {$: 'SettingsPopUp'};
+var $author$project$Main$updateGlobalSettings = F2(
+	function (func, model) {
+		var settings = model.activeSimulation.settings;
+		var updatedSettings = func(settings);
+		var updatedModel = $author$project$Main$applySettingsToCurrentAndFutureFields(
+			_Utils_update(
+				model,
+				{pendingSettings: updatedSettings}));
+		return _Utils_update(
+			updatedModel,
+			{pendingSettings: updatedSettings, popUp: $author$project$Main$SettingsPopUp});
+	});
+var $author$project$Main$pickSimulationColors = F3(
+	function (part, msg, model) {
+		var oldColors = model.pendingSettings.colors;
+		var _v0 = function () {
+			switch (part) {
+				case 'positiveCharge':
+					return _Utils_Tuple2(oldColors.positiveCharge, model.positiveChargeColorPicker);
+				case 'negativeCharge':
+					return _Utils_Tuple2(oldColors.negativeCharge, model.negativeChargeColorPicker);
+				case 'positiveLine':
+					return _Utils_Tuple2(oldColors.positiveLine, model.positiveLineColorPicker);
+				case 'negativeLine':
+					return _Utils_Tuple2(oldColors.negativeLine, model.negativeLineColorPicker);
+				default:
+					return _Utils_Tuple2($avh4$elm_color$Color$black, model.positiveChargeColorPicker);
+			}
+		}();
+		var oldColor = _v0.a;
+		var oldColorPicker = _v0.b;
+		var _v2 = A3($simonh1000$elm_colorpicker$ColorPicker$update, msg, oldColor, oldColorPicker);
+		var newColorPicker = _v2.a;
+		var newMaybeColor = _v2.b;
+		var updatedModel = function () {
+			switch (part) {
+				case 'positiveCharge':
+					return _Utils_update(
+						model,
+						{positiveChargeColorPicker: newColorPicker});
+				case 'negativeCharge':
+					return _Utils_update(
+						model,
+						{negativeChargeColorPicker: newColorPicker});
+				case 'positiveLine':
+					return _Utils_update(
+						model,
+						{positiveLineColorPicker: newColorPicker});
+				case 'negativeLine':
+					return _Utils_update(
+						model,
+						{negativeLineColorPicker: newColorPicker});
+				default:
+					return model;
+			}
+		}();
+		var newColor = A2($elm$core$Maybe$withDefault, oldColor, newMaybeColor);
+		return A2(
+			$author$project$Main$updateGlobalSettings,
+			function (settings) {
+				var colors = settings.colors;
+				return _Utils_update(
+					settings,
+					{
+						colors: function () {
+							switch (part) {
+								case 'positiveCharge':
+									return _Utils_update(
+										colors,
+										{positiveCharge: newColor});
+								case 'negativeCharge':
+									return _Utils_update(
+										colors,
+										{negativeCharge: newColor});
+								case 'positiveLine':
+									return _Utils_update(
+										colors,
+										{positiveLine: newColor});
+								case 'negativeLine':
+									return _Utils_update(
+										colors,
+										{negativeLine: newColor});
+								default:
+									return colors;
+							}
+						}()
+					});
+			},
+			updatedModel);
+	});
 var $elm$core$List$filter = F2(
 	function (isGood, list) {
 		return A3(
@@ -8114,15 +8434,6 @@ var $elm_community$list_extra$List$Extra$splitWhen = F2(
 			},
 			A2($elm_community$list_extra$List$Extra$findIndex, predicate, list));
 	});
-var $elm$core$Maybe$withDefault = F2(
-	function (_default, maybe) {
-		if (maybe.$ === 'Just') {
-			var value = maybe.a;
-			return value;
-		} else {
-			return _default;
-		}
-	});
 var $author$project$Main$getNextSimulation = F2(
 	function (current, simulations) {
 		var splits = A2(
@@ -8181,27 +8492,16 @@ var $author$project$Main$showPopUp = F2(
 			{popUp: popUp});
 	});
 var $elm$file$File$toString = _File_toString;
-var $author$project$Main$SettingsPopUp = {$: 'SettingsPopUp'};
 var $author$project$Main$toggleShowSourceValue = F2(
 	function (newChecked, model) {
-		var settings = model.activeSimulation.settings;
-		var updatedModel = $author$project$Main$applySettingsToCurrentAndFutureFields(
-			_Utils_update(
-				model,
-				{
-					pendingSettings: _Utils_update(
-						settings,
-						{showSourceValue: newChecked})
-				}));
-		var pendingSettings = model.pendingSettings;
-		return _Utils_update(
-			updatedModel,
-			{
-				pendingSettings: _Utils_update(
-					pendingSettings,
-					{showSourceValue: newChecked}),
-				popUp: $author$project$Main$SettingsPopUp
-			});
+		return A2(
+			$author$project$Main$updateGlobalSettings,
+			function (settings) {
+				return _Utils_update(
+					settings,
+					{showSourceValue: newChecked});
+			},
+			model);
 	});
 var $author$project$Main$updateActiveSimulation = F2(
 	function (newActiveSimulation, model) {
@@ -8449,10 +8749,6 @@ var $author$project$Simulation$StopWheelingTimeOut = {$: 'StopWheelingTimeOut'};
 var $author$project$Simulation$either = F3(
 	function (minimum, maximum, value) {
 		return (value < 0) ? minimum : maximum;
-	});
-var $elm$core$Basics$min = F2(
-	function (x, y) {
-		return (_Utils_cmp(x, y) < 0) ? x : y;
 	});
 var $elm$core$Basics$round = _Basics_round;
 var $author$project$Simulation$optimizeModel = function (model) {
@@ -8975,6 +9271,12 @@ var $author$project$Main$update = F2(
 				return _Utils_Tuple2(
 					A2($author$project$Main$toggleShowSourceValue, newChecked, model),
 					$elm$core$Platform$Cmd$none);
+			case 'PickSimulationColors':
+				var part = message.a;
+				var msg = message.b;
+				return _Utils_Tuple2(
+					A3($author$project$Main$pickSimulationColors, part, msg, model),
+					$elm$core$Platform$Cmd$none);
 			default:
 				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 		}
@@ -9396,14 +9698,6 @@ var $mdgriffith$elm_ui$Internal$Model$formatBoxShadow = function (shadow) {
 					$mdgriffith$elm_ui$Internal$Model$formatColor(shadow.color))
 				])));
 };
-var $elm$core$Tuple$mapFirst = F2(
-	function (func, _v0) {
-		var x = _v0.a;
-		var y = _v0.b;
-		return _Utils_Tuple2(
-			func(x),
-			y);
-	});
 var $elm$core$Tuple$mapSecond = F2(
 	function (func, _v0) {
 		var x = _v0.a;
@@ -12568,7 +12862,6 @@ var $elm$virtual_dom$VirtualDom$keyedNode = function (tag) {
 	return _VirtualDom_keyedNode(
 		_VirtualDom_noScript(tag));
 };
-var $elm$core$Basics$not = _Basics_not;
 var $elm$html$Html$p = _VirtualDom_node('p');
 var $elm$core$Bitwise$and = _Bitwise_and;
 var $mdgriffith$elm_ui$Internal$Flag$present = F2(
@@ -15767,7 +16060,6 @@ var $myrho$elm_round$Round$increaseNum = function (_v0) {
 	}
 };
 var $elm$core$Basics$isInfinite = _Basics_isInfinite;
-var $elm$core$Basics$isNaN = _Basics_isNaN;
 var $elm$core$String$fromChar = function (_char) {
 	return A2($elm$core$String$cons, _char, '');
 };
@@ -16621,6 +16913,10 @@ var $author$project$Main$viewHelpPopUp = A3(
 		]));
 var $author$project$Main$ApplyPendingSettings = {$: 'ApplyPendingSettings'};
 var $author$project$Main$CloseSettingsPopUp = {$: 'CloseSettingsPopUp'};
+var $author$project$Main$PickSimulationColors = F2(
+	function (a, b) {
+		return {$: 'PickSimulationColors', a: a, b: b};
+	});
 var $author$project$Main$ToggleShowSourceValue = function (a) {
 	return {$: 'ToggleShowSourceValue', a: a};
 };
@@ -17602,6 +17898,521 @@ var $mdgriffith$elm_ui$Element$Input$text = $mdgriffith$elm_ui$Element$Input$tex
 		spellchecked: false,
 		type_: $mdgriffith$elm_ui$Element$Input$TextInputNode('text')
 	});
+var $simonh1000$elm_colorpicker$ColorPicker$markerAttrs = _List_fromArray(
+	[
+		A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
+		A2($elm$html$Html$Attributes$style, 'top', '1px'),
+		A2($elm$html$Html$Attributes$style, 'bottom', '1px'),
+		A2($elm$html$Html$Attributes$style, 'border', '1px solid #ddd'),
+		A2($elm$html$Html$Attributes$style, 'background-color', '#ffffff'),
+		A2($elm$html$Html$Attributes$style, 'width', '6px'),
+		A2($elm$html$Html$Attributes$style, 'pointer-events', 'none')
+	]);
+var $simonh1000$elm_colorpicker$ColorPicker$alphaMarker = function (alpha) {
+	var correction = 4;
+	var xVal = $elm$core$String$fromInt(
+		$elm$core$Basics$round((alpha * $simonh1000$elm_colorpicker$ColorPicker$widgetWidth) - correction));
+	return A2(
+		$elm$html$Html$div,
+		A2(
+			$elm$core$List$cons,
+			A2($elm$html$Html$Attributes$style, 'left', xVal + 'px'),
+			$simonh1000$elm_colorpicker$ColorPicker$markerAttrs),
+		_List_Nil);
+};
+var $simonh1000$elm_colorpicker$ColorPicker$NoOp = {$: 'NoOp'};
+var $simonh1000$elm_colorpicker$ColorPicker$bubblePreventer = A2(
+	$elm$html$Html$Events$stopPropagationOn,
+	'click',
+	$elm$json$Json$Decode$succeed(
+		_Utils_Tuple2($simonh1000$elm_colorpicker$ColorPicker$NoOp, true)));
+var $simonh1000$elm_colorpicker$ColorPicker$checkedBkgStyles = _List_fromArray(
+	[
+		A2($elm$html$Html$Attributes$style, 'background-size', '12px 12px'),
+		A2($elm$html$Html$Attributes$style, 'background-position', '0 0, 0 6px, 6px -6px, -6px 0px'),
+		A2($elm$html$Html$Attributes$style, 'background-image', 'linear-gradient(45deg, #808080 25%, transparent 25%), linear-gradient(-45deg, #808080 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #808080 75%), linear-gradient(-45deg, transparent 75%, #808080 75%)')
+	]);
+var $avh4$elm_color$Color$hsl = F3(
+	function (h, s, l) {
+		return A4($avh4$elm_color$Color$hsla, h, s, l, 1.0);
+	});
+var $simonh1000$elm_colorpicker$ColorPicker$hueMarker = function (lastHue) {
+	var correction = 4;
+	var xVal = $elm$core$String$fromInt(
+		$elm$core$Basics$round((lastHue * $simonh1000$elm_colorpicker$ColorPicker$widgetWidth) - correction));
+	return A2(
+		$elm$html$Html$div,
+		A2(
+			$elm$core$List$cons,
+			A2($elm$html$Html$Attributes$style, 'left', xVal + 'px'),
+			$simonh1000$elm_colorpicker$ColorPicker$markerAttrs),
+		_List_Nil);
+};
+var $simonh1000$elm_colorpicker$ColorPicker$HueSlider = {$: 'HueSlider'};
+var $simonh1000$elm_colorpicker$ColorPicker$OnMouseMove = F2(
+	function (a, b) {
+		return {$: 'OnMouseMove', a: a, b: b};
+	});
+var $elm$svg$Svg$Attributes$class = _VirtualDom_attribute('class');
+var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
+var $elm$svg$Svg$defs = $elm$svg$Svg$trustedNode('defs');
+var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
+var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
+var $elm$svg$Svg$Attributes$id = _VirtualDom_attribute('id');
+var $elm$svg$Svg$linearGradient = $elm$svg$Svg$trustedNode('linearGradient');
+var $elm$svg$Svg$Attributes$offset = _VirtualDom_attribute('offset');
+var $elm$svg$Svg$rect = $elm$svg$Svg$trustedNode('rect');
+var $elm$svg$Svg$Attributes$display = _VirtualDom_attribute('display');
+var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
+var $simonh1000$elm_colorpicker$ColorPicker$sliderStyles = _List_fromArray(
+	[
+		$elm$svg$Svg$Attributes$width(
+		$elm$core$String$fromInt($simonh1000$elm_colorpicker$ColorPicker$widgetWidth)),
+		$elm$svg$Svg$Attributes$height('100%'),
+		$elm$svg$Svg$Attributes$display('block')
+	]);
+var $elm$svg$Svg$stop = $elm$svg$Svg$trustedNode('stop');
+var $elm$svg$Svg$Attributes$stopColor = _VirtualDom_attribute('stop-color');
+var $elm$svg$Svg$Attributes$stopOpacity = _VirtualDom_attribute('stop-opacity');
+var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
+var $simonh1000$elm_colorpicker$ColorPicker$OnClick = F2(
+	function (a, b) {
+		return {$: 'OnClick', a: a, b: b};
+	});
+var $simonh1000$elm_colorpicker$ColorPicker$OnMouseDown = F2(
+	function (a, b) {
+		return {$: 'OnMouseDown', a: a, b: b};
+	});
+var $simonh1000$elm_colorpicker$ColorPicker$OnMouseUp = {$: 'OnMouseUp'};
+var $simonh1000$elm_colorpicker$ColorPicker$MouseInfo = F3(
+	function (x, y, mousePressed) {
+		return {mousePressed: mousePressed, x: x, y: y};
+	});
+var $simonh1000$elm_colorpicker$ColorPicker$decodeMouseInfo = A4(
+	$elm$json$Json$Decode$map3,
+	$simonh1000$elm_colorpicker$ColorPicker$MouseInfo,
+	A2($elm$json$Json$Decode$field, 'offsetX', $elm$json$Json$Decode$int),
+	A2($elm$json$Json$Decode$field, 'offsetY', $elm$json$Json$Decode$int),
+	A2(
+		$elm$json$Json$Decode$map,
+		$elm$core$Basics$neq(0),
+		A2($elm$json$Json$Decode$field, 'buttons', $elm$json$Json$Decode$int)));
+var $elm$svg$Svg$Events$on = $elm$html$Html$Events$on;
+var $simonh1000$elm_colorpicker$ColorPicker$onClickSvg = function (msgCreator) {
+	return A2(
+		$elm$svg$Svg$Events$on,
+		'click',
+		A2($elm$json$Json$Decode$map, msgCreator, $simonh1000$elm_colorpicker$ColorPicker$decodeMouseInfo));
+};
+var $simonh1000$elm_colorpicker$ColorPicker$onMouseDownSvg = function (msgCreator) {
+	return A2(
+		$elm$svg$Svg$Events$on,
+		'mousedown',
+		A2($elm$json$Json$Decode$map, msgCreator, $simonh1000$elm_colorpicker$ColorPicker$decodeMouseInfo));
+};
+var $simonh1000$elm_colorpicker$ColorPicker$onMouseMoveSvg = function (msgCreator) {
+	return A2(
+		$elm$svg$Svg$Events$on,
+		'mousemove',
+		A2($elm$json$Json$Decode$map, msgCreator, $simonh1000$elm_colorpicker$ColorPicker$decodeMouseInfo));
+};
+var $elm$svg$Svg$Events$onMouseUp = function (msg) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'mouseup',
+		$elm$json$Json$Decode$succeed(msg));
+};
+var $simonh1000$elm_colorpicker$ColorPicker$svgDragAttrs = F3(
+	function (currMouseTgt, thisTgt, onMoveMsg) {
+		var common = _List_fromArray(
+			[
+				$simonh1000$elm_colorpicker$ColorPicker$onMouseDownSvg(
+				$simonh1000$elm_colorpicker$ColorPicker$OnMouseDown(thisTgt)),
+				$elm$svg$Svg$Events$onMouseUp($simonh1000$elm_colorpicker$ColorPicker$OnMouseUp),
+				$simonh1000$elm_colorpicker$ColorPicker$onClickSvg(
+				$simonh1000$elm_colorpicker$ColorPicker$OnClick(thisTgt))
+			]);
+		return _Utils_eq(currMouseTgt, thisTgt) ? A2(
+			$elm$core$List$cons,
+			$simonh1000$elm_colorpicker$ColorPicker$onMouseMoveSvg(onMoveMsg),
+			common) : common;
+	});
+var $elm$svg$Svg$Attributes$x = _VirtualDom_attribute('x');
+var $elm$svg$Svg$Attributes$x1 = _VirtualDom_attribute('x1');
+var $elm$svg$Svg$Attributes$x2 = _VirtualDom_attribute('x2');
+var $elm$svg$Svg$Attributes$y = _VirtualDom_attribute('y');
+var $elm$svg$Svg$Attributes$y1 = _VirtualDom_attribute('y1');
+var $elm$svg$Svg$Attributes$y2 = _VirtualDom_attribute('y2');
+var $simonh1000$elm_colorpicker$ColorPicker$huePalette = function (mouseTarget) {
+	var stops = _List_fromArray(
+		[
+			_Utils_Tuple2('0%', '#FF0000'),
+			_Utils_Tuple2('17%', '#FF00FF'),
+			_Utils_Tuple2('33%', '#0000FF'),
+			_Utils_Tuple2('50%', '#00FFFF'),
+			_Utils_Tuple2('66%', '#00FF00'),
+			_Utils_Tuple2('83%', '#FFFF00'),
+			_Utils_Tuple2('100%', '#FF0000')
+		]);
+	var mkStop = function (_v0) {
+		var os = _v0.a;
+		var sc = _v0.b;
+		return A2(
+			$elm$svg$Svg$stop,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$offset(os),
+					$elm$svg$Svg$Attributes$stopColor(sc),
+					$elm$svg$Svg$Attributes$stopOpacity('1')
+				]),
+			_List_Nil);
+	};
+	return A2(
+		$elm$svg$Svg$svg,
+		A2(
+			$elm$core$List$cons,
+			$elm$svg$Svg$Attributes$class('hue-picker'),
+			$simonh1000$elm_colorpicker$ColorPicker$sliderStyles),
+		_List_fromArray(
+			[
+				A2(
+				$elm$svg$Svg$defs,
+				_List_Nil,
+				_List_fromArray(
+					[
+						A2(
+						$elm$svg$Svg$linearGradient,
+						_List_fromArray(
+							[
+								$elm$svg$Svg$Attributes$id('gradient-hsv'),
+								$elm$svg$Svg$Attributes$x1('100%'),
+								$elm$svg$Svg$Attributes$y1('0%'),
+								$elm$svg$Svg$Attributes$x2('0%'),
+								$elm$svg$Svg$Attributes$y2('0%')
+							]),
+						A2($elm$core$List$map, mkStop, stops))
+					])),
+				A2(
+				$elm$svg$Svg$rect,
+				_Utils_ap(
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$x('0'),
+							$elm$svg$Svg$Attributes$y('0'),
+							$elm$svg$Svg$Attributes$width(
+							$elm$core$String$fromInt($simonh1000$elm_colorpicker$ColorPicker$widgetWidth)),
+							$elm$svg$Svg$Attributes$height('100%'),
+							$elm$svg$Svg$Attributes$fill('url(#gradient-hsv)')
+						]),
+					A3(
+						$simonh1000$elm_colorpicker$ColorPicker$svgDragAttrs,
+						mouseTarget,
+						$simonh1000$elm_colorpicker$ColorPicker$HueSlider,
+						$simonh1000$elm_colorpicker$ColorPicker$OnMouseMove($simonh1000$elm_colorpicker$ColorPicker$HueSlider))),
+				_List_Nil)
+			]));
+};
+var $simonh1000$elm_colorpicker$ColorPicker$OpacitySlider = function (a) {
+	return {$: 'OpacitySlider', a: a};
+};
+var $simonh1000$elm_colorpicker$ColorPicker$onClickHtml = function (msgCreator) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'click',
+		A2($elm$json$Json$Decode$map, msgCreator, $simonh1000$elm_colorpicker$ColorPicker$decodeMouseInfo));
+};
+var $elm$html$Html$Events$onMouseUp = function (msg) {
+	return A2(
+		$elm$html$Html$Events$on,
+		'mouseup',
+		$elm$json$Json$Decode$succeed(msg));
+};
+var $simonh1000$elm_colorpicker$ColorPicker$htmlDragAttrs = F3(
+	function (currMouseTgt, thisTgt, onMoveMsg) {
+		var common = _List_fromArray(
+			[
+				A2(
+				$elm$html$Html$Events$on,
+				'mousedown',
+				A2(
+					$elm$json$Json$Decode$map,
+					$simonh1000$elm_colorpicker$ColorPicker$OnMouseDown(thisTgt),
+					$simonh1000$elm_colorpicker$ColorPicker$decodeMouseInfo)),
+				$elm$html$Html$Events$onMouseUp($simonh1000$elm_colorpicker$ColorPicker$OnMouseUp),
+				$simonh1000$elm_colorpicker$ColorPicker$onClickHtml(
+				$simonh1000$elm_colorpicker$ColorPicker$OnClick(thisTgt))
+			]);
+		return _Utils_eq(currMouseTgt, thisTgt) ? A2(
+			$elm$core$List$cons,
+			A2(
+				$elm$html$Html$Events$on,
+				'mousemove',
+				A2($elm$json$Json$Decode$map, onMoveMsg, $simonh1000$elm_colorpicker$ColorPicker$decodeMouseInfo)),
+			common) : common;
+	});
+var $simonh1000$elm_colorpicker$ColorPicker$opacityPalette = F2(
+	function (hsla, model) {
+		var mouseTarget = $simonh1000$elm_colorpicker$ColorPicker$OpacitySlider(hsla.hue);
+		var mkCol = function (op) {
+			return $avh4$elm_color$Color$toCssString(
+				A4($avh4$elm_color$Color$hsla, hsla.hue, hsla.saturation, hsla.lightness, op));
+		};
+		var grad = 'linear-gradient(0.25turn, ' + (mkCol(0) + (', ' + (mkCol(1) + ')')));
+		var overlay = _List_fromArray(
+			[
+				A2($elm$html$Html$Attributes$style, 'background', grad),
+				A2($elm$html$Html$Attributes$style, 'height', '100%'),
+				A2($elm$html$Html$Attributes$style, 'width', '100%')
+			]);
+		return A2(
+			$elm$html$Html$div,
+			_Utils_ap(
+				overlay,
+				A3(
+					$simonh1000$elm_colorpicker$ColorPicker$htmlDragAttrs,
+					model.mouseTarget,
+					mouseTarget,
+					$simonh1000$elm_colorpicker$ColorPicker$OnMouseMove(mouseTarget))),
+			_List_Nil);
+	});
+var $simonh1000$elm_colorpicker$ColorPicker$pickerIndicator = function (col) {
+	var adjustment = 4;
+	var _v0 = $avh4$elm_color$Color$toHsla(col);
+	var saturation = _v0.saturation;
+	var lightness = _v0.lightness;
+	var borderColor = (lightness > 0.95) ? '#cccccc' : '#ffffff';
+	var cy_ = $elm$core$String$fromInt(
+		$elm$core$Basics$round(($simonh1000$elm_colorpicker$ColorPicker$widgetHeight - (lightness * $simonh1000$elm_colorpicker$ColorPicker$widgetHeight)) - adjustment));
+	var cx_ = $elm$core$String$fromInt(
+		$elm$core$Basics$round((saturation * $simonh1000$elm_colorpicker$ColorPicker$widgetWidth) - adjustment));
+	return A2(
+		$elm$html$Html$div,
+		_List_fromArray(
+			[
+				A2($elm$html$Html$Attributes$style, 'position', 'absolute'),
+				A2($elm$html$Html$Attributes$style, 'top', cy_ + 'px'),
+				A2($elm$html$Html$Attributes$style, 'left', cx_ + 'px'),
+				A2($elm$html$Html$Attributes$style, 'border-radius', '100%'),
+				A2($elm$html$Html$Attributes$style, 'border', '2px solid ' + borderColor),
+				A2($elm$html$Html$Attributes$style, 'width', '6px'),
+				A2($elm$html$Html$Attributes$style, 'height', '6px'),
+				A2($elm$html$Html$Attributes$style, 'pointer-events', 'none')
+			]),
+		_List_Nil);
+};
+var $simonh1000$elm_colorpicker$ColorPicker$pickerStyles = _List_fromArray(
+	[
+		A2($elm$html$Html$Attributes$style, 'cursor', 'crosshair'),
+		A2($elm$html$Html$Attributes$style, 'position', 'relative')
+	]);
+var $simonh1000$elm_colorpicker$ColorPicker$SatLight = function (a) {
+	return {$: 'SatLight', a: a};
+};
+var $simonh1000$elm_colorpicker$ColorPicker$satLightPalette = F3(
+	function (hue, colCss, mouseTarget) {
+		return A2(
+			$elm$svg$Svg$svg,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$width(
+					$elm$core$String$fromInt($simonh1000$elm_colorpicker$ColorPicker$widgetWidth)),
+					$elm$svg$Svg$Attributes$height(
+					$elm$core$String$fromInt($simonh1000$elm_colorpicker$ColorPicker$widgetHeight)),
+					$elm$svg$Svg$Attributes$class('main-picker'),
+					$elm$svg$Svg$Attributes$display('block')
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$svg$Svg$defs,
+					_List_Nil,
+					_List_fromArray(
+						[
+							A2(
+							$elm$svg$Svg$linearGradient,
+							_List_fromArray(
+								[
+									$elm$svg$Svg$Attributes$id('pickerSaturation')
+								]),
+							_List_fromArray(
+								[
+									A2(
+									$elm$svg$Svg$stop,
+									_List_fromArray(
+										[
+											$elm$svg$Svg$Attributes$offset('0'),
+											$elm$svg$Svg$Attributes$stopColor('#808080'),
+											$elm$svg$Svg$Attributes$stopOpacity('1')
+										]),
+									_List_Nil),
+									A2(
+									$elm$svg$Svg$stop,
+									_List_fromArray(
+										[
+											$elm$svg$Svg$Attributes$offset('1'),
+											$elm$svg$Svg$Attributes$stopColor('#808080'),
+											$elm$svg$Svg$Attributes$stopOpacity('0')
+										]),
+									_List_Nil)
+								])),
+							A2(
+							$elm$svg$Svg$linearGradient,
+							_List_fromArray(
+								[
+									$elm$svg$Svg$Attributes$id('pickerBrightness'),
+									$elm$svg$Svg$Attributes$x1('0'),
+									$elm$svg$Svg$Attributes$y1('0'),
+									$elm$svg$Svg$Attributes$x2('0'),
+									$elm$svg$Svg$Attributes$y2('1')
+								]),
+							_List_fromArray(
+								[
+									A2(
+									$elm$svg$Svg$stop,
+									_List_fromArray(
+										[
+											$elm$svg$Svg$Attributes$offset('0'),
+											$elm$svg$Svg$Attributes$stopColor('#fff'),
+											$elm$svg$Svg$Attributes$stopOpacity('1')
+										]),
+									_List_Nil),
+									A2(
+									$elm$svg$Svg$stop,
+									_List_fromArray(
+										[
+											$elm$svg$Svg$Attributes$offset('0.499'),
+											$elm$svg$Svg$Attributes$stopColor('#fff'),
+											$elm$svg$Svg$Attributes$stopOpacity('0')
+										]),
+									_List_Nil),
+									A2(
+									$elm$svg$Svg$stop,
+									_List_fromArray(
+										[
+											$elm$svg$Svg$Attributes$offset('0.5'),
+											$elm$svg$Svg$Attributes$stopColor('#000'),
+											$elm$svg$Svg$Attributes$stopOpacity('0')
+										]),
+									_List_Nil),
+									A2(
+									$elm$svg$Svg$stop,
+									_List_fromArray(
+										[
+											$elm$svg$Svg$Attributes$offset('1'),
+											$elm$svg$Svg$Attributes$stopColor('#000'),
+											$elm$svg$Svg$Attributes$stopOpacity('1')
+										]),
+									_List_Nil)
+								]))
+						])),
+					A2(
+					$elm$svg$Svg$rect,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$width(
+							$elm$core$String$fromInt($simonh1000$elm_colorpicker$ColorPicker$widgetWidth)),
+							$elm$svg$Svg$Attributes$height(
+							$elm$core$String$fromInt($simonh1000$elm_colorpicker$ColorPicker$widgetHeight)),
+							$elm$svg$Svg$Attributes$fill(colCss),
+							$elm$svg$Svg$Attributes$id('picker')
+						]),
+					_List_Nil),
+					A2(
+					$elm$svg$Svg$rect,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$width(
+							$elm$core$String$fromInt($simonh1000$elm_colorpicker$ColorPicker$widgetWidth)),
+							$elm$svg$Svg$Attributes$height(
+							$elm$core$String$fromInt($simonh1000$elm_colorpicker$ColorPicker$widgetHeight)),
+							$elm$svg$Svg$Attributes$fill('url(#pickerSaturation)')
+						]),
+					_List_Nil),
+					A2(
+					$elm$svg$Svg$rect,
+					_Utils_ap(
+						_List_fromArray(
+							[
+								$elm$svg$Svg$Attributes$width(
+								$elm$core$String$fromInt($simonh1000$elm_colorpicker$ColorPicker$widgetWidth)),
+								$elm$svg$Svg$Attributes$height(
+								$elm$core$String$fromInt($simonh1000$elm_colorpicker$ColorPicker$widgetHeight)),
+								$elm$svg$Svg$Attributes$fill('url(#pickerBrightness)')
+							]),
+						A3(
+							$simonh1000$elm_colorpicker$ColorPicker$svgDragAttrs,
+							mouseTarget,
+							$simonh1000$elm_colorpicker$ColorPicker$SatLight(hue),
+							$simonh1000$elm_colorpicker$ColorPicker$OnMouseMove(
+								$simonh1000$elm_colorpicker$ColorPicker$SatLight(hue)))),
+					_List_Nil)
+				]));
+	});
+var $simonh1000$elm_colorpicker$ColorPicker$sliderContainerStyles = function (name) {
+	return _List_fromArray(
+		[
+			A2(
+			$elm$html$Html$Attributes$style,
+			'width',
+			$elm$core$String$fromInt($simonh1000$elm_colorpicker$ColorPicker$widgetWidth) + 'px'),
+			A2($elm$html$Html$Attributes$style, 'height', '12px'),
+			A2($elm$html$Html$Attributes$style, 'marginTop', '8px'),
+			$elm$html$Html$Attributes$class('color-picker-slider ' + name)
+		]);
+};
+var $simonh1000$elm_colorpicker$ColorPicker$view = F2(
+	function (col, _v0) {
+		var model = _v0.a;
+		var hsla = $avh4$elm_color$Color$toHsla(col);
+		var hue = A2($elm$core$Maybe$withDefault, hsla.hue, model.hue);
+		var colCss = $avh4$elm_color$Color$toCssString(
+			A3($avh4$elm_color$Color$hsl, hue, 1, 0.5));
+		return A2(
+			$elm$html$Html$div,
+			_List_fromArray(
+				[
+					A2($elm$html$Html$Attributes$style, 'background-color', 'white'),
+					A2($elm$html$Html$Attributes$style, 'padding', '6px'),
+					A2($elm$html$Html$Attributes$style, 'display', 'inline-block'),
+					A2($elm$html$Html$Attributes$style, 'border-radius', '5px'),
+					A2($elm$html$Html$Attributes$style, 'box-shadow', 'rgba(0, 0, 0, 0.15) 0px 0px 0px 1px, rgba(0, 0, 0, 0.15) 0px 8px 16px'),
+					$elm$html$Html$Attributes$class('color-picker-container'),
+					$simonh1000$elm_colorpicker$ColorPicker$bubblePreventer
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$div,
+					$simonh1000$elm_colorpicker$ColorPicker$pickerStyles,
+					_List_fromArray(
+						[
+							A3($simonh1000$elm_colorpicker$ColorPicker$satLightPalette, hue, colCss, model.mouseTarget),
+							$simonh1000$elm_colorpicker$ColorPicker$pickerIndicator(col)
+						])),
+					A2(
+					$elm$html$Html$div,
+					_Utils_ap(
+						$simonh1000$elm_colorpicker$ColorPicker$pickerStyles,
+						$simonh1000$elm_colorpicker$ColorPicker$sliderContainerStyles('hue')),
+					_List_fromArray(
+						[
+							$simonh1000$elm_colorpicker$ColorPicker$huePalette(model.mouseTarget),
+							$simonh1000$elm_colorpicker$ColorPicker$hueMarker(hue)
+						])),
+					A2(
+					$elm$html$Html$div,
+					_Utils_ap(
+						$simonh1000$elm_colorpicker$ColorPicker$checkedBkgStyles,
+						_Utils_ap(
+							$simonh1000$elm_colorpicker$ColorPicker$pickerStyles,
+							$simonh1000$elm_colorpicker$ColorPicker$sliderContainerStyles('opacity'))),
+					_List_fromArray(
+						[
+							A2($simonh1000$elm_colorpicker$ColorPicker$opacityPalette, hsla, model),
+							$simonh1000$elm_colorpicker$ColorPicker$alphaMarker(hsla.alpha)
+						]))
+				]));
+	});
 var $author$project$Main$viewSettingsPopUp = function (model) {
 	var settings = model.pendingSettings;
 	return A3(
@@ -17724,6 +18535,73 @@ var $author$project$Main$viewSettingsPopUp = function (model) {
 						$mdgriffith$elm_ui$Element$text('Show source charge\'s value')),
 					onChange: $author$project$Main$ToggleShowSourceValue
 				}),
+				$mdgriffith$elm_ui$Element$text('Pick colors for:'),
+				A2(
+				$mdgriffith$elm_ui$Element$row,
+				_List_fromArray(
+					[
+						$mdgriffith$elm_ui$Element$spacing(20)
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$mdgriffith$elm_ui$Element$column,
+						_List_Nil,
+						_List_fromArray(
+							[
+								$mdgriffith$elm_ui$Element$text('Positive charges'),
+								$mdgriffith$elm_ui$Element$html(
+								A2(
+									$elm$html$Html$map,
+									$author$project$Main$PickSimulationColors('positiveCharge'),
+									A2($simonh1000$elm_colorpicker$ColorPicker$view, settings.colors.positiveCharge, model.positiveChargeColorPicker)))
+							])),
+						A2(
+						$mdgriffith$elm_ui$Element$column,
+						_List_Nil,
+						_List_fromArray(
+							[
+								$mdgriffith$elm_ui$Element$text('Positive field lines'),
+								$mdgriffith$elm_ui$Element$html(
+								A2(
+									$elm$html$Html$map,
+									$author$project$Main$PickSimulationColors('positiveLine'),
+									A2($simonh1000$elm_colorpicker$ColorPicker$view, settings.colors.positiveLine, model.positiveLineColorPicker)))
+							]))
+					])),
+				A2(
+				$mdgriffith$elm_ui$Element$row,
+				_List_fromArray(
+					[
+						$mdgriffith$elm_ui$Element$spacing(20)
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$mdgriffith$elm_ui$Element$column,
+						_List_Nil,
+						_List_fromArray(
+							[
+								$mdgriffith$elm_ui$Element$text('Negative charges'),
+								$mdgriffith$elm_ui$Element$html(
+								A2(
+									$elm$html$Html$map,
+									$author$project$Main$PickSimulationColors('negativeCharge'),
+									A2($simonh1000$elm_colorpicker$ColorPicker$view, settings.colors.negativeCharge, model.negativeChargeColorPicker)))
+							])),
+						A2(
+						$mdgriffith$elm_ui$Element$column,
+						_List_Nil,
+						_List_fromArray(
+							[
+								$mdgriffith$elm_ui$Element$text('Negative field lines'),
+								$mdgriffith$elm_ui$Element$html(
+								A2(
+									$elm$html$Html$map,
+									$author$project$Main$PickSimulationColors('negativeLine'),
+									A2($simonh1000$elm_colorpicker$ColorPicker$view, settings.colors.negativeLine, model.negativeLineColorPicker)))
+							]))
+					])),
 				A2(
 				$mdgriffith$elm_ui$Element$el,
 				_List_fromArray(
