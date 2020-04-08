@@ -16682,7 +16682,8 @@ var $author$project$Main$viewControlPanel = A2(
 	_List_fromArray(
 		[
 			$mdgriffith$elm_ui$Element$centerX,
-			$mdgriffith$elm_ui$Element$spacing(10)
+			$mdgriffith$elm_ui$Element$spacing(10),
+			$author$project$Utils$styles.padTop
 		]),
 	_List_fromArray(
 		[
