@@ -1055,6 +1055,7 @@ viewFieldSource activeSourceId settings field =
           [ Attributes.x (px <| field.source.x - field.source.r)
           , Attributes.y (px <| field.source.y - field.source.r - 10)
           , Attributes.stroke <| Paint Color.black
+          , Attributes.id "sourceValueLabel"
           ]
           [ TypedSvg.Core.text (signToString field.source.sign ++ Round.round 1 field.source.magnitude)
           ]

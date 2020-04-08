@@ -16557,7 +16557,8 @@ var $author$project$Simulation$viewFieldSource = F3(
 									$elm_community$typed_svg$TypedSvg$Attributes$y(
 									$elm_community$typed_svg$TypedSvg$Types$px((field.source.y - field.source.r) - 10)),
 									$elm_community$typed_svg$TypedSvg$Attributes$stroke(
-									$elm_community$typed_svg$TypedSvg$Types$Paint($avh4$elm_color$Color$black))
+									$elm_community$typed_svg$TypedSvg$Types$Paint($avh4$elm_color$Color$black)),
+									$elm_community$typed_svg$TypedSvg$Attributes$id('sourceValueLabel')
 								]),
 							_List_fromArray(
 								[

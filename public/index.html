@@ -24,11 +24,18 @@
         var strokeWidth = activeSource.getAttribute("stroke-width");
         activeSource.setAttribute("stroke-width", "0px");
       }
+      var sourceValueLabel = document.getElementById("sourceValueLabel");
+      if (sourceValueLabel !== null) {
+        sourceValueLabel.setAttribute("visibility", "hidden");
+      }
       var svgData = document.getElementById("modelSvg")
         .outerHTML
         .replace(/^<svg/, `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"`);
       if (activeSource !== null) {
         activeSource.setAttribute("stroke-width", strokeWidth);
+      }
+      if (sourceValueLabel !== null) {
+        sourceValueLabel.setAttribute("visibility", "visible");
       }
       download(modelName + ".svg", "image/svg+xml;charset=utf-8", svgData);
     });
