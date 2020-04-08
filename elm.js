@@ -15235,6 +15235,82 @@ var $elm$virtual_dom$VirtualDom$nodeNS = function (tag) {
 };
 var $elm_community$typed_svg$TypedSvg$Core$node = $elm$virtual_dom$VirtualDom$nodeNS('http://www.w3.org/2000/svg');
 var $elm_community$typed_svg$TypedSvg$svg = $elm_community$typed_svg$TypedSvg$Core$node('svg');
+var $elm_community$typed_svg$TypedSvg$Types$Paint = function (a) {
+	return {$: 'Paint', a: a};
+};
+var $avh4$elm_color$Color$toCssString = function (_v0) {
+	var r = _v0.a;
+	var g = _v0.b;
+	var b = _v0.c;
+	var a = _v0.d;
+	var roundTo = function (x) {
+		return $elm$core$Basics$round(x * 1000) / 1000;
+	};
+	var pct = function (x) {
+		return $elm$core$Basics$round(x * 10000) / 100;
+	};
+	return $elm$core$String$concat(
+		_List_fromArray(
+			[
+				'rgba(',
+				$elm$core$String$fromFloat(
+				pct(r)),
+				'%,',
+				$elm$core$String$fromFloat(
+				pct(g)),
+				'%,',
+				$elm$core$String$fromFloat(
+				pct(b)),
+				'%,',
+				$elm$core$String$fromFloat(
+				roundTo(a)),
+				')'
+			]));
+};
+var $elm_community$typed_svg$TypedSvg$TypesToStrings$paintToString = function (paint) {
+	switch (paint.$) {
+		case 'Paint':
+			var color = paint.a;
+			return $avh4$elm_color$Color$toCssString(color);
+		case 'Reference':
+			var string = paint.a;
+			return $elm$core$String$concat(
+				_List_fromArray(
+					['url(#', string, ')']));
+		case 'ContextFill':
+			return 'context-fill';
+		case 'ContextStroke':
+			return 'context-stroke';
+		default:
+			return 'none';
+	}
+};
+var $elm_community$typed_svg$TypedSvg$Attributes$fill = A2(
+	$elm$core$Basics$composeL,
+	$elm_community$typed_svg$TypedSvg$Core$attribute('fill'),
+	$elm_community$typed_svg$TypedSvg$TypesToStrings$paintToString);
+var $elm_community$typed_svg$TypedSvg$rect = $elm_community$typed_svg$TypedSvg$Core$node('rect');
+var $elm_community$typed_svg$TypedSvg$Attributes$width = function (length) {
+	return A2(
+		$elm_community$typed_svg$TypedSvg$Core$attribute,
+		'width',
+		$elm_community$typed_svg$TypedSvg$TypesToStrings$lengthToString(length));
+};
+var $author$project$Simulation$viewBackground = F3(
+	function (width, height, color) {
+		return A2(
+			$elm_community$typed_svg$TypedSvg$rect,
+			_List_fromArray(
+				[
+					$elm_community$typed_svg$TypedSvg$Attributes$width(
+					$elm_community$typed_svg$TypedSvg$Types$px(width)),
+					$elm_community$typed_svg$TypedSvg$Attributes$height(
+					$elm_community$typed_svg$TypedSvg$Types$px(height)),
+					$elm_community$typed_svg$TypedSvg$Attributes$fill(
+					$elm_community$typed_svg$TypedSvg$Types$Paint(color))
+				]),
+			_List_Nil);
+	});
 var $elm_community$typed_svg$TypedSvg$Attributes$viewBox = F4(
 	function (minX, minY, vWidth, vHeight) {
 		return A2(
@@ -15778,61 +15854,7 @@ var $author$project$Simulation$viewContextMenu = function (model) {
 				A2($author$project$Simulation$viewFieldContextMenu, $author$project$Utils$styles.button, model));
 	}
 };
-var $elm_community$typed_svg$TypedSvg$Types$Paint = function (a) {
-	return {$: 'Paint', a: a};
-};
 var $elm_community$typed_svg$TypedSvg$Types$PaintNone = {$: 'PaintNone'};
-var $avh4$elm_color$Color$toCssString = function (_v0) {
-	var r = _v0.a;
-	var g = _v0.b;
-	var b = _v0.c;
-	var a = _v0.d;
-	var roundTo = function (x) {
-		return $elm$core$Basics$round(x * 1000) / 1000;
-	};
-	var pct = function (x) {
-		return $elm$core$Basics$round(x * 10000) / 100;
-	};
-	return $elm$core$String$concat(
-		_List_fromArray(
-			[
-				'rgba(',
-				$elm$core$String$fromFloat(
-				pct(r)),
-				'%,',
-				$elm$core$String$fromFloat(
-				pct(g)),
-				'%,',
-				$elm$core$String$fromFloat(
-				pct(b)),
-				'%,',
-				$elm$core$String$fromFloat(
-				roundTo(a)),
-				')'
-			]));
-};
-var $elm_community$typed_svg$TypedSvg$TypesToStrings$paintToString = function (paint) {
-	switch (paint.$) {
-		case 'Paint':
-			var color = paint.a;
-			return $avh4$elm_color$Color$toCssString(color);
-		case 'Reference':
-			var string = paint.a;
-			return $elm$core$String$concat(
-				_List_fromArray(
-					['url(#', string, ')']));
-		case 'ContextFill':
-			return 'context-fill';
-		case 'ContextStroke':
-			return 'context-stroke';
-		default:
-			return 'none';
-	}
-};
-var $elm_community$typed_svg$TypedSvg$Attributes$fill = A2(
-	$elm$core$Basics$composeL,
-	$elm_community$typed_svg$TypedSvg$Core$attribute('fill'),
-	$elm_community$typed_svg$TypedSvg$TypesToStrings$paintToString);
 var $elm_community$typed_svg$TypedSvg$g = $elm_community$typed_svg$TypedSvg$Core$node('g');
 var $elm_community$typed_svg$TypedSvg$Attributes$points = function (pts) {
 	var pointToString = function (_v0) {
@@ -16573,12 +16595,6 @@ var $author$project$Simulation$viewFieldSource = F3(
 				}()
 				]));
 	});
-var $elm_community$typed_svg$TypedSvg$Attributes$width = function (length) {
-	return A2(
-		$elm_community$typed_svg$TypedSvg$Core$attribute,
-		'width',
-		$elm_community$typed_svg$TypedSvg$TypesToStrings$lengthToString(length));
-};
 var $author$project$Simulation$view = function (model) {
 	return A2(
 		$mdgriffith$elm_ui$Element$layout,
@@ -16590,9 +16606,7 @@ var $author$project$Simulation$view = function (model) {
 				$mdgriffith$elm_ui$Element$Font$size(16),
 				$mdgriffith$elm_ui$Element$Font$family(
 				_List_fromArray(
-					[$mdgriffith$elm_ui$Element$Font$monospace])),
-				$mdgriffith$elm_ui$Element$Background$color(
-				$author$project$Utils$toElmUiColor(model.settings.colors.background))
+					[$mdgriffith$elm_ui$Element$Font$monospace]))
 			]),
 		A2(
 			$mdgriffith$elm_ui$Element$el,
@@ -16617,15 +16631,18 @@ var $author$project$Simulation$view = function (model) {
 							$elm_community$typed_svg$TypedSvg$Attributes$id('modelSvg'),
 							$mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onContextMenu($author$project$Simulation$ShowGeneralContextMenu)
 						]),
-					_Utils_ap(
-						A2(
-							$elm$core$List$map,
-							$author$project$Simulation$viewFieldLines(model.settings),
-							model.fields),
-						A2(
-							$elm$core$List$map,
-							A2($author$project$Simulation$viewFieldSource, model.activeSourceId, model.settings),
-							model.fields))))));
+					A2(
+						$elm$core$List$cons,
+						A3($author$project$Simulation$viewBackground, model.width, model.height, model.settings.colors.background),
+						_Utils_ap(
+							A2(
+								$elm$core$List$map,
+								$author$project$Simulation$viewFieldLines(model.settings),
+								model.fields),
+							A2(
+								$elm$core$List$map,
+								A2($author$project$Simulation$viewFieldSource, model.activeSourceId, model.settings),
+								model.fields)))))));
 };
 var $author$project$Main$DownloadPopUp = {$: 'DownloadPopUp'};
 var $author$project$Main$HelpPopUp = {$: 'HelpPopUp'};
