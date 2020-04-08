@@ -1044,9 +1044,7 @@ updateGlobalSettings func model =
       }
   in
   { updatedModel
-    | pendingSettings =
-      updatedSettings
-    , popUp =
+    | popUp =
       SettingsPopUp
   }
 

@@ -481,13 +481,14 @@ encodeModel { name, fields, activeSourceId, nextId, settings, width, height } =
       ]
 
     encodeSettings : Settings -> Encode.Value
-    encodeSettings { magnitude, r, density, steps, delta, colors } =
+    encodeSettings { magnitude, r, density, steps, delta, showSourceValue, colors } =
       Encode.object
       [ ("magnitude", Encode.float magnitude)
       , ("r", Encode.float r)
       , ("density", Encode.int density)
       , ("steps", Encode.int steps)
       , ("delta", Encode.float delta)
+      , ("showSourceValue", Encode.bool showSourceValue)
       , ("colors", encodeSettingColors colors)
       ]
     encodeMaybeId : Maybe Id -> Encode.Value
