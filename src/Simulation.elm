@@ -888,7 +888,6 @@ view model =
     , Font.family
       [ Font.monospace
       ]
-    , Background.color <| toElmUiColor model.settings.colors.background
     ] <|
     E.el
       [ E.inFront <| viewContextMenu model
@@ -903,10 +902,20 @@ view model =
         , Attributes.id "modelSvg"
         , Mouse.onContextMenu ShowGeneralContextMenu
         ] <|
-        List.map (viewFieldLines model.settings) model.fields
+        viewBackground model.width model.height model.settings.colors.background
+        :: List.map (viewFieldLines model.settings) model.fields
         ++ List.map (viewFieldSource model.activeSourceId model.settings) model.fields
       )
 
+
+viewBackground : Float -> Float -> Color -> Svg Msg
+viewBackground width height color =
+  Svg.rect
+    [ Attributes.width <| px width
+    , Attributes.height <| px height
+    , Attributes.fill <| Paint color
+    ]
+    []
 
 viewContextMenu : Model -> E.Element Msg
 viewContextMenu model =
