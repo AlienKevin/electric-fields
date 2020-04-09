@@ -110,9 +110,9 @@ type alias Charge =
 defaultSettings : Settings
 defaultSettings =
   { r = 10.0
-  , density = 30
-  , steps = 900
-  , delta = 1
+  , density = 20
+  , steps = 450
+  , delta = 2
   , magnitude = 1.0
   , showSourceValue = True
   , colors =

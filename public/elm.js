@@ -6852,12 +6852,12 @@ var $avh4$elm_color$Color$orange = A4($avh4$elm_color$Color$RgbaSpace, 245 / 255
 var $avh4$elm_color$Color$white = A4($avh4$elm_color$Color$RgbaSpace, 255 / 255, 255 / 255, 255 / 255, 1.0);
 var $author$project$Simulation$defaultSettings = {
 	colors: {background: $avh4$elm_color$Color$white, negativeCharge: $avh4$elm_color$Color$blue, negativeLine: $avh4$elm_color$Color$black, positiveCharge: $avh4$elm_color$Color$orange, positiveLine: $avh4$elm_color$Color$black},
-	delta: 1,
-	density: 30,
+	delta: 2,
+	density: 20,
 	magnitude: 1.0,
 	r: 10.0,
 	showSourceValue: true,
-	steps: 900
+	steps: 450
 };
 var $author$project$Main$defaultSimulationHeight = 750;
 var $author$project$Main$defaultSimulationWidth = 1200;
