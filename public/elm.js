@@ -15901,7 +15901,9 @@ var $author$project$Utils$styles = {
 			A2($mdgriffith$elm_ui$Element$Border$widthXY, 2, 1),
 			$mdgriffith$elm_ui$Element$Border$color($author$project$Utils$colors.darkGrey)
 		]),
-	padTop: $mdgriffith$elm_ui$Element$htmlAttribute(
+	padTop10: $mdgriffith$elm_ui$Element$htmlAttribute(
+		A2($elm$html$Html$Attributes$style, 'margin-top', '10px')),
+	padTop20: $mdgriffith$elm_ui$Element$htmlAttribute(
 		A2($elm$html$Html$Attributes$style, 'margin-top', '20px')),
 	tab: _List_fromArray(
 		[
@@ -17053,18 +17055,177 @@ var $author$project$Main$viewButtonNoProp = F2(
 			});
 	});
 var $author$project$Main$UpdateActiveSimulationState = {$: 'UpdateActiveSimulationState'};
+var $elm$svg$Svg$Attributes$class = _VirtualDom_attribute('class');
+var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
+var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
+var $1602$elm_feather$FeatherIcons$Icon = function (a) {
+	return {$: 'Icon', a: a};
+};
+var $1602$elm_feather$FeatherIcons$defaultAttributes = function (name) {
+	return {
+		_class: $elm$core$Maybe$Just('feather feather-' + name),
+		size: 24,
+		sizeUnit: '',
+		strokeWidth: 2,
+		viewBox: '0 0 24 24'
+	};
+};
+var $1602$elm_feather$FeatherIcons$makeBuilder = F2(
+	function (name, src) {
+		return $1602$elm_feather$FeatherIcons$Icon(
+			{
+				attrs: $1602$elm_feather$FeatherIcons$defaultAttributes(name),
+				src: src
+			});
+	});
+var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
+var $elm$svg$Svg$rect = $elm$svg$Svg$trustedNode('rect');
+var $elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
+var $elm$svg$Svg$Attributes$strokeLinecap = _VirtualDom_attribute('stroke-linecap');
+var $elm$svg$Svg$Attributes$strokeLinejoin = _VirtualDom_attribute('stroke-linejoin');
+var $elm$svg$Svg$Attributes$strokeWidth = _VirtualDom_attribute('stroke-width');
+var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
+var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
+var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
+var $elm$svg$Svg$Attributes$x = _VirtualDom_attribute('x');
+var $1602$elm_feather$FeatherIcons$xmlns = function (s) {
+	return A2(
+		$elm$virtual_dom$VirtualDom$property,
+		'xmlns',
+		$elm$json$Json$Encode$string(s));
+};
+var $elm$svg$Svg$Attributes$y = _VirtualDom_attribute('y');
+var $1602$elm_feather$FeatherIcons$pause = A2(
+	$1602$elm_feather$FeatherIcons$makeBuilder,
+	'pause',
+	_List_fromArray(
+		[
+			A2(
+			$elm$svg$Svg$svg,
+			_List_fromArray(
+				[
+					$1602$elm_feather$FeatherIcons$xmlns('http://www.w3.org/2000/svg'),
+					$elm$svg$Svg$Attributes$width('24'),
+					$elm$svg$Svg$Attributes$height('24'),
+					$elm$svg$Svg$Attributes$viewBox('0 0 24 24'),
+					$elm$svg$Svg$Attributes$fill('none'),
+					$elm$svg$Svg$Attributes$stroke('currentColor'),
+					$elm$svg$Svg$Attributes$strokeWidth('2'),
+					$elm$svg$Svg$Attributes$strokeLinecap('round'),
+					$elm$svg$Svg$Attributes$strokeLinejoin('round'),
+					$elm$svg$Svg$Attributes$class('feather feather-pause')
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$svg$Svg$rect,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$x('6'),
+							$elm$svg$Svg$Attributes$y('4'),
+							$elm$svg$Svg$Attributes$width('4'),
+							$elm$svg$Svg$Attributes$height('16')
+						]),
+					_List_Nil),
+					A2(
+					$elm$svg$Svg$rect,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$x('14'),
+							$elm$svg$Svg$Attributes$y('4'),
+							$elm$svg$Svg$Attributes$width('4'),
+							$elm$svg$Svg$Attributes$height('16')
+						]),
+					_List_Nil)
+				]))
+		]));
+var $elm$svg$Svg$Attributes$points = _VirtualDom_attribute('points');
+var $elm$svg$Svg$polygon = $elm$svg$Svg$trustedNode('polygon');
+var $1602$elm_feather$FeatherIcons$play = A2(
+	$1602$elm_feather$FeatherIcons$makeBuilder,
+	'play',
+	_List_fromArray(
+		[
+			A2(
+			$elm$svg$Svg$svg,
+			_List_fromArray(
+				[
+					$1602$elm_feather$FeatherIcons$xmlns('http://www.w3.org/2000/svg'),
+					$elm$svg$Svg$Attributes$width('24'),
+					$elm$svg$Svg$Attributes$height('24'),
+					$elm$svg$Svg$Attributes$viewBox('0 0 24 24'),
+					$elm$svg$Svg$Attributes$fill('none'),
+					$elm$svg$Svg$Attributes$stroke('currentColor'),
+					$elm$svg$Svg$Attributes$strokeWidth('2'),
+					$elm$svg$Svg$Attributes$strokeLinecap('round'),
+					$elm$svg$Svg$Attributes$strokeLinejoin('round'),
+					$elm$svg$Svg$Attributes$class('feather feather-play')
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$svg$Svg$polygon,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$points('5 3 19 12 5 21 5 3')
+						]),
+					_List_Nil)
+				]))
+		]));
+var $elm$svg$Svg$map = $elm$virtual_dom$VirtualDom$map;
+var $1602$elm_feather$FeatherIcons$toHtml = F2(
+	function (attributes, _v0) {
+		var src = _v0.a.src;
+		var attrs = _v0.a.attrs;
+		var strSize = $elm$core$String$fromFloat(attrs.size);
+		var baseAttributes = _List_fromArray(
+			[
+				$elm$svg$Svg$Attributes$fill('none'),
+				$elm$svg$Svg$Attributes$height(
+				_Utils_ap(strSize, attrs.sizeUnit)),
+				$elm$svg$Svg$Attributes$width(
+				_Utils_ap(strSize, attrs.sizeUnit)),
+				$elm$svg$Svg$Attributes$stroke('currentColor'),
+				$elm$svg$Svg$Attributes$strokeLinecap('round'),
+				$elm$svg$Svg$Attributes$strokeLinejoin('round'),
+				$elm$svg$Svg$Attributes$strokeWidth(
+				$elm$core$String$fromFloat(attrs.strokeWidth)),
+				$elm$svg$Svg$Attributes$viewBox(attrs.viewBox)
+			]);
+		var combinedAttributes = _Utils_ap(
+			function () {
+				var _v1 = attrs._class;
+				if (_v1.$ === 'Just') {
+					var c = _v1.a;
+					return A2(
+						$elm$core$List$cons,
+						$elm$svg$Svg$Attributes$class(c),
+						baseAttributes);
+				} else {
+					return baseAttributes;
+				}
+			}(),
+			attributes);
+		return A2(
+			$elm$svg$Svg$svg,
+			combinedAttributes,
+			A2(
+				$elm$core$List$map,
+				$elm$svg$Svg$map($elm$core$Basics$never),
+				src));
+	});
 var $author$project$Main$viewUpdateStateButton = function (model) {
 	return A2(
 		$mdgriffith$elm_ui$Element$Input$button,
 		$author$project$Utils$styles.button,
 		{
-			label: $author$project$Utils$centeredText(
+			label: $mdgriffith$elm_ui$Element$html(
 				function () {
 					var _v0 = model.activeSimulation.state;
 					if (_v0.$ === 'Running') {
-						return 'Stop';
+						return A2($1602$elm_feather$FeatherIcons$toHtml, _List_Nil, $1602$elm_feather$FeatherIcons$pause);
 					} else {
-						return 'Run';
+						return A2($1602$elm_feather$FeatherIcons$toHtml, _List_Nil, $1602$elm_feather$FeatherIcons$play);
 					}
 				}()),
 			onPress: $elm$core$Maybe$Just($author$project$Main$UpdateActiveSimulationState)
@@ -17077,7 +17238,7 @@ var $author$project$Main$viewControlPanel = function (model) {
 			[
 				$mdgriffith$elm_ui$Element$centerX,
 				$mdgriffith$elm_ui$Element$spacing(10),
-				$author$project$Utils$styles.padTop
+				$author$project$Utils$styles.padTop10
 			]),
 		_List_fromArray(
 			[
@@ -17227,7 +17388,7 @@ var $author$project$Main$textHeader = function (text) {
 	return A2(
 		$mdgriffith$elm_ui$Element$el,
 		_List_fromArray(
-			[$author$project$Utils$styles.padTop, $mdgriffith$elm_ui$Element$Font$bold]),
+			[$author$project$Utils$styles.padTop20, $mdgriffith$elm_ui$Element$Font$bold]),
 		$mdgriffith$elm_ui$Element$text(text));
 };
 var $author$project$Main$viewDownloadPopUp = A3(
@@ -17269,7 +17430,7 @@ var $author$project$Main$viewDownloadPopUp = A3(
 			A2(
 			$mdgriffith$elm_ui$Element$el,
 			_List_fromArray(
-				[$author$project$Utils$styles.padTop, $mdgriffith$elm_ui$Element$alignRight]),
+				[$author$project$Utils$styles.padTop20, $mdgriffith$elm_ui$Element$alignRight]),
 			A2(
 				$mdgriffith$elm_ui$Element$Input$button,
 				$author$project$Utils$styles.button,
@@ -17299,7 +17460,7 @@ var $author$project$Main$viewHelpPopUp = A3(
 			A2(
 			$mdgriffith$elm_ui$Element$el,
 			_List_fromArray(
-				[$author$project$Utils$styles.padTop, $mdgriffith$elm_ui$Element$alignRight]),
+				[$author$project$Utils$styles.padTop20, $mdgriffith$elm_ui$Element$alignRight]),
 			A2(
 				$mdgriffith$elm_ui$Element$Input$button,
 				$author$project$Utils$styles.button,
@@ -18350,17 +18511,11 @@ var $simonh1000$elm_colorpicker$ColorPicker$OnMouseMove = F2(
 	function (a, b) {
 		return {$: 'OnMouseMove', a: a, b: b};
 	});
-var $elm$svg$Svg$Attributes$class = _VirtualDom_attribute('class');
-var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
 var $elm$svg$Svg$defs = $elm$svg$Svg$trustedNode('defs');
-var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
-var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
 var $elm$svg$Svg$Attributes$id = _VirtualDom_attribute('id');
 var $elm$svg$Svg$linearGradient = $elm$svg$Svg$trustedNode('linearGradient');
 var $elm$svg$Svg$Attributes$offset = _VirtualDom_attribute('offset');
-var $elm$svg$Svg$rect = $elm$svg$Svg$trustedNode('rect');
 var $elm$svg$Svg$Attributes$display = _VirtualDom_attribute('display');
-var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
 var $simonh1000$elm_colorpicker$ColorPicker$sliderStyles = _List_fromArray(
 	[
 		$elm$svg$Svg$Attributes$width(
@@ -18371,7 +18526,6 @@ var $simonh1000$elm_colorpicker$ColorPicker$sliderStyles = _List_fromArray(
 var $elm$svg$Svg$stop = $elm$svg$Svg$trustedNode('stop');
 var $elm$svg$Svg$Attributes$stopColor = _VirtualDom_attribute('stop-color');
 var $elm$svg$Svg$Attributes$stopOpacity = _VirtualDom_attribute('stop-opacity');
-var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
 var $simonh1000$elm_colorpicker$ColorPicker$OnClick = F2(
 	function (a, b) {
 		return {$: 'OnClick', a: a, b: b};
@@ -18434,10 +18588,8 @@ var $simonh1000$elm_colorpicker$ColorPicker$svgDragAttrs = F3(
 			$simonh1000$elm_colorpicker$ColorPicker$onMouseMoveSvg(onMoveMsg),
 			common) : common;
 	});
-var $elm$svg$Svg$Attributes$x = _VirtualDom_attribute('x');
 var $elm$svg$Svg$Attributes$x1 = _VirtualDom_attribute('x1');
 var $elm$svg$Svg$Attributes$x2 = _VirtualDom_attribute('x2');
-var $elm$svg$Svg$Attributes$y = _VirtualDom_attribute('y');
 var $elm$svg$Svg$Attributes$y1 = _VirtualDom_attribute('y1');
 var $elm$svg$Svg$Attributes$y2 = _VirtualDom_attribute('y2');
 var $simonh1000$elm_colorpicker$ColorPicker$huePalette = function (mouseTarget) {
@@ -18894,7 +19046,7 @@ var $author$project$Main$viewSettingsPopUp = function (model) {
 				_List_fromArray(
 					[
 						$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill),
-						$author$project$Utils$styles.padTop
+						$author$project$Utils$styles.padTop20
 					]),
 				_List_fromArray(
 					[
@@ -19015,7 +19167,7 @@ var $author$project$Main$viewSettingsPopUp = function (model) {
 				A2(
 				$mdgriffith$elm_ui$Element$el,
 				_List_fromArray(
-					[$author$project$Utils$styles.padTop, $mdgriffith$elm_ui$Element$alignRight]),
+					[$author$project$Utils$styles.padTop20, $mdgriffith$elm_ui$Element$alignRight]),
 				A2(
 					$mdgriffith$elm_ui$Element$Input$button,
 					$author$project$Utils$styles.button,
@@ -19091,7 +19243,7 @@ var $author$project$Main$viewUploadPopUp = function (model) {
 				_Utils_ap(
 					$author$project$Utils$styles.button,
 					_List_fromArray(
-						[$author$project$Utils$styles.padTop, $mdgriffith$elm_ui$Element$alignRight])),
+						[$author$project$Utils$styles.padTop20, $mdgriffith$elm_ui$Element$alignRight])),
 				{
 					label: $author$project$Utils$centeredText('Close'),
 					onPress: $elm$core$Maybe$Just($author$project$Main$CloseUploadPopUp)

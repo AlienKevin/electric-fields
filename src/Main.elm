@@ -21,6 +21,7 @@ import File.Download
 import Task
 import ColorPicker
 import Color
+import FeatherIcons
 import Utils exposing (styles, colors, centeredText, toElmUiColor)
 
 
@@ -480,7 +481,7 @@ viewControlPanel model =
   E.row
     [ E.centerX
     , E.spacing 10
-    , styles.padTop
+    , styles.padTop10
     ]
     [ viewButtonNoProp "Help" <| ShowPopUp HelpPopUp
     , viewButtonNoProp "Settings" <| ShowPopUp SettingsPopUp
@@ -496,12 +497,13 @@ viewUpdateStateButton model =
     { onPress =
       Just UpdateActiveSimulationState
     , label =
-      centeredText <|
-        case model.activeSimulation.state of
+        E.html <| case model.activeSimulation.state of
           Simulation.Running ->
-            "Stop"
+            FeatherIcons.pause
+              |> FeatherIcons.toHtml []
           Simulation.Resting ->
-            "Run"
+            FeatherIcons.play
+              |> FeatherIcons.toHtml []
     }
 
 
@@ -576,7 +578,7 @@ viewSettingsPopUp model =
     }
   , E.row
     [ E.width E.fill
-    , styles.padTop
+    , styles.padTop20
     ]
     [ Input.button (styles.button ++ [E.alignLeft])
       { onPress =
@@ -633,7 +635,7 @@ viewSettingsPopUp model =
     , E.html <| (ColorPicker.view settings.colors.background model.backgroundColorPicker
       |> Html.map (PickSimulationColors "background"))
     ]
-  , E.el [ styles.padTop, E.alignRight ] <|
+  , E.el [ styles.padTop20, E.alignRight ] <|
       Input.button
         styles.button
         { onPress = Just CloseSettingsPopUp
@@ -676,7 +678,7 @@ viewHelpPopUp =
     , textHeader "When you mouse over background and ..."
     , E.text "  Right Click:  * add + charge"
     , E.text "                * add - charge"
-    , E.el [ styles.padTop, E.alignRight ] <|
+    , E.el [ styles.padTop20, E.alignRight ] <|
       Input.button
         styles.button
         { onPress = Just CloseHelpPopUp
@@ -702,7 +704,7 @@ viewDownloadPopUp =
       , label = centeredText "Downloas as JSON"
       }
     , E.el
-      [ styles.padTop
+      [ styles.padTop20
       , E.alignRight
       ] <|
       Input.button styles.button
@@ -737,7 +739,7 @@ viewUploadPopUp model =
             ]
       UploadPending ->
         E.none
-    , Input.button (styles.button ++ [ styles.padTop, E.alignRight])
+    , Input.button (styles.button ++ [ styles.padTop20, E.alignRight])
       { onPress =
         Just CloseUploadPopUp
       , label =
@@ -774,7 +776,7 @@ viewPopUpOf title attributes content =
 textHeader : String -> E.Element Msg
 textHeader text =
   E.el
-    [ styles.padTop
+    [ styles.padTop20
     , Font.bold
     ] <|
     E.text text

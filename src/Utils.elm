@@ -27,11 +27,6 @@ colors =
   }
 
 
-styles :
-  { button : List (E.Attribute msg)
-  , tab : List (E.Attribute msg)
-  , padTop : E.Attribute msg
-  }
 styles =
   { button =
     [ Background.color colors.lightGrey
@@ -60,8 +55,10 @@ styles =
       , bottomRight = 0
       }
     ]
-  , padTop =
-      E.htmlAttribute <| Html.Attributes.style "margin-top" "20px"
+  , padTop10 =
+    E.htmlAttribute <| Html.Attributes.style "margin-top" "10px"
+  , padTop20 =
+    E.htmlAttribute <| Html.Attributes.style "margin-top" "20px"
   }
 
 
