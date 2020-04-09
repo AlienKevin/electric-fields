@@ -86,6 +86,7 @@ type Msg
   | WindowResized Int Int
   | ToggleShowSourceValue Bool
   | PickSimulationColors String ColorPicker.Msg
+  | UpdateActiveSimulationState
   | DoNothing
   
 
@@ -163,7 +164,7 @@ view model =
     E.el
       [ E.above <| viewTabs model
       , E.inFront <| viewPopUp model
-      , E.below <| viewControlPanel
+      , E.below <| viewControlPanel model
       , E.centerX
       , E.centerY
       ]
@@ -306,6 +307,9 @@ update message model =
 
     PickSimulationColors part msg ->
       (pickSimulationColors part msg model, Cmd.none)
+
+    UpdateActiveSimulationState ->
+      (updateActiveSimulationState model, Cmd.none)
 
     DoNothing ->
       (model, Cmd.none)
@@ -471,8 +475,8 @@ getNextSimulation current simulations =
   next
 
 
-viewControlPanel : E.Element Msg
-viewControlPanel =
+viewControlPanel : Model -> E.Element Msg
+viewControlPanel model =
   E.row
     [ E.centerX
     , E.spacing 10
@@ -480,9 +484,25 @@ viewControlPanel =
     ]
     [ viewButtonNoProp "Help" <| ShowPopUp HelpPopUp
     , viewButtonNoProp "Settings" <| ShowPopUp SettingsPopUp
+    , viewUpdateStateButton model
     , viewButtonNoProp "Download" <| ShowPopUp DownloadPopUp
     , viewButtonNoProp "Upload" <| ShowPopUp UploadPopUp
     ]
+
+
+viewUpdateStateButton : Model -> E.Element Msg
+viewUpdateStateButton model =
+  Input.button styles.button
+    { onPress =
+      Just UpdateActiveSimulationState
+    , label =
+      centeredText <|
+        case model.activeSimulation.state of
+          Simulation.Running ->
+            "Stop"
+          Simulation.Resting ->
+            "Run"
+    }
 
 
 viewButtonNoProp : String -> Msg -> E.Element Msg
@@ -1041,6 +1061,26 @@ pickSimulationColors part msg model =
     )
     updatedModel
 
+
+updateActiveSimulationState : Model -> Model
+updateActiveSimulationState model =
+  let
+    activeSimulation =
+      model.activeSimulation
+    nextState =
+      case activeSimulation.state of
+        Simulation.Running ->
+          Simulation.Resting
+        Simulation.Resting ->
+          Simulation.Running
+  in
+  { model
+    | activeSimulation =
+      { activeSimulation
+        | state =
+          nextState
+      }
+  }
 
 
 updateGlobalSettings : (Simulation.Settings -> Simulation.Settings) -> Model -> Model

@@ -1,14 +1,15 @@
-module Simulation exposing (Model, Msg, Settings, init, view, update, subscriptions, encodeModel, decodeModel, calculateFields, defaultName, defaultSettings)
+module Simulation exposing (Model, Msg, Settings, State(..), init, view, update, subscriptions, encodeModel, decodeModel, calculateFields, defaultName, defaultSettings)
 
 import Html exposing (Html)
 import Html.Attributes
 import Html.Events
+import Browser.Events
 import Color exposing (Color)
 import TypedSvg as Svg
 import TypedSvg.Attributes as Attributes
 import TypedSvg.Core exposing (Svg)
 import TypedSvg.Types exposing (px, Paint(..))
-import Math.Vector2 as Vector2
+import Math.Vector2 as Vector2 exposing (Vec2, vec2)
 import Draggable
 import Draggable.Events
 import Json.Decode as Decode exposing (Decoder)
@@ -17,13 +18,12 @@ import Json.Encode as Encode
 import Element as E
 import Element.Input as Input
 import Element.Font as Font
-import Element.Background as Background
 import Element.Events
 import Html.Events.Extra.Mouse as Mouse
 import Process
 import Task
 import Round
-import Utils exposing (styles, toElmUiColor)
+import Utils exposing (styles)
 
 
 type alias Model =
@@ -36,9 +36,15 @@ type alias Model =
   , settings : Settings
   , isWheeling : Bool
   , isWheelingTimeOutCleared : Bool
+  , state: State
   , width : Float
   , height : Float
   }
+
+
+type State
+  = Resting
+  | Running
 
 
 type alias Settings =
@@ -95,8 +101,8 @@ type alias Charge =
   { id : Id
   , sign: Sign
   , magnitude: Float
-  , x: Float
-  , y: Float
+  , position : Vec2
+  , velocity : Vec2
   , r: Float
   }
 
@@ -140,34 +146,35 @@ type Msg
   | AddPositiveCharge Position
   | AddNegativeCharge Position
   | StopWheelingTimeOut
+  | Step Float
 
 
 init : Float -> Float -> Model
 init width height =
   let
     defaultFields =
-      [{ source = { id = 0, sign = Negative, magnitude = 3.0, x = 465.0, y = 270.0, r = 10.0 }
-      , density = 30
-      , steps = 900
-      , delta = 1
+      [{ source = { id = 0, sign = Negative, magnitude = 3.0, position = vec2 465.0 270.0, velocity = vec2 0 0, r = 10.0 }
+      , density = 20
+      , steps = 450
+      , delta = 2
       , lines = []
       }
-      , { source = { id = 1, sign = Positive, magnitude = 1.0, x = 618.0, y = 515.0, r = 10.0 }
-      , density = 30
-      , steps = 900
-      , delta = 1
+      , { source = { id = 1, sign = Positive, magnitude = 1.0, position = vec2 618.0 515.0, velocity = vec2 0 0, r = 10.0 }
+      , density = 20
+      , steps = 450
+      , delta = 2
       , lines = []
       }
-      , { source = { id = 2, sign = Positive, magnitude = 10.0, x = 553.0, y = 338.0, r = 10.0 }
-      , density = 30
-      , steps = 900
-      , delta = 1
+      , { source = { id = 2, sign = Positive, magnitude = 10.0, position = vec2 553.0 338.0, velocity = vec2 0 0, r = 10.0 }
+      , density = 20
+      , steps = 450
+      , delta = 2
       , lines = []
       }
-      , { source = { id = 3, sign = Negative, magnitude = 20.0, x = 597.0, y = 182.0, r = 10.0 }
-      , density = 30
-      , steps = 900
-      , delta = 1
+      , { source = { id = 3, sign = Negative, magnitude = 20.0, position = vec2 597.0 182.0, velocity = vec2 0 0, r = 10.0 }
+      , density = 20
+      , steps = 450
+      , delta = 2
       , lines = []
       }
       ]
@@ -185,6 +192,7 @@ init width height =
       , isWheelingTimeOutCleared = False
       , width = width
       , height = height
+      , state = Resting
       }
   in
   defaultModel
@@ -203,17 +211,19 @@ calculateFields width height fields =
               let
                 angle =
                   deltaAngle * index
-                x =
-                  field.source.x + field.source.r * cos angle
-                y =
-                  field.source.y + field.source.r * sin angle
+                dx =
+                  field.source.r * cos angle
+                dy =
+                  field.source.r * sin angle
+                start =
+                  Vector2.add (vec2 dx dy) field.source.position 
               in
               calculateFieldLine
                 { charges = List.map .source fields
                 , steps = field.steps
                 , delta = field.delta
                 , sourceSign = field.source.sign
-                , start = (x, y)
+                , start = (Vector2.getX start, Vector2.getY start)
                 , xBound = width
                 , yBound = height
                 }
@@ -246,6 +256,8 @@ calculateFieldLine { charges, steps, delta, sourceSign, start, xBound, yBound } 
               prev
             _ ->
               (0, 0) -- impossible
+        previousPosition =
+          vec2 x y
         outOfBounds =
           x > xBound || x < 0 || y > yBound || y < 0
         netField =
@@ -256,7 +268,7 @@ calculateFieldLine { charges, steps, delta, sourceSign, start, xBound, yBound } 
             (\charge sum ->
               let
                 d =
-                  distance (x, y) (charge.x, charge.y) / 100
+                  Vector2.distance previousPosition charge.position / 100
                 magnitude =
                   charge.magnitude / (d ^ 2)
                 sign =
@@ -268,7 +280,7 @@ calculateFieldLine { charges, steps, delta, sourceSign, start, xBound, yBound } 
                 field =
                   Vector2.scale (sign * magnitude) <|
                     Vector2.normalize <|
-                      Vector2.vec2 (x - charge.x) (y - charge.y)
+                      Vector2.sub previousPosition charge.position
               in
               Vector2.add sum field
             )
@@ -366,6 +378,9 @@ update msg model =
     AddNegativeCharge position ->
       (addCharge Negative position model, Cmd.none)
 
+    Step delta ->
+      (step delta model, Cmd.none)
+
 
 onDragBy : Position -> Model -> Model
 onDragBy offsetPos model =
@@ -441,14 +456,20 @@ encodeModel { name, fields, activeSourceId, nextId, settings, width, height } =
         Negative ->
           Encode.string "Negative"
 
+    encodeVector2 : Vec2 -> Encode.Value
+    encodeVector2 vec =
+      Encode.object
+        [ ("x", Encode.float <| Vector2.getX vec)
+        , ("y", Encode.float <| Vector2.getY vec)
+        ]
+
     encodeCharge : Charge -> Encode.Value
-    encodeCharge { id, sign, magnitude, x, y, r } =
+    encodeCharge { id, sign, magnitude, position, r } =
       Encode.object
         [ ("id", Encode.int id)
         , ("sign", encodeSign sign)
         , ("magnitude", Encode.float magnitude)
-        , ("x", Encode.float x)
-        , ("y", Encode.float y)
+        , ("position", encodeVector2 position)
         , ("r", Encode.float r)
         ]
     
@@ -530,20 +551,26 @@ decodeModel =
               Decode.fail ("I can't recognize \"" ++ sign ++ "\". It should be either \"Postive\" or \"Negative\"")
         )
 
+    decodeVector2 =
+      Field.require "x" Decode.float <| \x ->
+      Field.require "y" Decode.float <| \y ->
+
+      Decode.succeed <|
+        vec2 x y
+
     decodeCharge =
       Field.require "id" Decode.int <| \id ->
       Field.require "sign" decodeSign <| \sign ->
       Field.require "magnitude" Decode.float <| \magnitude ->
-      Field.require "x" Decode.float <| \x ->
-      Field.require "y" Decode.float <| \y ->
+      Field.require "position" decodeVector2 <| \position ->
       Field.require "r" Decode.float <| \r ->
 
       Decode.succeed
         { id = id
         , sign = sign
         , magnitude = magnitude
-        , x = x
-        , y = y
+        , position = position
+        , velocity = vec2 0 0
         , r = r
         }
 
@@ -629,6 +656,7 @@ decodeModel =
     , contextMenu = NoContextMenu
     , isWheeling = False
     , isWheelingTimeOutCleared = False
+    , state = Resting
     }
 
 
@@ -774,8 +802,8 @@ addCharge sign (x, y) model =
     newCharge =
       { sign = sign
       , magnitude = model.settings.magnitude
-      , x = x
-      , y = y
+      , position = vec2 x y
+      , velocity = vec2 0 0
       , r = model.settings.r
       , id = model.nextId
       }
@@ -799,6 +827,121 @@ addCharge sign (x, y) model =
   }
 
 
+step : Float -> Model -> Model
+step _ model =
+  case model.state of
+    Running ->
+      move model
+    Resting ->
+      model
+
+move : Model -> Model
+move model =
+  let
+    fields =
+      model.fields
+    newFields =
+      List.map
+        (\field ->
+          let
+            force =
+              calculateElectricForce field (List.filter ((/=) field) fields)
+            newAcceleration =
+              force
+            newVelocity =
+              Vector2.toRecord <| Vector2.add newAcceleration field.source.velocity
+            newPosition =
+              Vector2.toRecord <| Vector2.add (Vector2.fromRecord newVelocity) field.source.position
+            r =
+              field.source.r
+            width =
+              model.width
+            height =
+              model.height
+            newX =
+              if newPosition.x < r then
+                r
+              else if newPosition.x > width - r then
+                width - r
+              else
+                newPosition.x
+            
+            newY =
+              if newPosition.y < r then
+                r
+              else if newPosition.y > height - r then
+                height - r
+              else
+                newPosition.y
+
+            newXVelocity =
+              if newPosition.x < r || newPosition.x > width - r then
+                -1 * newVelocity.x
+              else
+                newVelocity.x
+            
+            newYVelocity =
+              if newPosition.y < r || newPosition.y > height - r then
+                -1 * newVelocity.y
+              else
+                newVelocity.y
+            
+            source =
+              field.source
+          in
+          { field
+            | source =
+              { source
+                | position =
+                  vec2 newX newY
+                , velocity =
+                  vec2 newXVelocity newYVelocity
+              }
+          }
+        )
+        fields
+  in
+  { model
+    | fields =
+      calculateFields model.width model.height newFields
+  }
+
+
+calculateElectricForce : Field -> List Field -> Vec2
+calculateElectricForce self rests =
+  List.foldl
+    (\other netForce ->
+      let
+        d =
+          Vector2.distance self.source.position other.source.position / 100
+        forceMagnitude =
+          if d == 0 then
+            0.5
+          else
+            min 2 <| self.source.magnitude * other.source.magnitude / d ^ 2
+        forceDirection =
+          if d == 0 then
+            self.source.velocity
+          else
+            Vector2.normalize <| Vector2.sub self.source.position other.source.position
+        force =
+          Vector2.scale (sign * forceMagnitude) forceDirection
+        sign =
+          case (self.source.sign, other.source.sign) of
+            (Positive, Negative) ->
+              -1
+            (Negative, Positive) ->
+              -1
+            _ ->
+              1
+      in
+      Vector2.add force netForce
+    )
+    (Vector2.vec2 0 0)
+    rests
+
+
+
 duplicateActiveField : Model -> Model
 duplicateActiveField model =
   let
@@ -812,8 +955,8 @@ duplicateActiveField model =
           { field |
             source =
               { source
-                | x =
-                  source.x + source.r * 2 + 15
+                | position =
+                  Vector2.add (vec2 (source.r * 2 + 15) 0)source.position
                 , id =
                   model.nextId + index
               }
@@ -872,8 +1015,8 @@ dragSource (dx, dy) field =
   { field |
     source =
       { source
-        | x = field.source.x + dx
-        , y = field.source.y + dy
+        | position =
+          Vector2.add (Vector2.vec2 dx dy) source.position
       }
   }
 
@@ -949,7 +1092,7 @@ viewFieldContextMenu menuItemstyless model =
     (x, y) =
       case List.head <| getActiveFields model of
         Just field ->
-          (field.source.x, field.source.y)
+          (Vector2.getX field.source.position, Vector2.getY field.source.position)
         Nothing ->
           (0, 0) -- impossible
   in
@@ -1005,6 +1148,10 @@ viewFieldSource activeSourceId settings field =
           settings.colors.negativeCharge
     gradientId =
       "gradient" ++ String.fromInt field.source.id
+    x =
+      Vector2.getX field.source.position
+    y =
+      Vector2.getY field.source.position
   in
   Svg.g []
   [ Svg.defs []
@@ -1021,16 +1168,16 @@ viewFieldSource activeSourceId settings field =
       ]
     ]
   , Svg.circle
-    [ Attributes.cx (px field.source.x)
-    , Attributes.cy (px field.source.y)
+    [ Attributes.cx (px x)
+    , Attributes.cy (px y)
     , Attributes.r (px <| lerp 0 20 10 40 (min 20 field.source.r * field.source.magnitude / 10))
     , Attributes.fill <| Reference gradientId
     , Html.Attributes.style "pointer-events" "none"
     ]
     []
   , Svg.circle
-    ([ Attributes.cx (px field.source.x)
-    , Attributes.cy (px field.source.y)
+    ([ Attributes.cx (px x)
+    , Attributes.cy (px y)
     , Attributes.r (px field.source.r)
     , Attributes.fill <| Paint fill
     , Draggable.mouseTrigger field.source.id DragMsg
@@ -1061,8 +1208,8 @@ viewFieldSource activeSourceId settings field =
     Just id ->
       if field.source.id == id && settings.showSourceValue then
         Svg.text_
-          [ Attributes.x (px <| field.source.x - field.source.r)
-          , Attributes.y (px <| field.source.y - field.source.r - 10)
+          [ Attributes.x (px <| x - field.source.r)
+          , Attributes.y (px <| y - field.source.r - 10)
           , Attributes.stroke <| Paint Color.black
           , Attributes.id "sourceValueLabel"
           ]
@@ -1178,4 +1325,7 @@ foldlWhile accumulate initial list =
 
 subscriptions : Model -> Sub Msg
 subscriptions { drag } =
-  Draggable.subscriptions DragMsg drag
+  Sub.batch
+    [ Draggable.subscriptions DragMsg drag
+    , Browser.Events.onAnimationFrameDelta Step
+    ]
