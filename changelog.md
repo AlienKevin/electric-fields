@@ -1,3 +1,6 @@
+# 2.4.0
+Can simulate electric forces with run and pause buttons
+
 # 2.3.0
 
 Can select custom colors for
