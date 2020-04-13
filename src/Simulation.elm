@@ -1,4 +1,4 @@
-module Simulation exposing (Model, Msg, Settings, State(..), init, view, update, subscriptions, encodeModel, decodeModel, calculateFields, defaultName, defaultSettings)
+module Simulation exposing (Model, Msg, Settings, State(..), Position, Sign(..), addCharge, init, view, update, subscriptions, encodeModel, decodeModel, calculateFields, defaultName, defaultSettings)
 
 import Html exposing (Html)
 import Html.Attributes

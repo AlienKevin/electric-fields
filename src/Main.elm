@@ -5,12 +5,14 @@ import Browser.Dom
 import Browser.Events
 import Html exposing (Html)
 import Html.Events
+import Html.Events.Extra.Mouse as Mouse
 import Simulation
 import Element as E
 import Element.Input as Input
 import Element.Background as Background
 import Element.Font as Font
 import Element.Border as Border
+import Element.Events
 import Json.Encode as Encode
 import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Field as Field
@@ -21,7 +23,7 @@ import File.Download
 import Task
 import ColorPicker
 import Color
-import FeatherIcons
+import Icons
 import Utils exposing (styles, colors, centeredText, toElmUiColor)
 
 
@@ -44,6 +46,9 @@ type alias Model =
   , negativeChargeColorPicker : ColorPicker.State
   , negativeLineColorPicker : ColorPicker.State
   , backgroundColorPicker : ColorPicker.State
+  , cursor : Cursor
+  , showCursorOptions : Bool
+  , isMouseDown : Bool
   }
 
 
@@ -60,6 +65,11 @@ type UploadResult
   = UploadSuccess
   | UploadFailure Decode.Error
   | UploadPending
+
+
+type Cursor
+  = Selector
+  | Painter Simulation.Sign
 
 
 type Msg
@@ -88,6 +98,12 @@ type Msg
   | ToggleShowSourceValue Bool
   | PickSimulationColors String ColorPicker.Msg
   | UpdateActiveSimulationState
+  | UpdateCursor Cursor
+  | ShowCursorOptions
+  | HideCursorOptions
+  | DrawCharges Simulation.Position
+  | MouseDown
+  | MouseUp
   | DoNothing
   
 
@@ -144,6 +160,9 @@ init savedProject =
       , negativeChargeColorPicker = ColorPicker.empty
       , negativeLineColorPicker = ColorPicker.empty
       , backgroundColorPicker = ColorPicker.empty
+      , cursor = Selector
+      , showCursorOptions = False
+      , isMouseDown = False
       }
   in
   ( project
@@ -168,6 +187,9 @@ view model =
       , E.below <| viewControlPanel model
       , E.centerX
       , E.centerY
+      , E.htmlAttribute <| Mouse.onMove (\event -> DrawCharges event.offsetPos)
+      , E.htmlAttribute <| Mouse.onDown (\_ -> MouseDown )
+      , E.htmlAttribute <| Mouse.onUp (\_ -> MouseUp )
       ]
       (E.html (Html.map SimulationMsg <| Simulation.view model.activeSimulation))
 
@@ -311,6 +333,24 @@ update message model =
 
     UpdateActiveSimulationState ->
       (updateActiveSimulationState model, Cmd.none)
+
+    UpdateCursor newCursor ->
+      (updateCursor newCursor model, Cmd.none)
+
+    ShowCursorOptions ->
+      (showCursorOptions model, Cmd.none)
+
+    HideCursorOptions ->
+      (hideCursorOptions model, Cmd.none)
+
+    DrawCharges position ->
+      (drawCharges position model, Cmd.none)
+
+    MouseDown ->
+      (mouseDown model, Cmd.none)
+
+    MouseUp ->
+      (mouseUp model, Cmd.none)
 
     DoNothing ->
       (model, Cmd.none)
@@ -486,6 +526,7 @@ viewControlPanel model =
     [ viewButtonNoProp "Help" <| ShowPopUp HelpPopUp
     , viewButtonNoProp "Settings" <| ShowPopUp SettingsPopUp
     , viewUpdateStateButton model
+    , viewCursorButton model
     , viewButtonNoProp "Download" <| ShowPopUp DownloadPopUp
     , viewButtonNoProp "Upload" <| ShowPopUp UploadPopUp
     ]
@@ -499,12 +540,48 @@ viewUpdateStateButton model =
     , label =
         E.html <| case model.activeSimulation.state of
           Simulation.Running ->
-            FeatherIcons.pause
-              |> FeatherIcons.toHtml []
+            Icons.pause
           Simulation.Resting ->
-            FeatherIcons.play
-              |> FeatherIcons.toHtml []
+            Icons.play
     }
+
+
+viewCursorButton : Model -> E.Element Msg
+viewCursorButton model =
+  let
+    viewButton cursor =
+      Input.button
+        (styles.button
+        ++ [ E.htmlAttribute <| onClickNoProp <| UpdateCursor cursor
+        ])
+        { onPress =
+          Nothing
+        , label =
+            E.html <|
+            case cursor of
+              Selector ->
+                Icons.mousePointer
+              Painter sign ->
+                case sign of
+                  Simulation.Positive ->
+                    Icons.plusCircle
+                  Simulation.Negative ->
+                    Icons.minusCircle
+        }
+    unselectedOptions =
+      List.filter ((/=) model.cursor) [ Selector, Painter Simulation.Positive, Painter Simulation.Negative ]
+  in
+  E.el
+    [ Element.Events.onMouseEnter ShowCursorOptions
+    , Element.Events.onMouseLeave HideCursorOptions
+    , E.above <|
+      if model.showCursorOptions then
+        E.column [] <|
+        List.map viewButton unselectedOptions
+      else
+        E.none
+    ] <|
+  viewButton model.cursor
 
 
 viewButtonNoProp : String -> Msg -> E.Element Msg
@@ -1085,6 +1162,60 @@ updateActiveSimulationState model =
   }
 
 
+updateCursor : Cursor -> Model -> Model
+updateCursor newCursor model =
+  { model
+    | cursor =
+      newCursor
+  }
+
+
+showCursorOptions : Model -> Model
+showCursorOptions model =
+  { model
+    | showCursorOptions =
+      True
+  }
+
+
+hideCursorOptions : Model -> Model
+hideCursorOptions model =
+  { model
+    | showCursorOptions =
+      False
+  }
+
+
+drawCharges : Simulation.Position -> Model -> Model
+drawCharges position model =
+  case model.cursor of
+    Painter sign ->
+      if model.isMouseDown then
+        updateActiveSimulation
+          (Simulation.addCharge sign position model.activeSimulation)
+          model
+      else
+        model
+    Selector ->
+      model
+
+
+mouseDown : Model -> Model
+mouseDown model =
+  { model
+    | isMouseDown =
+      True
+  }
+
+
+mouseUp : Model -> Model
+mouseUp model =
+  { model
+    | isMouseDown =
+      False
+  }
+
+
 updateGlobalSettings : (Simulation.Settings -> Simulation.Settings) -> Model -> Model
 updateGlobalSettings func model =
   let
@@ -1136,6 +1267,9 @@ decodeProject =
     , negativeChargeColorPicker = ColorPicker.empty
     , negativeLineColorPicker = ColorPicker.empty
     , backgroundColorPicker = ColorPicker.empty
+    , cursor = Selector
+    , showCursorOptions = False
+    , isMouseDown = False
     }
 
 
