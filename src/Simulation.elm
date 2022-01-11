@@ -8,7 +8,7 @@ import Color exposing (Color)
 import TypedSvg as Svg
 import TypedSvg.Attributes as Attributes
 import TypedSvg.Core exposing (Svg)
-import TypedSvg.Types exposing (px, Paint(..))
+import TypedSvg.Types exposing (px, Paint(..), Transform(..))
 import Math.Vector2 as Vector2 exposing (Vec2, vec2)
 import Draggable
 import Draggable.Events
@@ -1207,14 +1207,27 @@ viewFieldSource activeSourceId settings field =
   , case activeSourceId of
     Just id ->
       if field.source.id == id && settings.showSourceValue then
-        Svg.text_
-          [ Attributes.x (px <| x - field.source.r)
-          , Attributes.y (px <| y - field.source.r - 10)
+      Svg.g
+        [ Attributes.transform [
+          Translate (x - field.source.r - 40) (y - field.source.r - 40)
+        ]]
+        [ Svg.rect
+          [ Attributes.x <| px 0
+          , Attributes.y <| px 0
+          , Attributes.width <| px 100
+          , Attributes.height <| px 30
+          , Attributes.fill <| Paint Color.lightGrey
+          ]
+          []
+        , Svg.text_
+          [ Attributes.x (px <| 25)
+          , Attributes.y (px <| 20)
           , Attributes.stroke <| Paint Color.black
           , Attributes.id "sourceValueLabel"
           ]
           [ TypedSvg.Core.text (signToString field.source.sign ++ Round.round 1 field.source.magnitude)
           ]
+        ]
       else
         Svg.g [] []
     Nothing ->
