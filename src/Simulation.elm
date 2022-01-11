@@ -8,7 +8,8 @@ import Color exposing (Color)
 import TypedSvg as Svg
 import TypedSvg.Attributes as Attributes
 import TypedSvg.Core exposing (Svg)
-import TypedSvg.Types exposing (px, Paint(..), Transform(..))
+import TypedSvg.Types exposing (px, Paint(..), Transform(..), Cursor(..))
+import TypedSvg.Events
 import Math.Vector2 as Vector2 exposing (Vec2, vec2)
 import Draggable
 import Draggable.Events
@@ -137,6 +138,7 @@ type Msg
   | ActivateSource Id
   | ToggleSourceSign
   | ScaleSourceMagnitude Int
+  | UpdateSourceCharge Sign
   | ShowFieldContextMenu
   | ShowGeneralContextMenu Mouse.Event
   | DeleteActiveField
@@ -347,6 +349,9 @@ update msg model =
 
     ScaleSourceMagnitude delta ->
       scaleSourceMagnitude delta model
+    
+    UpdateSourceCharge sign ->
+      updateSourceCharge sign model
 
     StopWheelingTimeOut ->
       (stopWheelingTimeOut model, Cmd.none)
@@ -731,6 +736,49 @@ scaleSourceMagnitude delta model =
   , setTimeOut 200 StopWheelingTimeOut
   )
 
+
+updateSourceCharge : Sign -> Model -> (Model, Cmd Msg)
+updateSourceCharge deltaDirection model =
+  let
+    newFields =
+      updateActive
+        (\field ->
+          let
+            source =
+              field.source
+            delta =
+              case deltaDirection of
+                Positive -> 0.5
+                Negative -> -0.5
+            newMagnitude =
+              source.magnitude +
+                case source.sign of
+                  Positive ->
+                    delta
+                  Negative ->
+                    -delta
+          in
+          { field |
+            source =
+              { source |
+                magnitude = min 20 <| max 0.5 <| newMagnitude,
+                sign =
+                  if abs newMagnitude < 0.5 then
+                    flipSign source.sign
+                  else
+                    source.sign
+            }
+          }
+        )
+        model.activeSourceId
+        model.fields
+  in
+  ({ model
+    | fields =
+      calculateFields model.width model.height newFields
+  }
+  , Cmd.none
+  )
 
 setTimeOut : Float -> msg -> Cmd msg
 setTimeOut time msg =
@@ -1220,12 +1268,31 @@ viewFieldSource activeSourceId settings field =
           ]
           []
         , Svg.text_
+          [ Attributes.x (px <| 10)
+          , Attributes.y (px <| 20)
+          , Attributes.stroke <| Paint Color.black
+          , Attributes.cursor CursorPointer
+          , TypedSvg.Events.onClick (UpdateSourceCharge Negative)
+          ]
+          [ TypedSvg.Core.text "<"
+          ]
+        , Svg.text_
           [ Attributes.x (px <| 25)
           , Attributes.y (px <| 20)
           , Attributes.stroke <| Paint Color.black
           , Attributes.id "sourceValueLabel"
+          , Attributes.cursor CursorDefault
           ]
           [ TypedSvg.Core.text (signToString field.source.sign ++ Round.round 1 field.source.magnitude)
+          ]
+        , Svg.text_
+          [ Attributes.x (px <| 100 - 20)
+          , Attributes.y (px <| 20)
+          , Attributes.stroke <| Paint Color.black
+          , Attributes.cursor CursorPointer
+          , TypedSvg.Events.onClick (UpdateSourceCharge Positive)
+          ]
+          [ TypedSvg.Core.text ">"
           ]
         ]
       else
@@ -1277,6 +1344,15 @@ signToString sign =
       "+"
     Negative ->
       "-"
+
+
+flipSign : Sign -> Sign
+flipSign sign =
+  case sign of
+    Positive ->
+      Negative
+    Negative ->
+      Positive
 
 
 setAlpha : Float -> Color -> Color
