@@ -1277,7 +1277,7 @@ viewFieldSource activeSourceId settings field =
           [ TypedSvg.Core.text "<"
           ]
         , Svg.text_
-          [ Attributes.x (px <| 25)
+          [ Attributes.x (px <| if field.source.magnitude < 10 then 30 else 25)
           , Attributes.y (px <| 20)
           , Attributes.stroke <| Paint Color.black
           , Attributes.id "sourceValueLabel"

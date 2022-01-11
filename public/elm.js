@@ -17229,7 +17229,8 @@ var $author$project$Simulation$viewFieldSource = F3(
 									_List_fromArray(
 										[
 											$elm_community$typed_svg$TypedSvg$Attributes$x(
-											$elm_community$typed_svg$TypedSvg$Types$px(25)),
+											$elm_community$typed_svg$TypedSvg$Types$px(
+												(field.source.magnitude < 10) ? 30 : 25)),
 											$elm_community$typed_svg$TypedSvg$Attributes$y(
 											$elm_community$typed_svg$TypedSvg$Types$px(20)),
 											$elm_community$typed_svg$TypedSvg$Attributes$stroke(
