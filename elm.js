@@ -9367,6 +9367,61 @@ var $zaboco$elm_draggable$Draggable$update = F3(
 				{drag: dragState}),
 			dragCmd);
 	});
+var $elm$core$Basics$abs = function (n) {
+	return (n < 0) ? (-n) : n;
+};
+var $author$project$Simulation$flipSign = function (sign) {
+	if (sign.$ === 'Positive') {
+		return $author$project$Simulation$Negative;
+	} else {
+		return $author$project$Simulation$Positive;
+	}
+};
+var $author$project$Simulation$updateSourceCharge = F2(
+	function (deltaDirection, model) {
+		var newFields = A3(
+			$author$project$Simulation$updateActive,
+			function (field) {
+				var source = field.source;
+				var delta = function () {
+					if (deltaDirection.$ === 'Positive') {
+						return 0.5;
+					} else {
+						return -0.5;
+					}
+				}();
+				var newMagnitude = source.magnitude + function () {
+					var _v0 = source.sign;
+					if (_v0.$ === 'Positive') {
+						return delta;
+					} else {
+						return -delta;
+					}
+				}();
+				return _Utils_update(
+					field,
+					{
+						source: _Utils_update(
+							source,
+							{
+								magnitude: A2(
+									$elm$core$Basics$min,
+									20,
+									A2($elm$core$Basics$max, 0.5, newMagnitude)),
+								sign: ($elm$core$Basics$abs(newMagnitude) < 0.5) ? $author$project$Simulation$flipSign(source.sign) : source.sign
+							})
+					});
+			},
+			model.activeSourceId,
+			model.fields);
+		return _Utils_Tuple2(
+			_Utils_update(
+				model,
+				{
+					fields: A3($author$project$Simulation$calculateFields, model.width, model.height, newFields)
+				}),
+			$elm$core$Platform$Cmd$none);
+	});
 var $author$project$Simulation$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
@@ -9396,6 +9451,9 @@ var $author$project$Simulation$update = F2(
 			case 'ScaleSourceMagnitude':
 				var delta = msg.a;
 				return A2($author$project$Simulation$scaleSourceMagnitude, delta, model);
+			case 'UpdateSourceCharge':
+				var sign = msg.a;
+				return A2($author$project$Simulation$updateSourceCharge, sign, model);
 			case 'StopWheelingTimeOut':
 				return _Utils_Tuple2(
 					$author$project$Simulation$stopWheelingTimeOut(model),
@@ -16311,6 +16369,8 @@ var $author$project$Simulation$viewFieldLines = F2(
 				},
 				field.lines));
 	});
+var $elm_community$typed_svg$TypedSvg$Types$CursorDefault = {$: 'CursorDefault'};
+var $elm_community$typed_svg$TypedSvg$Types$CursorPointer = {$: 'CursorPointer'};
 var $elm_community$typed_svg$TypedSvg$Types$Duration = function (a) {
 	return {$: 'Duration', a: a};
 };
@@ -16327,6 +16387,9 @@ var $elm_community$typed_svg$TypedSvg$Types$Translate = F2(
 	function (a, b) {
 		return {$: 'Translate', a: a, b: b};
 	});
+var $author$project$Simulation$UpdateSourceCharge = function (a) {
+	return {$: 'UpdateSourceCharge', a: a};
+};
 var $elm_community$typed_svg$TypedSvg$animate = $elm_community$typed_svg$TypedSvg$Core$node('animate');
 var $elm_community$typed_svg$TypedSvg$Attributes$animationValues = function (values) {
 	return A2(
@@ -16341,6 +16404,51 @@ var $elm_community$typed_svg$TypedSvg$Attributes$attributeName = function (nm) {
 	return A2($elm_community$typed_svg$TypedSvg$Core$attribute, 'attributeName', nm);
 };
 var $elm_community$typed_svg$TypedSvg$circle = $elm_community$typed_svg$TypedSvg$Core$node('circle');
+var $elm_community$typed_svg$TypedSvg$TypesToStrings$cursorToString = function (cursor) {
+	switch (cursor.$) {
+		case 'CursorAuto':
+			return 'auto';
+		case 'CursorDefault':
+			return 'default';
+		case 'CursorCrosshair':
+			return 'crosshair';
+		case 'CursorPointer':
+			return 'pointer';
+		case 'CursorMove':
+			return 'move';
+		case 'CursorEResize':
+			return 'e-resize';
+		case 'CursorNEResize':
+			return 'ne-resize';
+		case 'CursorNWResize':
+			return 'nw-resize';
+		case 'CursorNResize':
+			return 'n-resize';
+		case 'CursorSEResize':
+			return 'se-resize';
+		case 'CursorSWResize':
+			return 'sw-resize';
+		case 'CursorWResize':
+			return 'w-resize';
+		case 'CursorText':
+			return 'text';
+		case 'CursorWait':
+			return 'wait';
+		case 'CursorHelp':
+			return 'help';
+		case 'CursorInherit':
+			return 'inherit';
+		default:
+			var funcIRI = cursor.a;
+			return funcIRI;
+	}
+};
+var $elm_community$typed_svg$TypedSvg$Attributes$cursor = function (csor) {
+	return A2(
+		$elm_community$typed_svg$TypedSvg$Core$attribute,
+		'cursor',
+		$elm_community$typed_svg$TypedSvg$TypesToStrings$cursorToString(csor));
+};
 var $elm_community$typed_svg$TypedSvg$Attributes$cx = function (length) {
 	return A2(
 		$elm_community$typed_svg$TypedSvg$Core$attribute,
@@ -16367,9 +16475,6 @@ var $elm_community$typed_svg$TypedSvg$Attributes$dur = function (duration) {
 		$elm_community$typed_svg$TypedSvg$Core$attribute,
 		'dur',
 		$elm_community$typed_svg$TypedSvg$TypesToStrings$durationToString(duration));
-};
-var $elm$core$Basics$abs = function (n) {
-	return (n < 0) ? (-n) : n;
 };
 var $author$project$Simulation$lerp = F5(
 	function (min1, max1, min2, max2, num) {
@@ -16418,6 +16523,17 @@ var $zaboco$elm_draggable$Draggable$mouseTrigger = F2(
 				$zaboco$elm_draggable$Draggable$baseDecoder(key)));
 	});
 var $elm_community$typed_svg$TypedSvg$Attributes$offset = $elm_community$typed_svg$TypedSvg$Core$attribute('offset');
+var $elm_community$typed_svg$TypedSvg$Events$on = $elm$virtual_dom$VirtualDom$on;
+var $elm_community$typed_svg$TypedSvg$Events$simpleOn = function (name) {
+	return function (msg) {
+		return A2(
+			$elm_community$typed_svg$TypedSvg$Events$on,
+			name,
+			$elm$virtual_dom$VirtualDom$Normal(
+				$elm$json$Json$Decode$succeed(msg)));
+	};
+};
+var $elm_community$typed_svg$TypedSvg$Events$onClick = $elm_community$typed_svg$TypedSvg$Events$simpleOn('click');
 var $elm$html$Html$Events$onDoubleClick = function (msg) {
 	return A2(
 		$elm$html$Html$Events$on,
@@ -17095,12 +17211,31 @@ var $author$project$Simulation$viewFieldSource = F3(
 									_List_fromArray(
 										[
 											$elm_community$typed_svg$TypedSvg$Attributes$x(
+											$elm_community$typed_svg$TypedSvg$Types$px(10)),
+											$elm_community$typed_svg$TypedSvg$Attributes$y(
+											$elm_community$typed_svg$TypedSvg$Types$px(20)),
+											$elm_community$typed_svg$TypedSvg$Attributes$stroke(
+											$elm_community$typed_svg$TypedSvg$Types$Paint($avh4$elm_color$Color$black)),
+											$elm_community$typed_svg$TypedSvg$Attributes$cursor($elm_community$typed_svg$TypedSvg$Types$CursorPointer),
+											$elm_community$typed_svg$TypedSvg$Events$onClick(
+											$author$project$Simulation$UpdateSourceCharge($author$project$Simulation$Negative))
+										]),
+									_List_fromArray(
+										[
+											$elm_community$typed_svg$TypedSvg$Core$text('<')
+										])),
+									A2(
+									$elm_community$typed_svg$TypedSvg$text_,
+									_List_fromArray(
+										[
+											$elm_community$typed_svg$TypedSvg$Attributes$x(
 											$elm_community$typed_svg$TypedSvg$Types$px(25)),
 											$elm_community$typed_svg$TypedSvg$Attributes$y(
 											$elm_community$typed_svg$TypedSvg$Types$px(20)),
 											$elm_community$typed_svg$TypedSvg$Attributes$stroke(
 											$elm_community$typed_svg$TypedSvg$Types$Paint($avh4$elm_color$Color$black)),
-											$elm_community$typed_svg$TypedSvg$Attributes$id('sourceValueLabel')
+											$elm_community$typed_svg$TypedSvg$Attributes$id('sourceValueLabel'),
+											$elm_community$typed_svg$TypedSvg$Attributes$cursor($elm_community$typed_svg$TypedSvg$Types$CursorDefault)
 										]),
 									_List_fromArray(
 										[
@@ -17108,6 +17243,24 @@ var $author$project$Simulation$viewFieldSource = F3(
 											_Utils_ap(
 												$author$project$Simulation$signToString(field.source.sign),
 												A2($myrho$elm_round$Round$round, 1, field.source.magnitude)))
+										])),
+									A2(
+									$elm_community$typed_svg$TypedSvg$text_,
+									_List_fromArray(
+										[
+											$elm_community$typed_svg$TypedSvg$Attributes$x(
+											$elm_community$typed_svg$TypedSvg$Types$px(100 - 20)),
+											$elm_community$typed_svg$TypedSvg$Attributes$y(
+											$elm_community$typed_svg$TypedSvg$Types$px(20)),
+											$elm_community$typed_svg$TypedSvg$Attributes$stroke(
+											$elm_community$typed_svg$TypedSvg$Types$Paint($avh4$elm_color$Color$black)),
+											$elm_community$typed_svg$TypedSvg$Attributes$cursor($elm_community$typed_svg$TypedSvg$Types$CursorPointer),
+											$elm_community$typed_svg$TypedSvg$Events$onClick(
+											$author$project$Simulation$UpdateSourceCharge($author$project$Simulation$Positive))
+										]),
+									_List_fromArray(
+										[
+											$elm_community$typed_svg$TypedSvg$Core$text('>')
 										]))
 								])) : A2($elm_community$typed_svg$TypedSvg$g, _List_Nil, _List_Nil);
 					} else {
