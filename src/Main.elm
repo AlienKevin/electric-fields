@@ -102,6 +102,7 @@ type Msg
   | ShowCursorOptions
   | HideCursorOptions
   | DrawCharges Simulation.Position
+  | AddCharge Simulation.Position
   | MouseDown
   | MouseUp
   | DoNothing
@@ -188,6 +189,7 @@ view model =
       , E.centerX
       , E.centerY
       , E.htmlAttribute <| Mouse.onMove (\event -> DrawCharges event.offsetPos)
+      , E.htmlAttribute <| Mouse.onClick (\event -> AddCharge event.offsetPos)
       , E.htmlAttribute <| Mouse.onDown (\_ -> MouseDown )
       , E.htmlAttribute <| Mouse.onUp (\_ -> MouseUp )
       ]
@@ -345,6 +347,9 @@ update message model =
 
     DrawCharges position ->
       (drawCharges position model, Cmd.none)
+    
+    AddCharge position ->
+      (addCharge position model, Cmd.none)
 
     MouseDown ->
       (mouseDown model, Cmd.none)
@@ -1199,6 +1204,16 @@ drawCharges position model =
     Selector ->
       model
 
+
+addCharge : Simulation.Position -> Model -> Model
+addCharge position model =
+  case model.cursor of
+    Painter sign ->
+        updateActiveSimulation
+          (Simulation.addCharge sign position model.activeSimulation)
+          model
+    Selector ->
+      model
 
 mouseDown : Model -> Model
 mouseDown model =

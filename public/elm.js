@@ -7649,6 +7649,54 @@ var $author$project$Main$JsonLoaded = function (a) {
 var $author$project$Main$JsonSelected = function (a) {
 	return {$: 'JsonSelected', a: a};
 };
+var $author$project$Simulation$addCharge = F3(
+	function (sign, _v0, model) {
+		var x = _v0.a;
+		var y = _v0.b;
+		var newCharge = {
+			id: model.nextId,
+			magnitude: model.settings.magnitude,
+			position: A2($elm_explorations$linear_algebra$Math$Vector2$vec2, x, y),
+			r: model.settings.r,
+			sign: sign,
+			velocity: A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 0, 0)
+		};
+		var newField = {delta: model.settings.delta, density: model.settings.density, lines: _List_Nil, source: newCharge, steps: model.settings.steps};
+		var newFields = A2($elm$core$List$cons, newField, model.fields);
+		return _Utils_update(
+			model,
+			{
+				fields: A3($author$project$Simulation$calculateFields, model.width, model.height, newFields),
+				nextId: model.nextId + 1
+			});
+	});
+var $author$project$Main$updateActiveSimulation = F2(
+	function (newActiveSimulation, model) {
+		return _Utils_update(
+			model,
+			{
+				activeSimulation: newActiveSimulation,
+				simulations: A2(
+					$elm$core$List$map,
+					function (simulation) {
+						return _Utils_eq(simulation, model.activeSimulation) ? newActiveSimulation : simulation;
+					},
+					model.simulations)
+			});
+	});
+var $author$project$Main$addCharge = F2(
+	function (position, model) {
+		var _v0 = model.cursor;
+		if (_v0.$ === 'Painter') {
+			var sign = _v0.a;
+			return A2(
+				$author$project$Main$updateActiveSimulation,
+				A3($author$project$Simulation$addCharge, sign, position, model.activeSimulation),
+				model);
+		} else {
+			return model;
+		}
+	});
 var $author$project$Main$addSimulation = function (model) {
 	var newDefaultSimulationIndex = model.defaultSimulationIndex + 1;
 	var defaultSimulationName = $author$project$Main$getDefaultSimulationName(newDefaultSimulationIndex);
@@ -7764,41 +7812,6 @@ var $author$project$Main$closeUploadPopUp = function (model) {
 };
 var $elm$json$Json$Encode$string = _Json_wrap;
 var $author$project$Main$downloadModelAsSvg = _Platform_outgoingPort('downloadModelAsSvg', $elm$json$Json$Encode$string);
-var $author$project$Simulation$addCharge = F3(
-	function (sign, _v0, model) {
-		var x = _v0.a;
-		var y = _v0.b;
-		var newCharge = {
-			id: model.nextId,
-			magnitude: model.settings.magnitude,
-			position: A2($elm_explorations$linear_algebra$Math$Vector2$vec2, x, y),
-			r: model.settings.r,
-			sign: sign,
-			velocity: A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 0, 0)
-		};
-		var newField = {delta: model.settings.delta, density: model.settings.density, lines: _List_Nil, source: newCharge, steps: model.settings.steps};
-		var newFields = A2($elm$core$List$cons, newField, model.fields);
-		return _Utils_update(
-			model,
-			{
-				fields: A3($author$project$Simulation$calculateFields, model.width, model.height, newFields),
-				nextId: model.nextId + 1
-			});
-	});
-var $author$project$Main$updateActiveSimulation = F2(
-	function (newActiveSimulation, model) {
-		return _Utils_update(
-			model,
-			{
-				activeSimulation: newActiveSimulation,
-				simulations: A2(
-					$elm$core$List$map,
-					function (simulation) {
-						return _Utils_eq(simulation, model.activeSimulation) ? newActiveSimulation : simulation;
-					},
-					model.simulations)
-			});
-	});
 var $author$project$Main$drawCharges = F2(
 	function (position, model) {
 		var _v0 = model.cursor;
@@ -9745,6 +9758,11 @@ var $author$project$Main$update = F2(
 				return _Utils_Tuple2(
 					A2($author$project$Main$drawCharges, position, model),
 					$elm$core$Platform$Cmd$none);
+			case 'AddCharge':
+				var position = message.a;
+				return _Utils_Tuple2(
+					A2($author$project$Main$addCharge, position, model),
+					$elm$core$Platform$Cmd$none);
 			case 'MouseDown':
 				return _Utils_Tuple2(
 					$author$project$Main$mouseDown(model),
@@ -9757,6 +9775,9 @@ var $author$project$Main$update = F2(
 				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 		}
 	});
+var $author$project$Main$AddCharge = function (a) {
+	return {$: 'AddCharge', a: a};
+};
 var $author$project$Main$DrawCharges = function (a) {
 	return {$: 'DrawCharges', a: a};
 };
@@ -15578,6 +15599,7 @@ var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onWithOptions = F3(
 				},
 				$mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$eventDecoder));
 	});
+var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onClick = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onWithOptions, 'click', $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$defaultOptions);
 var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onDown = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onWithOptions, 'mousedown', $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$defaultOptions);
 var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onMove = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onWithOptions, 'mousemove', $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$defaultOptions);
 var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onUp = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onWithOptions, 'mouseup', $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$defaultOptions);
@@ -19810,6 +19832,11 @@ var $author$project$Main$view = function (model) {
 					$mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onMove(
 						function (event) {
 							return $author$project$Main$DrawCharges(event.offsetPos);
+						})),
+					$mdgriffith$elm_ui$Element$htmlAttribute(
+					$mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onClick(
+						function (event) {
+							return $author$project$Main$AddCharge(event.offsetPos);
 						})),
 					$mdgriffith$elm_ui$Element$htmlAttribute(
 					$mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onDown(
