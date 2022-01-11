@@ -110,7 +110,7 @@ type alias Charge =
 
 defaultSettings : Settings
 defaultSettings =
-  { r = 10.0
+  { r = 15.0
   , density = 20
   , steps = 450
   , delta = 2
@@ -155,25 +155,25 @@ init : Float -> Float -> Model
 init width height =
   let
     defaultFields =
-      [{ source = { id = 0, sign = Negative, magnitude = 3.0, position = vec2 465.0 270.0, velocity = vec2 0 0, r = 10.0 }
+      [{ source = { id = 0, sign = Negative, magnitude = 3.0, position = vec2 465.0 270.0, velocity = vec2 0 0, r = 15.0 }
       , density = 20
       , steps = 450
       , delta = 2
       , lines = []
       }
-      , { source = { id = 1, sign = Positive, magnitude = 1.0, position = vec2 618.0 515.0, velocity = vec2 0 0, r = 10.0 }
+      , { source = { id = 1, sign = Positive, magnitude = 1.0, position = vec2 618.0 515.0, velocity = vec2 0 0, r = 15.0 }
       , density = 20
       , steps = 450
       , delta = 2
       , lines = []
       }
-      , { source = { id = 2, sign = Positive, magnitude = 10.0, position = vec2 553.0 338.0, velocity = vec2 0 0, r = 10.0 }
+      , { source = { id = 2, sign = Positive, magnitude = 10.0, position = vec2 553.0 338.0, velocity = vec2 0 0, r = 15.0 }
       , density = 20
       , steps = 450
       , delta = 2
       , lines = []
       }
-      , { source = { id = 3, sign = Negative, magnitude = 20.0, position = vec2 597.0 182.0, velocity = vec2 0 0, r = 10.0 }
+      , { source = { id = 3, sign = Negative, magnitude = 20.0, position = vec2 597.0 182.0, velocity = vec2 0 0, r = 15.0 }
       , density = 20
       , steps = 450
       , delta = 2
@@ -1238,7 +1238,7 @@ viewFieldSource activeSourceId settings field =
         if field.source.id == id then
           [ Attributes.id "activeSource"
           , Attributes.stroke <| Paint Color.lightGreen
-          , Attributes.strokeWidth <| px 2.5
+          , Attributes.strokeWidth <| px 5
           ]
         else
           []
@@ -1254,16 +1254,20 @@ viewFieldSource activeSourceId settings field =
     ]
   , case activeSourceId of
     Just id ->
+      let
+        tooltipWidth = 100
+        tooltipHeight = 30
+      in
       if field.source.id == id && settings.showSourceValue then
       Svg.g
         [ Attributes.transform [
-          Translate (x - field.source.r - 40) (y - field.source.r - 40)
+          Translate (x - tooltipWidth / 2) (y - field.source.r - tooltipHeight - 10)
         ]]
         [ Svg.rect
           [ Attributes.x <| px 0
           , Attributes.y <| px 0
-          , Attributes.width <| px 100
-          , Attributes.height <| px 30
+          , Attributes.width <| px tooltipWidth
+          , Attributes.height <| px tooltipHeight
           , Attributes.fill <| Paint Color.lightGrey
           ]
           []
@@ -1286,7 +1290,7 @@ viewFieldSource activeSourceId settings field =
           [ TypedSvg.Core.text (signToString field.source.sign ++ Round.round 1 field.source.magnitude)
           ]
         , Svg.text_
-          [ Attributes.x (px <| 100 - 20)
+          [ Attributes.x (px <| tooltipWidth - 20)
           , Attributes.y (px <| 20)
           , Attributes.stroke <| Paint Color.black
           , Attributes.cursor CursorPointer

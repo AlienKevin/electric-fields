@@ -6856,7 +6856,7 @@ var $author$project$Simulation$defaultSettings = {
 	delta: 2,
 	density: 20,
 	magnitude: 1.0,
-	r: 10.0,
+	r: 15.0,
 	showSourceValue: true,
 	steps: 450
 };
@@ -6906,7 +6906,7 @@ var $author$project$Simulation$init = F2(
 					id: 0,
 					magnitude: 3.0,
 					position: A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 465.0, 270.0),
-					r: 10.0,
+					r: 15.0,
 					sign: $author$project$Simulation$Negative,
 					velocity: A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 0, 0)
 				},
@@ -6920,7 +6920,7 @@ var $author$project$Simulation$init = F2(
 					id: 1,
 					magnitude: 1.0,
 					position: A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 618.0, 515.0),
-					r: 10.0,
+					r: 15.0,
 					sign: $author$project$Simulation$Positive,
 					velocity: A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 0, 0)
 				},
@@ -6934,7 +6934,7 @@ var $author$project$Simulation$init = F2(
 					id: 2,
 					magnitude: 10.0,
 					position: A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 553.0, 338.0),
-					r: 10.0,
+					r: 15.0,
 					sign: $author$project$Simulation$Positive,
 					velocity: A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 0, 0)
 				},
@@ -6948,7 +6948,7 @@ var $author$project$Simulation$init = F2(
 					id: 3,
 					magnitude: 20.0,
 					position: A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 597.0, 182.0),
-					r: 10.0,
+					r: 15.0,
 					sign: $author$project$Simulation$Negative,
 					velocity: A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 0, 0)
 				},
@@ -17153,7 +17153,7 @@ var $author$project$Simulation$viewFieldSource = F3(
 											$elm_community$typed_svg$TypedSvg$Attributes$stroke(
 											$elm_community$typed_svg$TypedSvg$Types$Paint($avh4$elm_color$Color$lightGreen)),
 											$elm_community$typed_svg$TypedSvg$Attributes$strokeWidth(
-											$elm_community$typed_svg$TypedSvg$Types$px(2.5))
+											$elm_community$typed_svg$TypedSvg$Types$px(5))
 										]) : _List_Nil;
 								} else {
 									return _List_Nil;
@@ -17178,6 +17178,8 @@ var $author$project$Simulation$viewFieldSource = F3(
 					function () {
 					if (activeSourceId.$ === 'Just') {
 						var id = activeSourceId.a;
+						var tooltipWidth = 100;
+						var tooltipHeight = 30;
 						return (_Utils_eq(field.source.id, id) && settings.showSourceValue) ? A2(
 							$elm_community$typed_svg$TypedSvg$g,
 							_List_fromArray(
@@ -17185,7 +17187,7 @@ var $author$project$Simulation$viewFieldSource = F3(
 									$elm_community$typed_svg$TypedSvg$Attributes$transform(
 									_List_fromArray(
 										[
-											A2($elm_community$typed_svg$TypedSvg$Types$Translate, (x - field.source.r) - 40, (y - field.source.r) - 40)
+											A2($elm_community$typed_svg$TypedSvg$Types$Translate, x - (tooltipWidth / 2), ((y - field.source.r) - tooltipHeight) - 10)
 										]))
 								]),
 							_List_fromArray(
@@ -17199,9 +17201,9 @@ var $author$project$Simulation$viewFieldSource = F3(
 											$elm_community$typed_svg$TypedSvg$Attributes$y(
 											$elm_community$typed_svg$TypedSvg$Types$px(0)),
 											$elm_community$typed_svg$TypedSvg$Attributes$width(
-											$elm_community$typed_svg$TypedSvg$Types$px(100)),
+											$elm_community$typed_svg$TypedSvg$Types$px(tooltipWidth)),
 											$elm_community$typed_svg$TypedSvg$Attributes$height(
-											$elm_community$typed_svg$TypedSvg$Types$px(30)),
+											$elm_community$typed_svg$TypedSvg$Types$px(tooltipHeight)),
 											$elm_community$typed_svg$TypedSvg$Attributes$fill(
 											$elm_community$typed_svg$TypedSvg$Types$Paint($avh4$elm_color$Color$lightGrey))
 										]),
@@ -17250,7 +17252,7 @@ var $author$project$Simulation$viewFieldSource = F3(
 									_List_fromArray(
 										[
 											$elm_community$typed_svg$TypedSvg$Attributes$x(
-											$elm_community$typed_svg$TypedSvg$Types$px(100 - 20)),
+											$elm_community$typed_svg$TypedSvg$Types$px(tooltipWidth - 20)),
 											$elm_community$typed_svg$TypedSvg$Attributes$y(
 											$elm_community$typed_svg$TypedSvg$Types$px(20)),
 											$elm_community$typed_svg$TypedSvg$Attributes$stroke(
