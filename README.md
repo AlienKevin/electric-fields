@@ -87,7 +87,7 @@ Like what you are seeing? Create some cool electric field art yourself @ https:/
 
 2. At the project root directory, start elm-live server
 ```
-sed -i 's+src="elm.js"+src="/public/elm.js"+' public/index.html
+sed -i '' 's+src="elm.js"+src="/public/elm.js"+' public/index.html
 elm-live src/Main.elm --start-page public/index.html --host 0.0.0.0 -- --output=public/elm.js
 ```
 

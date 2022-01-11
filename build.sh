@@ -5,7 +5,7 @@ set -e
 js="public/elm.js"
 min="public/elm.min.js"
 
-sed -i 's+/public/elm.js+elm.js+' public/index.html
+sed -i '' 's+/public/elm.js+elm.js+' public/index.html
 
 elm make --optimize --output=$js "src/Main.elm"
 
