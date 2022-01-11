@@ -16323,6 +16323,10 @@ var $author$project$Simulation$ScaleSourceMagnitude = function (a) {
 };
 var $author$project$Simulation$ShowFieldContextMenu = {$: 'ShowFieldContextMenu'};
 var $author$project$Simulation$ToggleSourceSign = {$: 'ToggleSourceSign'};
+var $elm_community$typed_svg$TypedSvg$Types$Translate = F2(
+	function (a, b) {
+		return {$: 'Translate', a: a, b: b};
+	});
 var $elm_community$typed_svg$TypedSvg$animate = $elm_community$typed_svg$TypedSvg$Core$node('animate');
 var $elm_community$typed_svg$TypedSvg$Attributes$animationValues = function (values) {
 	return A2(
@@ -16373,6 +16377,7 @@ var $author$project$Simulation$lerp = F5(
 		return min2 + (ratio * (max2 - min2));
 	});
 var $avh4$elm_color$Color$lightGreen = A4($avh4$elm_color$Color$RgbaSpace, 138 / 255, 226 / 255, 52 / 255, 1.0);
+var $avh4$elm_color$Color$lightGrey = A4($avh4$elm_color$Color$RgbaSpace, 238 / 255, 238 / 255, 236 / 255, 1.0);
 var $zaboco$elm_draggable$Draggable$alwaysPreventDefaultAndStopPropagation = function (msg) {
 	return {message: msg, preventDefault: true, stopPropagation: true};
 };
@@ -16838,6 +16843,84 @@ var $zaboco$elm_draggable$Draggable$touchTriggers = F2(
 					}))
 			]);
 	});
+var $elm_community$typed_svg$TypedSvg$TypesToStrings$transformToString = function (xform) {
+	var tr = F2(
+		function (name, args) {
+			return $elm$core$String$concat(
+				_List_fromArray(
+					[
+						name,
+						'(',
+						A2(
+						$elm$core$String$join,
+						' ',
+						A2($elm$core$List$map, $elm$core$String$fromFloat, args)),
+						')'
+					]));
+		});
+	switch (xform.$) {
+		case 'Matrix':
+			var a = xform.a;
+			var b = xform.b;
+			var c = xform.c;
+			var d = xform.d;
+			var e = xform.e;
+			var f = xform.f;
+			return A2(
+				tr,
+				'matrix',
+				_List_fromArray(
+					[a, b, c, d, e, f]));
+		case 'Rotate':
+			var a = xform.a;
+			var x = xform.b;
+			var y = xform.c;
+			return A2(
+				tr,
+				'rotate',
+				_List_fromArray(
+					[a, x, y]));
+		case 'Scale':
+			var x = xform.a;
+			var y = xform.b;
+			return A2(
+				tr,
+				'scale',
+				_List_fromArray(
+					[x, y]));
+		case 'SkewX':
+			var x = xform.a;
+			return A2(
+				tr,
+				'skewX',
+				_List_fromArray(
+					[x]));
+		case 'SkewY':
+			var y = xform.a;
+			return A2(
+				tr,
+				'skewY',
+				_List_fromArray(
+					[y]));
+		default:
+			var x = xform.a;
+			var y = xform.b;
+			return A2(
+				tr,
+				'translate',
+				_List_fromArray(
+					[x, y]));
+	}
+};
+var $elm_community$typed_svg$TypedSvg$Attributes$transform = function (transforms) {
+	return A2(
+		$elm_community$typed_svg$TypedSvg$Core$attribute,
+		'transform',
+		A2(
+			$elm$core$String$join,
+			' ',
+			A2($elm$core$List$map, $elm_community$typed_svg$TypedSvg$TypesToStrings$transformToString, transforms)));
+};
 var $elm_community$typed_svg$TypedSvg$Attributes$x = function (length) {
 	return A2(
 		$elm_community$typed_svg$TypedSvg$Core$attribute,
@@ -16980,23 +17063,52 @@ var $author$project$Simulation$viewFieldSource = F3(
 					if (activeSourceId.$ === 'Just') {
 						var id = activeSourceId.a;
 						return (_Utils_eq(field.source.id, id) && settings.showSourceValue) ? A2(
-							$elm_community$typed_svg$TypedSvg$text_,
+							$elm_community$typed_svg$TypedSvg$g,
 							_List_fromArray(
 								[
-									$elm_community$typed_svg$TypedSvg$Attributes$x(
-									$elm_community$typed_svg$TypedSvg$Types$px(x - field.source.r)),
-									$elm_community$typed_svg$TypedSvg$Attributes$y(
-									$elm_community$typed_svg$TypedSvg$Types$px((y - field.source.r) - 10)),
-									$elm_community$typed_svg$TypedSvg$Attributes$stroke(
-									$elm_community$typed_svg$TypedSvg$Types$Paint($avh4$elm_color$Color$black)),
-									$elm_community$typed_svg$TypedSvg$Attributes$id('sourceValueLabel')
+									$elm_community$typed_svg$TypedSvg$Attributes$transform(
+									_List_fromArray(
+										[
+											A2($elm_community$typed_svg$TypedSvg$Types$Translate, (x - field.source.r) - 40, (y - field.source.r) - 40)
+										]))
 								]),
 							_List_fromArray(
 								[
-									$elm_community$typed_svg$TypedSvg$Core$text(
-									_Utils_ap(
-										$author$project$Simulation$signToString(field.source.sign),
-										A2($myrho$elm_round$Round$round, 1, field.source.magnitude)))
+									A2(
+									$elm_community$typed_svg$TypedSvg$rect,
+									_List_fromArray(
+										[
+											$elm_community$typed_svg$TypedSvg$Attributes$x(
+											$elm_community$typed_svg$TypedSvg$Types$px(0)),
+											$elm_community$typed_svg$TypedSvg$Attributes$y(
+											$elm_community$typed_svg$TypedSvg$Types$px(0)),
+											$elm_community$typed_svg$TypedSvg$Attributes$width(
+											$elm_community$typed_svg$TypedSvg$Types$px(100)),
+											$elm_community$typed_svg$TypedSvg$Attributes$height(
+											$elm_community$typed_svg$TypedSvg$Types$px(30)),
+											$elm_community$typed_svg$TypedSvg$Attributes$fill(
+											$elm_community$typed_svg$TypedSvg$Types$Paint($avh4$elm_color$Color$lightGrey))
+										]),
+									_List_Nil),
+									A2(
+									$elm_community$typed_svg$TypedSvg$text_,
+									_List_fromArray(
+										[
+											$elm_community$typed_svg$TypedSvg$Attributes$x(
+											$elm_community$typed_svg$TypedSvg$Types$px(25)),
+											$elm_community$typed_svg$TypedSvg$Attributes$y(
+											$elm_community$typed_svg$TypedSvg$Types$px(20)),
+											$elm_community$typed_svg$TypedSvg$Attributes$stroke(
+											$elm_community$typed_svg$TypedSvg$Types$Paint($avh4$elm_color$Color$black)),
+											$elm_community$typed_svg$TypedSvg$Attributes$id('sourceValueLabel')
+										]),
+									_List_fromArray(
+										[
+											$elm_community$typed_svg$TypedSvg$Core$text(
+											_Utils_ap(
+												$author$project$Simulation$signToString(field.source.sign),
+												A2($myrho$elm_round$Round$round, 1, field.source.magnitude)))
+										]))
 								])) : A2($elm_community$typed_svg$TypedSvg$g, _List_Nil, _List_Nil);
 					} else {
 						return A2($elm_community$typed_svg$TypedSvg$g, _List_Nil, _List_Nil);
