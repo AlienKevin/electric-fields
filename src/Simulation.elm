@@ -112,7 +112,7 @@ defaultSettings : Settings
 defaultSettings =
   { r = 15.0
   , density = 20
-  , steps = 450
+  , steps = 3000
   , delta = 2
   , magnitude = 1.0
   , showSourceValue = True
@@ -262,8 +262,12 @@ calculateFieldLine { charges, steps, delta, sourceSign, start, xBound, yBound } 
           vec2 x y
         outOfBounds =
           x > xBound || x < 0 || y > yBound || y < 0
+        reachedACharge =
+          List.any (\charge -> Vector2.distance charge.position previousPosition <= charge.r) charges
+        stopCalculation =
+          outOfBounds || reachedACharge
         netField =
-          if outOfBounds then
+          if stopCalculation then
             Vector2.vec2 0 0
           else
             List.foldl
@@ -289,7 +293,7 @@ calculateFieldLine { charges, steps, delta, sourceSign, start, xBound, yBound } 
             (Vector2.vec2 0 0)
             charges
         next =
-          if outOfBounds then
+          if stopCalculation then
             (x, y)
           else
             let
@@ -308,7 +312,7 @@ calculateFieldLine { charges, steps, delta, sourceSign, start, xBound, yBound } 
             in
             (Vector2.getX vec, Vector2.getY vec)
       in
-      (next :: line, outOfBounds)
+      (next :: line, stopCalculation)
   )
   [ start ]
   (List.range 0 (steps - 1))
