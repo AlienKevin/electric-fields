@@ -1,11 +1,10 @@
-module Icons
-    exposing
-        ( minusCircle
-        , mousePointer
-        , pause
-        , play
-        , plusCircle
-        )
+module Icons exposing
+    ( minusCircle
+    , mousePointer
+    , pause
+    , play
+    , plusCircle
+    )
 
 import Html exposing (Html)
 import Svg exposing (Svg, svg)
