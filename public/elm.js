@@ -6470,6 +6470,7 @@ var $elm$core$Basics$negate = function (n) {
 	return -n;
 };
 var $elm_explorations$linear_algebra$Math$Vector2$negate = _MJS_v2negate;
+var $elm$core$Basics$neq = _Utils_notEqual;
 var $elm_explorations$linear_algebra$Math$Vector2$normalize = _MJS_v2normalize;
 var $elm$core$Basics$pow = _Basics_pow;
 var $elm_explorations$linear_algebra$Math$Vector2$scale = _MJS_v2scale;
@@ -6505,9 +6506,7 @@ var $author$project$Simulation$calculateFieldLine = function (_v0) {
 				var reachedAChargeWithId = A2(
 					$elm_community$list_extra$List$Extra$findIndex,
 					function (charge) {
-						return _Utils_cmp(
-							A2($elm_explorations$linear_algebra$Math$Vector2$distance, charge.position, previousPosition),
-							charge.r) < 1;
+						return (!_Utils_eq(charge.id, startChargeId)) && (A2($elm_explorations$linear_algebra$Math$Vector2$distance, charge.position, previousPosition) <= 5);
 					},
 					charges);
 				var stopCalculation = outOfBounds || $elm_community$maybe_extra$Maybe$Extra$isJust(reachedAChargeWithId);
@@ -8757,7 +8756,6 @@ var $author$project$Main$getNextSimulation = F2(
 		}();
 		return next;
 	});
-var $elm$core$Basics$neq = _Utils_notEqual;
 var $author$project$Main$removeSimulation = F2(
 	function (target, model) {
 		if ($elm$core$List$length(model.simulations) === 1) {

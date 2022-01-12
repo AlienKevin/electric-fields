@@ -292,7 +292,14 @@ calculateFieldLine { charges, steps, delta, sourceSign, startChargeId, start, xB
                     x > xBound || x < 0 || y > yBound || y < 0
 
                 reachedAChargeWithId =
-                    List.Extra.findIndex (\charge -> Vector2.distance charge.position previousPosition <= charge.r) charges
+                    List.Extra.findIndex
+                        (\charge ->
+                            charge.id
+                                /= startChargeId
+                                && Vector2.distance charge.position previousPosition
+                                <= 5
+                        )
+                        charges
 
                 stopCalculation =
                     outOfBounds || Maybe.Extra.isJust reachedAChargeWithId
