@@ -16,6 +16,7 @@
             "elm/svg": "1.0.1",
             "elm/time": "1.0.0",
             "elm-community/list-extra": "8.2.3",
+            "elm-community/maybe-extra": "5.3.0",
             "elm-community/typed-svg": "6.0.0",
             "elm-explorations/linear-algebra": "1.0.3",
             "mdgriffith/elm-ui": "1.1.5",

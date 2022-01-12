@@ -15,7 +15,9 @@ import Html.Events.Extra.Mouse as Mouse
 import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Field as Field
 import Json.Encode as Encode
+import List.Extra
 import Math.Vector2 as Vector2 exposing (Vec2, vec2)
+import Maybe.Extra
 import Process
 import Round
 import Task
@@ -88,7 +90,7 @@ type alias Id =
 
 
 type alias Line =
-    List Point
+    ( Id, List Point, Maybe Id )
 
 
 type alias Point =
@@ -241,6 +243,7 @@ calculateFields width height fields =
                                 , steps = field.steps
                                 , delta = field.delta
                                 , sourceSign = field.source.sign
+                                , startChargeId = field.source.id
                                 , start = ( Vector2.getX start, Vector2.getY start )
                                 , xBound = width
                                 , yBound = height
@@ -260,17 +263,21 @@ calculateFieldLine :
     , steps : Int
     , delta : Float
     , sourceSign : Sign
+    , startChargeId : Id
     , start : Point
     , xBound : Float
     , yBound : Float
     }
     -> Line
-calculateFieldLine { charges, steps, delta, sourceSign, start, xBound, yBound } =
+calculateFieldLine { charges, steps, delta, sourceSign, startChargeId, start, xBound, yBound } =
     foldlWhile
         (\_ line ->
             let
+                ( _, points, _ ) =
+                    line
+
                 ( x, y ) =
-                    case line of
+                    case points of
                         prev :: _ ->
                             prev
 
@@ -284,11 +291,11 @@ calculateFieldLine { charges, steps, delta, sourceSign, start, xBound, yBound } 
                 outOfBounds =
                     x > xBound || x < 0 || y > yBound || y < 0
 
-                reachedACharge =
-                    List.any (\charge -> Vector2.distance charge.position previousPosition <= charge.r) charges
+                reachedAChargeWithId =
+                    List.Extra.findIndex (\charge -> Vector2.distance charge.position previousPosition <= charge.r) charges
 
                 stopCalculation =
-                    outOfBounds || reachedACharge
+                    outOfBounds || Maybe.Extra.isJust reachedAChargeWithId
 
                 netField =
                     if stopCalculation then
@@ -345,9 +352,9 @@ calculateFieldLine { charges, steps, delta, sourceSign, start, xBound, yBound } 
                         in
                         ( Vector2.getX vec, Vector2.getY vec )
             in
-            ( next :: line, stopCalculation )
+            ( ( startChargeId, next :: points, reachedAChargeWithId ), stopCalculation )
         )
-        [ start ]
+        ( startChargeId, [ start ], Nothing )
         (List.range 0 (steps - 1))
 
 
@@ -1467,7 +1474,7 @@ viewFieldLines settings field =
     in
     Svg.g [] <|
         List.map
-            (\line ->
+            (\( _, line, _ ) ->
                 Svg.polyline
                     [ Attributes.fill PaintNone, Attributes.stroke <| Paint lineColor, Attributes.points line ]
                     []
