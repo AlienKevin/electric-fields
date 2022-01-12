@@ -1,9 +1,11 @@
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Electric Field Simulation</title>
 </head>
+
 <body>
   <script src="/public/elm.js"></script>
   <main></main>
@@ -17,7 +19,7 @@
     var app = Elm.Main.init({ node: document.querySelector('main'), flags: savedProject });
 
     // download model as svg
-    app.ports.downloadModelAsSvg.subscribe(function(modelName) {
+    app.ports.downloadModelAsSvg.subscribe(function (modelName) {
       var activeSource = document.getElementById("activeSource");
       if (activeSource !== null) {
         var strokeWidth = activeSource.getAttribute("stroke-width");
@@ -40,7 +42,7 @@
     });
 
     function download(fileName, type, data) {
-      var blob = new Blob([data], {type: type});
+      var blob = new Blob([data], { type: type });
       var url = URL.createObjectURL(blob);
       var downloadLink = document.createElement("a");
       downloadLink.href = url;
@@ -52,14 +54,15 @@
     }
 
     // save project
-    app.ports.saveProject.subscribe(function(project) {
+    app.ports.saveProject.subscribe(function (project) {
       var projectJson = JSON.stringify(project);
       localStorage.setItem(localStorageKey, projectJson);
     });
 
-    window.addEventListener("beforeunload", function() {
+    window.addEventListener("beforeunload", function () {
       app.ports.pageWillClose.send(null);
     });
   </script>
 </body>
+
 </html>
