@@ -6404,28 +6404,31 @@ var $webbhuset$elm_json_decode$Json$Decode$Field$attempt = F3(
 	});
 var $elm$json$Json$Decode$bool = _Json_decodeBool;
 var $elm_explorations$linear_algebra$Math$Vector2$add = _MJS_v2add;
-var $elm$core$List$any = F2(
-	function (isOkay, list) {
-		any:
+var $elm_explorations$linear_algebra$Math$Vector2$distance = _MJS_v2distance;
+var $elm_community$list_extra$List$Extra$findIndexHelp = F3(
+	function (index, predicate, list) {
+		findIndexHelp:
 		while (true) {
 			if (!list.b) {
-				return false;
+				return $elm$core$Maybe$Nothing;
 			} else {
 				var x = list.a;
 				var xs = list.b;
-				if (isOkay(x)) {
-					return true;
+				if (predicate(x)) {
+					return $elm$core$Maybe$Just(index);
 				} else {
-					var $temp$isOkay = isOkay,
+					var $temp$index = index + 1,
+						$temp$predicate = predicate,
 						$temp$list = xs;
-					isOkay = $temp$isOkay;
+					index = $temp$index;
+					predicate = $temp$predicate;
 					list = $temp$list;
-					continue any;
+					continue findIndexHelp;
 				}
 			}
 		}
 	});
-var $elm_explorations$linear_algebra$Math$Vector2$distance = _MJS_v2distance;
+var $elm_community$list_extra$List$Extra$findIndex = $elm_community$list_extra$List$Extra$findIndexHelp(0);
 var $author$project$Simulation$foldlWhile = F3(
 	function (accumulate, initial, list) {
 		var foldlHelper = F2(
@@ -6456,6 +6459,13 @@ var $author$project$Simulation$foldlWhile = F3(
 	});
 var $elm_explorations$linear_algebra$Math$Vector2$getX = _MJS_v2getX;
 var $elm_explorations$linear_algebra$Math$Vector2$getY = _MJS_v2getY;
+var $elm_community$maybe_extra$Maybe$Extra$isJust = function (m) {
+	if (m.$ === 'Nothing') {
+		return false;
+	} else {
+		return true;
+	}
+};
 var $elm$core$Basics$negate = function (n) {
 	return -n;
 };
@@ -6470,6 +6480,7 @@ var $author$project$Simulation$calculateFieldLine = function (_v0) {
 	var steps = _v0.steps;
 	var delta = _v0.delta;
 	var sourceSign = _v0.sourceSign;
+	var startChargeId = _v0.startChargeId;
 	var start = _v0.start;
 	var xBound = _v0.xBound;
 	var yBound = _v0.yBound;
@@ -6477,34 +6488,36 @@ var $author$project$Simulation$calculateFieldLine = function (_v0) {
 		$author$project$Simulation$foldlWhile,
 		F2(
 			function (_v1, line) {
-				var _v2 = function () {
-					if (line.b) {
-						var prev = line.a;
+				var _v2 = line;
+				var points = _v2.b;
+				var _v3 = function () {
+					if (points.b) {
+						var prev = points.a;
 						return prev;
 					} else {
 						return _Utils_Tuple2(0, 0);
 					}
 				}();
-				var x = _v2.a;
-				var y = _v2.b;
+				var x = _v3.a;
+				var y = _v3.b;
 				var outOfBounds = (_Utils_cmp(x, xBound) > 0) || ((x < 0) || ((_Utils_cmp(y, yBound) > 0) || (y < 0)));
 				var previousPosition = A2($elm_explorations$linear_algebra$Math$Vector2$vec2, x, y);
-				var reachedACharge = A2(
-					$elm$core$List$any,
+				var reachedAChargeWithId = A2(
+					$elm_community$list_extra$List$Extra$findIndex,
 					function (charge) {
 						return _Utils_cmp(
 							A2($elm_explorations$linear_algebra$Math$Vector2$distance, charge.position, previousPosition),
 							charge.r) < 1;
 					},
 					charges);
-				var stopCalculation = outOfBounds || reachedACharge;
+				var stopCalculation = outOfBounds || $elm_community$maybe_extra$Maybe$Extra$isJust(reachedAChargeWithId);
 				var netField = stopCalculation ? A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 0, 0) : A3(
 					$elm$core$List$foldl,
 					F2(
 						function (charge, sum) {
 							var sign = function () {
-								var _v5 = charge.sign;
-								if (_v5.$ === 'Positive') {
+								var _v6 = charge.sign;
+								if (_v6.$ === 'Positive') {
 									return 1;
 								} else {
 									return -1;
@@ -6545,11 +6558,17 @@ var $author$project$Simulation$calculateFieldLine = function (_v0) {
 					}
 				}();
 				return _Utils_Tuple2(
-					A2($elm$core$List$cons, next, line),
+					_Utils_Tuple3(
+						startChargeId,
+						A2($elm$core$List$cons, next, points),
+						reachedAChargeWithId),
 					stopCalculation);
 			}),
-		_List_fromArray(
-			[start]),
+		_Utils_Tuple3(
+			startChargeId,
+			_List_fromArray(
+				[start]),
+			$elm$core$Maybe$Nothing),
 		A2($elm$core$List$range, 0, steps - 1));
 };
 var $elm$core$Basics$cos = _Basics_cos;
@@ -6584,6 +6603,7 @@ var $author$project$Simulation$calculateFields = F3(
 								start: _Utils_Tuple2(
 									$elm_explorations$linear_algebra$Math$Vector2$getX(start),
 									$elm_explorations$linear_algebra$Math$Vector2$getY(start)),
+								startChargeId: field.source.id,
 								steps: field.steps,
 								xBound: width,
 								yBound: height
@@ -8687,30 +8707,6 @@ var $elm_community$list_extra$List$Extra$removeAt = F2(
 			}
 		}
 	});
-var $elm_community$list_extra$List$Extra$findIndexHelp = F3(
-	function (index, predicate, list) {
-		findIndexHelp:
-		while (true) {
-			if (!list.b) {
-				return $elm$core$Maybe$Nothing;
-			} else {
-				var x = list.a;
-				var xs = list.b;
-				if (predicate(x)) {
-					return $elm$core$Maybe$Just(index);
-				} else {
-					var $temp$index = index + 1,
-						$temp$predicate = predicate,
-						$temp$list = xs;
-					index = $temp$index;
-					predicate = $temp$predicate;
-					list = $temp$list;
-					continue findIndexHelp;
-				}
-			}
-		}
-	});
-var $elm_community$list_extra$List$Extra$findIndex = $elm_community$list_extra$List$Extra$findIndexHelp(0);
 var $elm$core$Maybe$map = F2(
 	function (f, maybe) {
 		if (maybe.$ === 'Just') {
@@ -12374,6 +12370,27 @@ var $mdgriffith$elm_ui$Internal$Model$staticRoot = function (opts) {
 				_List_Nil);
 	}
 };
+var $elm$core$List$any = F2(
+	function (isOkay, list) {
+		any:
+		while (true) {
+			if (!list.b) {
+				return false;
+			} else {
+				var x = list.a;
+				var xs = list.b;
+				if (isOkay(x)) {
+					return true;
+				} else {
+					var $temp$isOkay = isOkay,
+						$temp$list = xs;
+					isOkay = $temp$isOkay;
+					list = $temp$list;
+					continue any;
+				}
+			}
+		}
+	});
 var $mdgriffith$elm_ui$Internal$Model$fontName = function (font) {
 	switch (font.$) {
 		case 'Serif':
@@ -16374,8 +16391,8 @@ var $elm_community$typed_svg$TypedSvg$Attributes$stroke = A2(
 var $author$project$Simulation$viewFieldLines = F2(
 	function (settings, field) {
 		var lineColor = function () {
-			var _v0 = field.source.sign;
-			if (_v0.$ === 'Positive') {
+			var _v1 = field.source.sign;
+			if (_v1.$ === 'Positive') {
 				return settings.colors.positiveLine;
 			} else {
 				return settings.colors.negativeLine;
@@ -16386,7 +16403,8 @@ var $author$project$Simulation$viewFieldLines = F2(
 			_List_Nil,
 			A2(
 				$elm$core$List$map,
-				function (line) {
+				function (_v0) {
+					var line = _v0.b;
 					return A2(
 						$elm_community$typed_svg$TypedSvg$polyline,
 						_List_fromArray(
