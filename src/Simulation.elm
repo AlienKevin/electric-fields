@@ -245,8 +245,8 @@ calculateFields width height fields =
                                 , sourceSign = field.source.sign
                                 , startChargeId = field.source.id
                                 , start = ( Vector2.getX start, Vector2.getY start )
-                                , xBound = width
-                                , yBound = height
+                                , xBound = width * 1.5
+                                , yBound = height * 1.5
                                 }
                         )
                         (List.map toFloat <| List.range 0 (field.density - 1))
