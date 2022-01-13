@@ -2,6 +2,8 @@ module Simulation exposing (Model, Msg, Position, Settings, Sign(..), State(..),
 
 import Browser.Events
 import Color exposing (Color)
+import Dict exposing (Dict)
+import Dict.Extra
 import Draggable
 import Draggable.Events
 import Element as E
@@ -20,6 +22,7 @@ import Math.Vector2 as Vector2 exposing (Vec2, vec2)
 import Maybe.Extra
 import Process
 import Round
+import Set exposing (Set)
 import Task
 import TypedSvg as Svg
 import TypedSvg.Attributes as Attributes
@@ -214,48 +217,133 @@ init width height =
     defaultModel
 
 
-calculateFields : Float -> Float -> List Field -> List Field
-calculateFields width height fields =
+countFieldLinesEndingWithChargeId : Id -> Field -> Int
+countFieldLinesEndingWithChargeId id field =
+    List.sum <|
+        List.map
+            (\( _, _, endChargeId ) ->
+                if endChargeId == Just id then
+                    1
+
+                else
+                    0
+            )
+            field.lines
+
+
+leanifyFields : List Field -> List Field
+leanifyFields fields =
+    let
+        sourceToDestination =
+            findDuplicateFieldLines fields
+
+        _ =
+            Debug.log "sourceToDestination" sourceToDestination
+    in
     List.map
         (\field ->
-            let
-                deltaAngle =
-                    2 * pi / toFloat field.density
+            case Dict.get field.source.id sourceToDestination of
+                Just destinationIds ->
+                    let
+                        _ =
+                            Debug.log "field" field.source.id
 
-                lines =
-                    List.map
-                        (\index ->
-                            let
-                                angle =
-                                    deltaAngle * index
+                        _ =
+                            Debug.log "destinationIds" (Set.toList destinationIds)
 
-                                dx =
-                                    field.source.r * cos angle
+                        _ =
+                            Debug.log "field.lines" (List.map (\( _, _, end ) -> end) field.lines)
+                    in
+                    { field
+                        | lines =
+                            List.filter
+                                (\( _, _, endChargeId ) ->
+                                    case endChargeId of
+                                        Just id ->
+                                            not (Set.member id destinationIds)
 
-                                dy =
-                                    field.source.r * sin angle
+                                        Nothing ->
+                                            True
+                                )
+                                field.lines
+                    }
 
-                                start =
-                                    Vector2.add (vec2 dx dy) field.source.position
-                            in
-                            calculateFieldLine
-                                { charges = List.map .source fields
-                                , steps = field.steps
-                                , delta = field.delta
-                                , sourceSign = field.source.sign
-                                , startChargeId = field.source.id
-                                , start = ( Vector2.getX start, Vector2.getY start )
-                                , xBound = width * 1.5
-                                , yBound = height * 1.5
-                                }
-                        )
-                        (List.map toFloat <| List.range 0 (field.density - 1))
-            in
-            { field
-                | lines = lines
-            }
+                Nothing ->
+                    field
         )
         fields
+
+
+findDuplicateFieldLines : List Field -> Dict Id (Set Id)
+findDuplicateFieldLines fields =
+    Dict.Extra.fromListDedupe Set.union <|
+        List.map
+            (\( fieldA, fieldB ) ->
+                let
+                    chargeA =
+                        fieldA.source.id
+
+                    chargeB =
+                        fieldB.source.id
+
+                    numOfLinesFromAtoB =
+                        countFieldLinesEndingWithChargeId chargeB fieldA
+
+                    numOfLinesFromBtoA =
+                        countFieldLinesEndingWithChargeId chargeA fieldB
+                in
+                if numOfLinesFromAtoB > numOfLinesFromBtoA then
+                    ( chargeB, Set.singleton chargeA )
+
+                else
+                    ( chargeA, Set.singleton chargeB )
+            )
+            (List.Extra.uniquePairs fields)
+
+
+calculateFields : Float -> Float -> List Field -> List Field
+calculateFields width height fields =
+    leanifyFields <|
+        List.map
+            (\field ->
+                let
+                    deltaAngle =
+                        2 * pi / toFloat field.density
+
+                    lines =
+                        List.map
+                            (\index ->
+                                let
+                                    angle =
+                                        deltaAngle * index
+
+                                    dx =
+                                        field.source.r * cos angle
+
+                                    dy =
+                                        field.source.r * sin angle
+
+                                    start =
+                                        Vector2.add (vec2 dx dy) field.source.position
+                                in
+                                calculateFieldLine
+                                    { charges = List.map .source fields
+                                    , steps = field.steps
+                                    , delta = field.delta
+                                    , sourceSign = field.source.sign
+                                    , startChargeId = field.source.id
+                                    , start = ( Vector2.getX start, Vector2.getY start )
+                                    , xBound = width * 1.5
+                                    , yBound = height * 1.5
+                                    }
+                            )
+                            (List.map toFloat <| List.range 0 (field.density - 1))
+                in
+                { field
+                    | lines = lines
+                }
+            )
+            fields
 
 
 calculateFieldLine :
