@@ -380,12 +380,18 @@ calculateFieldLine { charges, steps, delta, sourceSign, startChargeId, start, xB
                     x > xBound || x < 0 || y > yBound || y < 0
 
                 reachedAChargeWithId =
-                    List.Extra.findIndex
+                    List.Extra.findMap
                         (\charge ->
-                            charge.id
-                                /= startChargeId
-                                && Vector2.distance charge.position previousPosition
-                                <= 5
+                            if
+                                charge.id
+                                    /= startChargeId
+                                    && Vector2.distance charge.position previousPosition
+                                    <= 5
+                            then
+                                Just charge.id
+
+                            else
+                                Nothing
                         )
                         charges
 
