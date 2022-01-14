@@ -236,24 +236,11 @@ leanifyFields fields =
     let
         sourceToDestination =
             findDuplicateFieldLines fields
-
-        _ =
-            Debug.log "sourceToDestination" sourceToDestination
     in
     List.map
         (\field ->
             case Dict.get field.source.id sourceToDestination of
                 Just destinationIds ->
-                    let
-                        _ =
-                            Debug.log "field" field.source.id
-
-                        _ =
-                            Debug.log "destinationIds" (Set.toList destinationIds)
-
-                        _ =
-                            Debug.log "field.lines" (List.map (\( _, _, end ) -> end) field.lines)
-                    in
                     { field
                         | lines =
                             List.filter
