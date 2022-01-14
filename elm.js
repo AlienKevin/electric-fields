@@ -6405,30 +6405,29 @@ var $webbhuset$elm_json_decode$Json$Decode$Field$attempt = F3(
 var $elm$json$Json$Decode$bool = _Json_decodeBool;
 var $elm_explorations$linear_algebra$Math$Vector2$add = _MJS_v2add;
 var $elm_explorations$linear_algebra$Math$Vector2$distance = _MJS_v2distance;
-var $elm_community$list_extra$List$Extra$findIndexHelp = F3(
-	function (index, predicate, list) {
-		findIndexHelp:
+var $elm_community$list_extra$List$Extra$findMap = F2(
+	function (f, list) {
+		findMap:
 		while (true) {
 			if (!list.b) {
 				return $elm$core$Maybe$Nothing;
 			} else {
-				var x = list.a;
-				var xs = list.b;
-				if (predicate(x)) {
-					return $elm$core$Maybe$Just(index);
+				var a = list.a;
+				var tail = list.b;
+				var _v1 = f(a);
+				if (_v1.$ === 'Just') {
+					var b = _v1.a;
+					return $elm$core$Maybe$Just(b);
 				} else {
-					var $temp$index = index + 1,
-						$temp$predicate = predicate,
-						$temp$list = xs;
-					index = $temp$index;
-					predicate = $temp$predicate;
+					var $temp$f = f,
+						$temp$list = tail;
+					f = $temp$f;
 					list = $temp$list;
-					continue findIndexHelp;
+					continue findMap;
 				}
 			}
 		}
 	});
-var $elm_community$list_extra$List$Extra$findIndex = $elm_community$list_extra$List$Extra$findIndexHelp(0);
 var $author$project$Simulation$foldlWhile = F3(
 	function (accumulate, initial, list) {
 		var foldlHelper = F2(
@@ -6504,9 +6503,9 @@ var $author$project$Simulation$calculateFieldLine = function (_v0) {
 				var outOfBounds = (_Utils_cmp(x, xBound) > 0) || ((x < 0) || ((_Utils_cmp(y, yBound) > 0) || (y < 0)));
 				var previousPosition = A2($elm_explorations$linear_algebra$Math$Vector2$vec2, x, y);
 				var reachedAChargeWithId = A2(
-					$elm_community$list_extra$List$Extra$findIndex,
+					$elm_community$list_extra$List$Extra$findMap,
 					function (charge) {
-						return (!_Utils_eq(charge.id, startChargeId)) && (A2($elm_explorations$linear_algebra$Math$Vector2$distance, charge.position, previousPosition) <= 5);
+						return ((!_Utils_eq(charge.id, startChargeId)) && (A2($elm_explorations$linear_algebra$Math$Vector2$distance, charge.position, previousPosition) <= 5)) ? $elm$core$Maybe$Just(charge.id) : $elm$core$Maybe$Nothing;
 					},
 					charges);
 				var stopCalculation = outOfBounds || $elm_community$maybe_extra$Maybe$Extra$isJust(reachedAChargeWithId);
@@ -9089,14 +9088,6 @@ var $elm_community$list_extra$List$Extra$last = function (items) {
 		}
 	}
 };
-var $elm$core$List$append = F2(
-	function (xs, ys) {
-		if (!ys.b) {
-			return xs;
-		} else {
-			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
-		}
-	});
 var $elm$core$List$drop = F2(
 	function (n, list) {
 		drop:
@@ -9118,15 +9109,6 @@ var $elm$core$List$drop = F2(
 			}
 		}
 	});
-var $elm$core$List$tail = function (list) {
-	if (list.b) {
-		var x = list.a;
-		var xs = list.b;
-		return $elm$core$Maybe$Just(xs);
-	} else {
-		return $elm$core$Maybe$Nothing;
-	}
-};
 var $elm$core$List$takeReverse = F3(
 	function (n, list, kept) {
 		takeReverse:
@@ -9258,17 +9240,41 @@ var $elm_community$list_extra$List$Extra$removeAt = F2(
 		if (index < 0) {
 			return l;
 		} else {
-			var tail = $elm$core$List$tail(
-				A2($elm$core$List$drop, index, l));
-			var head = A2($elm$core$List$take, index, l);
-			if (tail.$ === 'Nothing') {
+			var _v0 = A2($elm$core$List$drop, index, l);
+			if (!_v0.b) {
 				return l;
 			} else {
-				var t = tail.a;
-				return A2($elm$core$List$append, head, t);
+				var rest = _v0.b;
+				return _Utils_ap(
+					A2($elm$core$List$take, index, l),
+					rest);
 			}
 		}
 	});
+var $elm_community$list_extra$List$Extra$findIndexHelp = F3(
+	function (index, predicate, list) {
+		findIndexHelp:
+		while (true) {
+			if (!list.b) {
+				return $elm$core$Maybe$Nothing;
+			} else {
+				var x = list.a;
+				var xs = list.b;
+				if (predicate(x)) {
+					return $elm$core$Maybe$Just(index);
+				} else {
+					var $temp$index = index + 1,
+						$temp$predicate = predicate,
+						$temp$list = xs;
+					index = $temp$index;
+					predicate = $temp$predicate;
+					list = $temp$list;
+					continue findIndexHelp;
+				}
+			}
+		}
+	});
+var $elm_community$list_extra$List$Extra$findIndex = $elm_community$list_extra$List$Extra$findIndexHelp(0);
 var $elm$core$Maybe$map = F2(
 	function (f, maybe) {
 		if (maybe.$ === 'Just') {
@@ -10922,6 +10928,14 @@ var $mdgriffith$elm_ui$Internal$Style$CenterY = {$: 'CenterY'};
 var $mdgriffith$elm_ui$Internal$Style$Top = {$: 'Top'};
 var $mdgriffith$elm_ui$Internal$Style$alignments = _List_fromArray(
 	[$mdgriffith$elm_ui$Internal$Style$Top, $mdgriffith$elm_ui$Internal$Style$Bottom, $mdgriffith$elm_ui$Internal$Style$Right, $mdgriffith$elm_ui$Internal$Style$Left, $mdgriffith$elm_ui$Internal$Style$CenterX, $mdgriffith$elm_ui$Internal$Style$CenterY]);
+var $elm$core$List$append = F2(
+	function (xs, ys) {
+		if (!ys.b) {
+			return xs;
+		} else {
+			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
+		}
+	});
 var $elm$core$List$concat = function (lists) {
 	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
 };
