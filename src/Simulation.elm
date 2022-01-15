@@ -1486,10 +1486,10 @@ viewFieldSource activeSourceId settings field =
             Just id ->
                 let
                     tooltipWidth =
-                        100
+                        160
 
                     tooltipHeight =
-                        30
+                        40
                 in
                 if field.source.id == id && settings.showSourceValue then
                     Svg.g
@@ -1500,44 +1500,72 @@ viewFieldSource activeSourceId settings field =
                         ]
                         [ Svg.rect
                             [ Attributes.x <| px 0
-                            , Attributes.y <| px 0
+                            , Attributes.y <| px -10
                             , Attributes.width <| px tooltipWidth
                             , Attributes.height <| px tooltipHeight
                             , Attributes.fill <| Paint Color.lightGrey
                             ]
                             []
-                        , Svg.text_
-                            [ Attributes.x (px <| 10)
-                            , Attributes.y (px <| 20)
-                            , Attributes.stroke <| Paint Color.black
-                            , Attributes.cursor CursorPointer
+                        , Svg.g
+                            [ Attributes.cursor CursorPointer
                             , TypedSvg.Events.onClick (UpdateSourceCharge Negative)
                             ]
-                            [ TypedSvg.Core.text "<"
+                            [ Svg.rect
+                                [ Attributes.x <| (px <| 0)
+                                , Attributes.y <| (px <| -10)
+                                , Attributes.width <| px 40
+                                , Attributes.height <| px 40
+                                , Attributes.fill <| Paint settings.colors.negativeCharge
+                                ]
+                                []
+                            , Svg.text_
+                                [ Attributes.x (px <| 12)
+                                , Attributes.y (px <| 20)
+                                , Attributes.stroke <| Paint settings.colors.background
+                                , Attributes.fill <| Paint settings.colors.background
+                                , Attributes.fontSize (px <| 26)
+                                ]
+                                [ TypedSvg.Core.text "<"
+                                ]
                             ]
                         , Svg.text_
                             [ Attributes.x
                                 (px <|
                                     if field.source.magnitude < 10 then
-                                        30
+                                        50
 
                                     else
-                                        25
+                                        45
                                 )
                             , Attributes.y (px <| 20)
                             , Attributes.stroke <| Paint Color.black
+                            , Attributes.fontSize (px <| 24)
                             , Attributes.cursor CursorDefault
                             ]
                             [ TypedSvg.Core.text (signToString field.source.sign ++ Round.round 1 field.source.magnitude)
                             ]
-                        , Svg.text_
-                            [ Attributes.x (px <| tooltipWidth - 20)
-                            , Attributes.y (px <| 20)
-                            , Attributes.stroke <| Paint Color.black
-                            , Attributes.cursor CursorPointer
+                        , Svg.g
+                            [ Attributes.cursor CursorPointer
                             , TypedSvg.Events.onClick (UpdateSourceCharge Positive)
                             ]
-                            [ TypedSvg.Core.text ">"
+                            [ Svg.rect
+                                [ Attributes.x <| (px <| tooltipWidth - 40)
+                                , Attributes.y <| (px <| -10)
+                                , Attributes.width <| px 40
+                                , Attributes.height <| px 40
+                                , Attributes.fill <| Paint settings.colors.positiveCharge
+                                ]
+                                []
+                            , Svg.text_
+                                [ Attributes.x (px <| tooltipWidth - 27)
+                                , Attributes.y (px <| 20)
+                                , Attributes.stroke <| Paint settings.colors.background
+                                , Attributes.fill <| Paint settings.colors.background
+                                , Attributes.cursor CursorPointer
+                                , Attributes.fontSize (px <| 26)
+                                ]
+                                [ TypedSvg.Core.text ">"
+                                ]
                             ]
                         ]
 

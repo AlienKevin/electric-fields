@@ -17037,6 +17037,12 @@ var $elm_community$typed_svg$TypedSvg$Attributes$dur = function (duration) {
 		'dur',
 		$elm_community$typed_svg$TypedSvg$TypesToStrings$durationToString(duration));
 };
+var $elm_community$typed_svg$TypedSvg$Attributes$fontSize = function (length) {
+	return A2(
+		$elm_community$typed_svg$TypedSvg$Core$attribute,
+		'font-size',
+		$elm_community$typed_svg$TypedSvg$TypesToStrings$lengthToString(length));
+};
 var $author$project$Simulation$lerp = F5(
 	function (min1, max1, min2, max2, num) {
 		var ratio = $elm$core$Basics$abs((num - min1) / (max1 - min1));
@@ -17739,8 +17745,8 @@ var $author$project$Simulation$viewFieldSource = F3(
 					function () {
 					if (activeSourceId.$ === 'Just') {
 						var id = activeSourceId.a;
-						var tooltipWidth = 100;
-						var tooltipHeight = 30;
+						var tooltipWidth = 160;
+						var tooltipHeight = 40;
 						return (_Utils_eq(field.source.id, id) && settings.showSourceValue) ? A2(
 							$elm_community$typed_svg$TypedSvg$g,
 							_List_fromArray(
@@ -17761,7 +17767,7 @@ var $author$project$Simulation$viewFieldSource = F3(
 											$elm_community$typed_svg$TypedSvg$Attributes$x(
 											$elm_community$typed_svg$TypedSvg$Types$px(0)),
 											$elm_community$typed_svg$TypedSvg$Attributes$y(
-											$elm_community$typed_svg$TypedSvg$Types$px(0)),
+											$elm_community$typed_svg$TypedSvg$Types$px(-10)),
 											$elm_community$typed_svg$TypedSvg$Attributes$width(
 											$elm_community$typed_svg$TypedSvg$Types$px(tooltipWidth)),
 											$elm_community$typed_svg$TypedSvg$Attributes$height(
@@ -17771,22 +17777,50 @@ var $author$project$Simulation$viewFieldSource = F3(
 										]),
 									_List_Nil),
 									A2(
-									$elm_community$typed_svg$TypedSvg$text_,
+									$elm_community$typed_svg$TypedSvg$g,
 									_List_fromArray(
 										[
-											$elm_community$typed_svg$TypedSvg$Attributes$x(
-											$elm_community$typed_svg$TypedSvg$Types$px(10)),
-											$elm_community$typed_svg$TypedSvg$Attributes$y(
-											$elm_community$typed_svg$TypedSvg$Types$px(20)),
-											$elm_community$typed_svg$TypedSvg$Attributes$stroke(
-											$elm_community$typed_svg$TypedSvg$Types$Paint($avh4$elm_color$Color$black)),
 											$elm_community$typed_svg$TypedSvg$Attributes$cursor($elm_community$typed_svg$TypedSvg$Types$CursorPointer),
 											$elm_community$typed_svg$TypedSvg$Events$onClick(
 											$author$project$Simulation$UpdateSourceCharge($author$project$Simulation$Negative))
 										]),
 									_List_fromArray(
 										[
-											$elm_community$typed_svg$TypedSvg$Core$text('<')
+											A2(
+											$elm_community$typed_svg$TypedSvg$rect,
+											_List_fromArray(
+												[
+													$elm_community$typed_svg$TypedSvg$Attributes$x(
+													$elm_community$typed_svg$TypedSvg$Types$px(0)),
+													$elm_community$typed_svg$TypedSvg$Attributes$y(
+													$elm_community$typed_svg$TypedSvg$Types$px(-10)),
+													$elm_community$typed_svg$TypedSvg$Attributes$width(
+													$elm_community$typed_svg$TypedSvg$Types$px(40)),
+													$elm_community$typed_svg$TypedSvg$Attributes$height(
+													$elm_community$typed_svg$TypedSvg$Types$px(40)),
+													$elm_community$typed_svg$TypedSvg$Attributes$fill(
+													$elm_community$typed_svg$TypedSvg$Types$Paint(settings.colors.negativeCharge))
+												]),
+											_List_Nil),
+											A2(
+											$elm_community$typed_svg$TypedSvg$text_,
+											_List_fromArray(
+												[
+													$elm_community$typed_svg$TypedSvg$Attributes$x(
+													$elm_community$typed_svg$TypedSvg$Types$px(12)),
+													$elm_community$typed_svg$TypedSvg$Attributes$y(
+													$elm_community$typed_svg$TypedSvg$Types$px(20)),
+													$elm_community$typed_svg$TypedSvg$Attributes$stroke(
+													$elm_community$typed_svg$TypedSvg$Types$Paint(settings.colors.background)),
+													$elm_community$typed_svg$TypedSvg$Attributes$fill(
+													$elm_community$typed_svg$TypedSvg$Types$Paint(settings.colors.background)),
+													$elm_community$typed_svg$TypedSvg$Attributes$fontSize(
+													$elm_community$typed_svg$TypedSvg$Types$px(26))
+												]),
+											_List_fromArray(
+												[
+													$elm_community$typed_svg$TypedSvg$Core$text('<')
+												]))
 										])),
 									A2(
 									$elm_community$typed_svg$TypedSvg$text_,
@@ -17794,11 +17828,13 @@ var $author$project$Simulation$viewFieldSource = F3(
 										[
 											$elm_community$typed_svg$TypedSvg$Attributes$x(
 											$elm_community$typed_svg$TypedSvg$Types$px(
-												(field.source.magnitude < 10) ? 30 : 25)),
+												(field.source.magnitude < 10) ? 50 : 45)),
 											$elm_community$typed_svg$TypedSvg$Attributes$y(
 											$elm_community$typed_svg$TypedSvg$Types$px(20)),
 											$elm_community$typed_svg$TypedSvg$Attributes$stroke(
 											$elm_community$typed_svg$TypedSvg$Types$Paint($avh4$elm_color$Color$black)),
+											$elm_community$typed_svg$TypedSvg$Attributes$fontSize(
+											$elm_community$typed_svg$TypedSvg$Types$px(24)),
 											$elm_community$typed_svg$TypedSvg$Attributes$cursor($elm_community$typed_svg$TypedSvg$Types$CursorDefault)
 										]),
 									_List_fromArray(
@@ -17809,22 +17845,51 @@ var $author$project$Simulation$viewFieldSource = F3(
 												A2($myrho$elm_round$Round$round, 1, field.source.magnitude)))
 										])),
 									A2(
-									$elm_community$typed_svg$TypedSvg$text_,
+									$elm_community$typed_svg$TypedSvg$g,
 									_List_fromArray(
 										[
-											$elm_community$typed_svg$TypedSvg$Attributes$x(
-											$elm_community$typed_svg$TypedSvg$Types$px(tooltipWidth - 20)),
-											$elm_community$typed_svg$TypedSvg$Attributes$y(
-											$elm_community$typed_svg$TypedSvg$Types$px(20)),
-											$elm_community$typed_svg$TypedSvg$Attributes$stroke(
-											$elm_community$typed_svg$TypedSvg$Types$Paint($avh4$elm_color$Color$black)),
 											$elm_community$typed_svg$TypedSvg$Attributes$cursor($elm_community$typed_svg$TypedSvg$Types$CursorPointer),
 											$elm_community$typed_svg$TypedSvg$Events$onClick(
 											$author$project$Simulation$UpdateSourceCharge($author$project$Simulation$Positive))
 										]),
 									_List_fromArray(
 										[
-											$elm_community$typed_svg$TypedSvg$Core$text('>')
+											A2(
+											$elm_community$typed_svg$TypedSvg$rect,
+											_List_fromArray(
+												[
+													$elm_community$typed_svg$TypedSvg$Attributes$x(
+													$elm_community$typed_svg$TypedSvg$Types$px(tooltipWidth - 40)),
+													$elm_community$typed_svg$TypedSvg$Attributes$y(
+													$elm_community$typed_svg$TypedSvg$Types$px(-10)),
+													$elm_community$typed_svg$TypedSvg$Attributes$width(
+													$elm_community$typed_svg$TypedSvg$Types$px(40)),
+													$elm_community$typed_svg$TypedSvg$Attributes$height(
+													$elm_community$typed_svg$TypedSvg$Types$px(40)),
+													$elm_community$typed_svg$TypedSvg$Attributes$fill(
+													$elm_community$typed_svg$TypedSvg$Types$Paint(settings.colors.positiveCharge))
+												]),
+											_List_Nil),
+											A2(
+											$elm_community$typed_svg$TypedSvg$text_,
+											_List_fromArray(
+												[
+													$elm_community$typed_svg$TypedSvg$Attributes$x(
+													$elm_community$typed_svg$TypedSvg$Types$px(tooltipWidth - 27)),
+													$elm_community$typed_svg$TypedSvg$Attributes$y(
+													$elm_community$typed_svg$TypedSvg$Types$px(20)),
+													$elm_community$typed_svg$TypedSvg$Attributes$stroke(
+													$elm_community$typed_svg$TypedSvg$Types$Paint(settings.colors.background)),
+													$elm_community$typed_svg$TypedSvg$Attributes$fill(
+													$elm_community$typed_svg$TypedSvg$Types$Paint(settings.colors.background)),
+													$elm_community$typed_svg$TypedSvg$Attributes$cursor($elm_community$typed_svg$TypedSvg$Types$CursorPointer),
+													$elm_community$typed_svg$TypedSvg$Attributes$fontSize(
+													$elm_community$typed_svg$TypedSvg$Types$px(26))
+												]),
+											_List_fromArray(
+												[
+													$elm_community$typed_svg$TypedSvg$Core$text('>')
+												]))
 										]))
 								])) : A2($elm_community$typed_svg$TypedSvg$g, _List_Nil, _List_Nil);
 					} else {
