@@ -121,7 +121,7 @@ type alias Charge =
 
 defaultSettings : Settings
 defaultSettings =
-    { r = 15.0
+    { r = 20.0
     , density = 20
     , steps = 3000
     , delta = 2
@@ -1464,7 +1464,7 @@ viewFieldSource activeSourceId settings field =
                             if field.source.id == id then
                                 [ Attributes.id "activeSource"
                                 , Attributes.stroke <| Paint Color.lightGreen
-                                , Attributes.strokeWidth <| px 5
+                                , Attributes.strokeWidth <| px 8
                                 ]
 
                             else

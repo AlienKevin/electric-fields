@@ -7602,7 +7602,7 @@ var $author$project$Simulation$defaultSettings = {
 	delta: 2,
 	density: 20,
 	magnitude: 1.0,
-	r: 15.0,
+	r: 20.0,
 	showSourceValue: true,
 	steps: 3000
 };
@@ -17720,7 +17720,7 @@ var $author$project$Simulation$viewFieldSource = F3(
 											$elm_community$typed_svg$TypedSvg$Attributes$stroke(
 											$elm_community$typed_svg$TypedSvg$Types$Paint($avh4$elm_color$Color$lightGreen)),
 											$elm_community$typed_svg$TypedSvg$Attributes$strokeWidth(
-											$elm_community$typed_svg$TypedSvg$Types$px(5))
+											$elm_community$typed_svg$TypedSvg$Types$px(8))
 										]) : _List_Nil;
 								} else {
 									return _List_Nil;
