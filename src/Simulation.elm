@@ -1496,6 +1496,7 @@ viewFieldSource activeSourceId settings field =
                         [ Attributes.transform
                             [ Translate (x - tooltipWidth / 2) (y - field.source.r - tooltipHeight - 10)
                             ]
+                        , Attributes.id "sourceValueControl"
                         ]
                         [ Svg.rect
                             [ Attributes.x <| px 0
@@ -1525,7 +1526,6 @@ viewFieldSource activeSourceId settings field =
                                 )
                             , Attributes.y (px <| 20)
                             , Attributes.stroke <| Paint Color.black
-                            , Attributes.id "sourceValueLabel"
                             , Attributes.cursor CursorDefault
                             ]
                             [ TypedSvg.Core.text (signToString field.source.sign ++ Round.round 1 field.source.magnitude)

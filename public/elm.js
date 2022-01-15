@@ -17749,7 +17749,8 @@ var $author$project$Simulation$viewFieldSource = F3(
 									_List_fromArray(
 										[
 											A2($elm_community$typed_svg$TypedSvg$Types$Translate, x - (tooltipWidth / 2), ((y - field.source.r) - tooltipHeight) - 10)
-										]))
+										])),
+									$elm_community$typed_svg$TypedSvg$Attributes$id('sourceValueControl')
 								]),
 							_List_fromArray(
 								[
@@ -17798,7 +17799,6 @@ var $author$project$Simulation$viewFieldSource = F3(
 											$elm_community$typed_svg$TypedSvg$Types$px(20)),
 											$elm_community$typed_svg$TypedSvg$Attributes$stroke(
 											$elm_community$typed_svg$TypedSvg$Types$Paint($avh4$elm_color$Color$black)),
-											$elm_community$typed_svg$TypedSvg$Attributes$id('sourceValueLabel'),
 											$elm_community$typed_svg$TypedSvg$Attributes$cursor($elm_community$typed_svg$TypedSvg$Types$CursorDefault)
 										]),
 									_List_fromArray(
