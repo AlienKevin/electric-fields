@@ -332,10 +332,10 @@ update message model =
             ( closeUploadPopUp model, Cmd.none )
 
         GotViewport viewport ->
-            ( updateSimulationSize (viewport.viewport.width - 50) (viewport.viewport.height - 110) model, Cmd.none )
+            ( updateSimulationSize (viewport.viewport.width - 50) (viewport.viewport.height - 150) model, Cmd.none )
 
         WindowResized newWidth newHeight ->
-            ( updateSimulationSize (toFloat newWidth - 50) (toFloat newHeight - 110) model, Cmd.none )
+            ( updateSimulationSize (toFloat newWidth - 50) (toFloat newHeight - 150) model, Cmd.none )
 
         ToggleShowSourceValue newChecked ->
             ( toggleShowSourceValue newChecked model, Cmd.none )
@@ -550,7 +550,8 @@ viewControlPanel model =
     E.row
         [ E.centerX
         , E.spacing 10
-        , styles.padTop10
+        , styles.padTop20
+        , styles.padBottom20
         ]
         [ viewButtonNoProp "Help" <| ShowPopUp HelpPopUp
         , viewButtonNoProp "Settings" <| ShowPopUp SettingsPopUp

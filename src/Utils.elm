@@ -60,6 +60,8 @@ styles =
         E.htmlAttribute <| Html.Attributes.style "margin-top" "10px"
     , padTop20 =
         E.htmlAttribute <| Html.Attributes.style "margin-top" "20px"
+    , padBottom20 =
+        E.htmlAttribute <| Html.Attributes.style "margin-bottom" "20px"
     }
 
 
