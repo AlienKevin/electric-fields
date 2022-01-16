@@ -1449,15 +1449,21 @@ viewFieldSource activeSourceId settings field =
             ]
             []
         , Svg.circle
-            ([ Attributes.cx (px x)
-             , Attributes.cy (px y)
-             , Attributes.r (px field.source.r)
-             , Attributes.fill <| Paint fill
-             , Draggable.mouseTrigger field.source.id DragMsg
-             , onWheel ScaleSourceMagnitude
-             , Html.Events.onDoubleClick ToggleSourceSign
-             , onRightClick ShowFieldContextMenu
-             ]
+            (([ Attributes.cx (px x)
+              , Attributes.cy (px y)
+              , Attributes.r (px field.source.r)
+              , Attributes.fill <| Paint fill
+              , Draggable.mouseTrigger field.source.id DragMsg
+              , onWheel ScaleSourceMagnitude
+              , Html.Events.onDoubleClick ToggleSourceSign
+              ]
+                ++ (if Just field.source.id == activeSourceId then
+                        [ onRightClick ShowFieldContextMenu ]
+
+                    else
+                        []
+                   )
+             )
                 ++ Draggable.touchTriggers field.source.id DragMsg
                 ++ (case activeSourceId of
                         Just id ->

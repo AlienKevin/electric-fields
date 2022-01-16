@@ -17697,21 +17697,27 @@ var $author$project$Simulation$viewFieldSource = F3(
 					A2(
 					$elm_community$typed_svg$TypedSvg$circle,
 					_Utils_ap(
-						_List_fromArray(
-							[
-								$elm_community$typed_svg$TypedSvg$Attributes$cx(
-								$elm_community$typed_svg$TypedSvg$Types$px(x)),
-								$elm_community$typed_svg$TypedSvg$Attributes$cy(
-								$elm_community$typed_svg$TypedSvg$Types$px(y)),
-								$elm_community$typed_svg$TypedSvg$Attributes$r(
-								$elm_community$typed_svg$TypedSvg$Types$px(field.source.r)),
-								$elm_community$typed_svg$TypedSvg$Attributes$fill(
-								$elm_community$typed_svg$TypedSvg$Types$Paint(fill)),
-								A2($zaboco$elm_draggable$Draggable$mouseTrigger, field.source.id, $author$project$Simulation$DragMsg),
-								$author$project$Simulation$onWheel($author$project$Simulation$ScaleSourceMagnitude),
-								$elm$html$Html$Events$onDoubleClick($author$project$Simulation$ToggleSourceSign),
-								$author$project$Simulation$onRightClick($author$project$Simulation$ShowFieldContextMenu)
-							]),
+						_Utils_ap(
+							_List_fromArray(
+								[
+									$elm_community$typed_svg$TypedSvg$Attributes$cx(
+									$elm_community$typed_svg$TypedSvg$Types$px(x)),
+									$elm_community$typed_svg$TypedSvg$Attributes$cy(
+									$elm_community$typed_svg$TypedSvg$Types$px(y)),
+									$elm_community$typed_svg$TypedSvg$Attributes$r(
+									$elm_community$typed_svg$TypedSvg$Types$px(field.source.r)),
+									$elm_community$typed_svg$TypedSvg$Attributes$fill(
+									$elm_community$typed_svg$TypedSvg$Types$Paint(fill)),
+									A2($zaboco$elm_draggable$Draggable$mouseTrigger, field.source.id, $author$project$Simulation$DragMsg),
+									$author$project$Simulation$onWheel($author$project$Simulation$ScaleSourceMagnitude),
+									$elm$html$Html$Events$onDoubleClick($author$project$Simulation$ToggleSourceSign)
+								]),
+							_Utils_eq(
+								$elm$core$Maybe$Just(field.source.id),
+								activeSourceId) ? _List_fromArray(
+								[
+									$author$project$Simulation$onRightClick($author$project$Simulation$ShowFieldContextMenu)
+								]) : _List_Nil),
 						_Utils_ap(
 							A2($zaboco$elm_draggable$Draggable$touchTriggers, field.source.id, $author$project$Simulation$DragMsg),
 							function () {
