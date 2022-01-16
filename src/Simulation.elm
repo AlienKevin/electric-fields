@@ -453,14 +453,19 @@ distance ( x1, y1 ) ( x2, y2 ) =
     sqrt ((x2 - x1) ^ 2 + (y2 - y1) ^ 2)
 
 
-dragConfig : Draggable.Config Id Msg
-dragConfig =
+dragConfig : Bool -> Draggable.Config Id Msg
+dragConfig isDeleteModeOn =
     Draggable.customConfig
-        [ Draggable.Events.onDragBy OnDragBy
-        , Draggable.Events.onDragStart StartDragging
-        , Draggable.Events.onDragEnd EndDragging
-        , Draggable.Events.onClick ActivateSource
-        ]
+        (if isDeleteModeOn then
+            []
+
+         else
+            [ Draggable.Events.onDragBy OnDragBy
+            , Draggable.Events.onDragStart StartDragging
+            , Draggable.Events.onDragEnd EndDragging
+            , Draggable.Events.onClick ActivateSource
+            ]
+        )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -491,7 +496,7 @@ update msg model =
             ( stopWheelingTimeOut model, Cmd.none )
 
         DragMsg dragMsg ->
-            Draggable.update dragConfig dragMsg model
+            Draggable.update (dragConfig model.isDeleteModeOn) dragMsg model
 
         ShowFieldContextMenu ->
             ( showFieldContextMenu model, Cmd.none )
@@ -836,13 +841,9 @@ decodeModel =
 
 setActiveSourceId : Id -> Model -> Model
 setActiveSourceId id model =
-    if model.isDeleteModeOn then
-        model
-
-    else
-        { model
-            | activeSourceId = Just id
-        }
+    { model
+        | activeSourceId = Just id
+    }
 
 
 toggleSourceSign : Model -> Model
@@ -1312,14 +1313,20 @@ dragSource ( dx, dy ) field =
 view : Model -> Html Msg
 view model =
     E.layout
-        [ E.width E.fill
-        , E.height E.fill
-        , Element.Events.onClick ClickedBackground
-        , Font.size 16
-        , Font.family
+        ([ E.width E.fill
+         , E.height E.fill
+         , Font.size 16
+         , Font.family
             [ Font.monospace
             ]
-        ]
+         ]
+            ++ (if model.isDeleteModeOn then
+                    []
+
+                else
+                    [ Element.Events.onClick ClickedBackground ]
+               )
+        )
     <|
         E.el
             [ E.inFront <| viewContextMenu model
@@ -1338,7 +1345,7 @@ view model =
                 <|
                     viewBackground model.width model.height model.settings.colors.background
                         :: List.map (viewFieldLines model.settings) model.fields
-                        ++ List.map (viewFieldSource model.activeSourceId model.settings) model.fields
+                        ++ List.map (viewFieldSource model.isDeleteModeOn model.activeSourceId model.settings) model.fields
             )
 
 
@@ -1435,8 +1442,8 @@ viewGeneralContextMenu menuItemstyless ( x, y ) =
         ]
 
 
-viewFieldSource : Maybe Id -> Settings -> Field -> Svg Msg
-viewFieldSource activeSourceId settings field =
+viewFieldSource : Bool -> Maybe Id -> Settings -> Field -> Svg Msg
+viewFieldSource isDeleteModeOn activeSourceId settings field =
     let
         fill =
             case field.source.sign of
@@ -1484,7 +1491,6 @@ viewFieldSource activeSourceId settings field =
               , Attributes.cy (px y)
               , Attributes.r (px field.source.r)
               , Attributes.fill <| Paint fill
-              , Draggable.mouseTrigger field.source.id DragMsg
               , onWheel ScaleSourceMagnitude
               , Html.Events.onDoubleClick ToggleSourceSign
               ]
@@ -1494,8 +1500,14 @@ viewFieldSource activeSourceId settings field =
                     else
                         []
                    )
+                ++ (if isDeleteModeOn then
+                        []
+
+                    else
+                        Draggable.mouseTrigger field.source.id DragMsg
+                            :: Draggable.touchTriggers field.source.id DragMsg
+                   )
              )
-                ++ Draggable.touchTriggers field.source.id DragMsg
                 ++ (case activeSourceId of
                         Just id ->
                             if field.source.id == id then

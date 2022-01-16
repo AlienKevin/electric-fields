@@ -1371,10 +1371,6 @@ cursorClicked position model =
             in
             case clickedChargedId of
                 Just id ->
-                    let
-                        _ =
-                            Debug.log "clickedChargedId" id
-                    in
                     updateActiveSimulation
                         (Simulation.deleteCharge id model.activeSimulation)
                         model

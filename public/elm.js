@@ -8409,7 +8409,6 @@ var $author$project$Simulation$deleteCharge = F2(
 				fields: A3($author$project$Simulation$calculateFields, model.width, model.height, newFields)
 			});
 	});
-var $elm$core$Debug$log = _Debug_log;
 var $elm$core$Tuple$second = function (_v0) {
 	var y = _v0.b;
 	return y;
@@ -8452,7 +8451,6 @@ var $author$project$Main$cursorClicked = F2(
 					model.activeSimulation.fields);
 				if (clickedChargedId.$ === 'Just') {
 					var id = clickedChargedId.a;
-					var _v2 = A2($elm$core$Debug$log, 'clickedChargedId', id);
 					return A2(
 						$author$project$Main$updateActiveSimulation,
 						A2($author$project$Simulation$deleteCharge, id, model.activeSimulation),
@@ -9533,14 +9531,16 @@ var $zaboco$elm_draggable$Draggable$Events$onDragStart = F2(
 				onDragStart: A2($elm$core$Basics$composeL, $elm$core$Maybe$Just, toMsg)
 			});
 	});
-var $author$project$Simulation$dragConfig = $zaboco$elm_draggable$Draggable$customConfig(
-	_List_fromArray(
-		[
-			$zaboco$elm_draggable$Draggable$Events$onDragBy($author$project$Simulation$OnDragBy),
-			$zaboco$elm_draggable$Draggable$Events$onDragStart($author$project$Simulation$StartDragging),
-			$zaboco$elm_draggable$Draggable$Events$onDragEnd($author$project$Simulation$EndDragging),
-			$zaboco$elm_draggable$Draggable$Events$onClick($author$project$Simulation$ActivateSource)
-		]));
+var $author$project$Simulation$dragConfig = function (isDeleteModeOn) {
+	return $zaboco$elm_draggable$Draggable$customConfig(
+		isDeleteModeOn ? _List_Nil : _List_fromArray(
+			[
+				$zaboco$elm_draggable$Draggable$Events$onDragBy($author$project$Simulation$OnDragBy),
+				$zaboco$elm_draggable$Draggable$Events$onDragStart($author$project$Simulation$StartDragging),
+				$zaboco$elm_draggable$Draggable$Events$onDragEnd($author$project$Simulation$EndDragging),
+				$zaboco$elm_draggable$Draggable$Events$onClick($author$project$Simulation$ActivateSource)
+			]));
+};
 var $author$project$Simulation$getActiveFields = function (model) {
 	var _v0 = model.activeSourceId;
 	if (_v0.$ === 'Just') {
@@ -9725,7 +9725,7 @@ var $author$project$Simulation$scaleSourceMagnitude = F2(
 	});
 var $author$project$Simulation$setActiveSourceId = F2(
 	function (id, model) {
-		return model.isDeleteModeOn ? model : _Utils_update(
+		return _Utils_update(
 			model,
 			{
 				activeSourceId: $elm$core$Maybe$Just(id)
@@ -10097,7 +10097,11 @@ var $author$project$Simulation$update = F2(
 					$elm$core$Platform$Cmd$none);
 			case 'DragMsg':
 				var dragMsg = msg.a;
-				return A3($zaboco$elm_draggable$Draggable$update, $author$project$Simulation$dragConfig, dragMsg, model);
+				return A3(
+					$zaboco$elm_draggable$Draggable$update,
+					$author$project$Simulation$dragConfig(model.isDeleteModeOn),
+					dragMsg,
+					model);
 			case 'ShowFieldContextMenu':
 				return _Utils_Tuple2(
 					$author$project$Simulation$showFieldContextMenu(model),
@@ -17671,8 +17675,8 @@ var $elm_community$typed_svg$TypedSvg$Attributes$y = function (length) {
 		'y',
 		$elm_community$typed_svg$TypedSvg$TypesToStrings$lengthToString(length));
 };
-var $author$project$Simulation$viewFieldSource = F3(
-	function (activeSourceId, settings, field) {
+var $author$project$Simulation$viewFieldSource = F4(
+	function (isDeleteModeOn, activeSourceId, settings, field) {
 		var y = $elm_explorations$linear_algebra$Math$Vector2$getY(field.source.position);
 		var x = $elm_explorations$linear_algebra$Math$Vector2$getX(field.source.position);
 		var gradientId = 'gradient' + $elm$core$String$fromInt(field.source.id);
@@ -17760,33 +17764,35 @@ var $author$project$Simulation$viewFieldSource = F3(
 									$elm_community$typed_svg$TypedSvg$Types$px(field.source.r)),
 									$elm_community$typed_svg$TypedSvg$Attributes$fill(
 									$elm_community$typed_svg$TypedSvg$Types$Paint(fill)),
-									A2($zaboco$elm_draggable$Draggable$mouseTrigger, field.source.id, $author$project$Simulation$DragMsg),
 									$author$project$Simulation$onWheel($author$project$Simulation$ScaleSourceMagnitude),
 									$elm$html$Html$Events$onDoubleClick($author$project$Simulation$ToggleSourceSign)
 								]),
-							_Utils_eq(
-								$elm$core$Maybe$Just(field.source.id),
-								activeSourceId) ? _List_fromArray(
-								[
-									$author$project$Simulation$onRightClick($author$project$Simulation$ShowFieldContextMenu)
-								]) : _List_Nil),
-						_Utils_ap(
-							A2($zaboco$elm_draggable$Draggable$touchTriggers, field.source.id, $author$project$Simulation$DragMsg),
-							function () {
-								if (activeSourceId.$ === 'Just') {
-									var id = activeSourceId.a;
-									return _Utils_eq(field.source.id, id) ? _List_fromArray(
-										[
-											$elm_community$typed_svg$TypedSvg$Attributes$id('activeSource'),
-											$elm_community$typed_svg$TypedSvg$Attributes$stroke(
-											$elm_community$typed_svg$TypedSvg$Types$Paint($avh4$elm_color$Color$lightGreen)),
-											$elm_community$typed_svg$TypedSvg$Attributes$strokeWidth(
-											$elm_community$typed_svg$TypedSvg$Types$px(8))
-										]) : _List_Nil;
-								} else {
-									return _List_Nil;
-								}
-							}())),
+							_Utils_ap(
+								_Utils_eq(
+									$elm$core$Maybe$Just(field.source.id),
+									activeSourceId) ? _List_fromArray(
+									[
+										$author$project$Simulation$onRightClick($author$project$Simulation$ShowFieldContextMenu)
+									]) : _List_Nil,
+								isDeleteModeOn ? _List_Nil : A2(
+									$elm$core$List$cons,
+									A2($zaboco$elm_draggable$Draggable$mouseTrigger, field.source.id, $author$project$Simulation$DragMsg),
+									A2($zaboco$elm_draggable$Draggable$touchTriggers, field.source.id, $author$project$Simulation$DragMsg)))),
+						function () {
+							if (activeSourceId.$ === 'Just') {
+								var id = activeSourceId.a;
+								return _Utils_eq(field.source.id, id) ? _List_fromArray(
+									[
+										$elm_community$typed_svg$TypedSvg$Attributes$id('activeSource'),
+										$elm_community$typed_svg$TypedSvg$Attributes$stroke(
+										$elm_community$typed_svg$TypedSvg$Types$Paint($avh4$elm_color$Color$lightGreen)),
+										$elm_community$typed_svg$TypedSvg$Attributes$strokeWidth(
+										$elm_community$typed_svg$TypedSvg$Types$px(8))
+									]) : _List_Nil;
+							} else {
+								return _List_Nil;
+							}
+						}()),
 					_List_fromArray(
 						[
 							A2(
@@ -17962,16 +17968,20 @@ var $author$project$Simulation$viewFieldSource = F3(
 var $author$project$Simulation$view = function (model) {
 	return A2(
 		$mdgriffith$elm_ui$Element$layout,
-		_List_fromArray(
-			[
-				$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill),
-				$mdgriffith$elm_ui$Element$height($mdgriffith$elm_ui$Element$fill),
-				$mdgriffith$elm_ui$Element$Events$onClick($author$project$Simulation$ClickedBackground),
-				$mdgriffith$elm_ui$Element$Font$size(16),
-				$mdgriffith$elm_ui$Element$Font$family(
-				_List_fromArray(
-					[$mdgriffith$elm_ui$Element$Font$monospace]))
-			]),
+		_Utils_ap(
+			_List_fromArray(
+				[
+					$mdgriffith$elm_ui$Element$width($mdgriffith$elm_ui$Element$fill),
+					$mdgriffith$elm_ui$Element$height($mdgriffith$elm_ui$Element$fill),
+					$mdgriffith$elm_ui$Element$Font$size(16),
+					$mdgriffith$elm_ui$Element$Font$family(
+					_List_fromArray(
+						[$mdgriffith$elm_ui$Element$Font$monospace]))
+				]),
+			model.isDeleteModeOn ? _List_Nil : _List_fromArray(
+				[
+					$mdgriffith$elm_ui$Element$Events$onClick($author$project$Simulation$ClickedBackground)
+				])),
 		A2(
 			$mdgriffith$elm_ui$Element$el,
 			_List_fromArray(
@@ -18005,7 +18015,7 @@ var $author$project$Simulation$view = function (model) {
 								model.fields),
 							A2(
 								$elm$core$List$map,
-								A2($author$project$Simulation$viewFieldSource, model.activeSourceId, model.settings),
+								A3($author$project$Simulation$viewFieldSource, model.isDeleteModeOn, model.activeSourceId, model.settings),
 								model.fields)))))));
 };
 var $author$project$Main$DownloadPopUp = {$: 'DownloadPopUp'};
