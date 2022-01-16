@@ -16148,6 +16148,8 @@ var $mdgriffith$elm_ui$Element$Font$size = function (i) {
 		$mdgriffith$elm_ui$Internal$Flag$fontSize,
 		$mdgriffith$elm_ui$Internal$Model$FontSize(i));
 };
+var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
+var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
 var $mdgriffith$elm_ui$Element$rgba = $mdgriffith$elm_ui$Internal$Model$Rgba;
 var $author$project$Utils$toElmUiColor = function (color) {
 	var _v0 = $avh4$elm_color$Color$toRgba(color);
@@ -16348,8 +16350,6 @@ var $elm_community$typed_svg$TypedSvg$Attributes$viewBox = F4(
 					_List_fromArray(
 						[minX, minY, vWidth, vHeight]))));
 	});
-var $elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
-var $elm$html$Html$Attributes$style = $elm$virtual_dom$VirtualDom$style;
 var $mdgriffith$elm_ui$Internal$Flag$borderColor = $mdgriffith$elm_ui$Internal$Flag$flag(28);
 var $mdgriffith$elm_ui$Element$Border$color = function (clr) {
 	return A2(
@@ -20422,7 +20422,9 @@ var $author$project$Main$view = function (model) {
 				_List_fromArray(
 					[$mdgriffith$elm_ui$Element$Font$monospace])),
 				$mdgriffith$elm_ui$Element$Background$color(
-				$author$project$Utils$toElmUiColor(model.activeSimulation.settings.colors.background))
+				$author$project$Utils$toElmUiColor(model.activeSimulation.settings.colors.background)),
+				$mdgriffith$elm_ui$Element$htmlAttribute(
+				A2($elm$html$Html$Attributes$style, 'touch-action', 'none'))
 			]),
 		A2(
 			$mdgriffith$elm_ui$Element$el,
