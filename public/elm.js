@@ -7643,6 +7643,7 @@ var $author$project$Main$getDefaultSimulationName = function (index) {
 var $elm$browser$Browser$Dom$getViewport = _Browser_withWindow(_Browser_getViewport);
 var $author$project$Simulation$init = F2(
 	function (width, height) {
+		var halfWidth = width / 2;
 		var defaultFields = _List_fromArray(
 			[
 				{
@@ -7651,8 +7652,8 @@ var $author$project$Simulation$init = F2(
 				lines: _List_Nil,
 				source: {
 					id: 0,
-					magnitude: 3.0,
-					position: A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 465.0, 270.0),
+					magnitude: 1.0,
+					position: A2($elm_explorations$linear_algebra$Math$Vector2$vec2, halfWidth, (height * 1) / 3),
 					r: $author$project$Simulation$defaultSettings.r,
 					sign: $author$project$Simulation$Negative,
 					velocity: A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 0, 0)
@@ -7666,37 +7667,9 @@ var $author$project$Simulation$init = F2(
 				source: {
 					id: 1,
 					magnitude: 1.0,
-					position: A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 618.0, 515.0),
+					position: A2($elm_explorations$linear_algebra$Math$Vector2$vec2, halfWidth, (height * 2) / 3),
 					r: $author$project$Simulation$defaultSettings.r,
 					sign: $author$project$Simulation$Positive,
-					velocity: A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 0, 0)
-				},
-				steps: $author$project$Simulation$defaultSettings.steps
-			},
-				{
-				delta: $author$project$Simulation$defaultSettings.delta,
-				density: $author$project$Simulation$defaultSettings.density,
-				lines: _List_Nil,
-				source: {
-					id: 2,
-					magnitude: 10.0,
-					position: A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 553.0, 338.0),
-					r: $author$project$Simulation$defaultSettings.r,
-					sign: $author$project$Simulation$Positive,
-					velocity: A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 0, 0)
-				},
-				steps: $author$project$Simulation$defaultSettings.steps
-			},
-				{
-				delta: $author$project$Simulation$defaultSettings.delta,
-				density: $author$project$Simulation$defaultSettings.density,
-				lines: _List_Nil,
-				source: {
-					id: 3,
-					magnitude: 20.0,
-					position: A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 597.0, 182.0),
-					r: $author$project$Simulation$defaultSettings.r,
-					sign: $author$project$Simulation$Negative,
 					velocity: A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 0, 0)
 				},
 				steps: $author$project$Simulation$defaultSettings.steps

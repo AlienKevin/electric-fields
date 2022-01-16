@@ -167,26 +167,17 @@ type Msg
 init : Float -> Float -> Model
 init width height =
     let
+        halfWidth =
+            width / 2
+
         defaultFields =
-            [ { source = { id = 0, sign = Negative, magnitude = 3.0, position = vec2 465.0 270.0, velocity = vec2 0 0, r = defaultSettings.r }
+            [ { source = { id = 0, sign = Negative, magnitude = 1.0, position = vec2 halfWidth (height * 1 / 3), velocity = vec2 0 0, r = defaultSettings.r }
               , density = defaultSettings.density
               , steps = defaultSettings.steps
               , delta = defaultSettings.delta
               , lines = []
               }
-            , { source = { id = 1, sign = Positive, magnitude = 1.0, position = vec2 618.0 515.0, velocity = vec2 0 0, r = defaultSettings.r }
-              , density = defaultSettings.density
-              , steps = defaultSettings.steps
-              , delta = defaultSettings.delta
-              , lines = []
-              }
-            , { source = { id = 2, sign = Positive, magnitude = 10.0, position = vec2 553.0 338.0, velocity = vec2 0 0, r = defaultSettings.r }
-              , density = defaultSettings.density
-              , steps = defaultSettings.steps
-              , delta = defaultSettings.delta
-              , lines = []
-              }
-            , { source = { id = 3, sign = Negative, magnitude = 20.0, position = vec2 597.0 182.0, velocity = vec2 0 0, r = defaultSettings.r }
+            , { source = { id = 1, sign = Positive, magnitude = 1.0, position = vec2 halfWidth (height * 2 / 3), velocity = vec2 0 0, r = defaultSettings.r }
               , density = defaultSettings.density
               , steps = defaultSettings.steps
               , delta = defaultSettings.delta
