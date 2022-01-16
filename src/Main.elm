@@ -23,6 +23,7 @@ import Json.Decode as Decode exposing (Decoder)
 import Json.Decode.Field as Field
 import Json.Encode as Encode
 import List.Extra
+import Math.Vector2 as Vector2
 import Simulation
 import Task
 import Utils exposing (centeredText, colors, styles, toElmUiColor)
@@ -75,6 +76,7 @@ type UploadResult
 type Cursor
     = Selector
     | Painter Simulation.Sign
+    | Deleter
 
 
 type Msg
@@ -107,7 +109,7 @@ type Msg
     | ShowCursorOptions
     | HideCursorOptions
     | DrawCharges Simulation.Position
-    | AddCharge Simulation.Position
+    | CursorClicked Simulation.Position
     | MouseDown
     | MouseUp
     | DoNothing
@@ -198,7 +200,7 @@ view model =
             , E.centerX
             , E.centerY
             , E.htmlAttribute <| Mouse.onMove (\event -> DrawCharges event.offsetPos)
-            , E.htmlAttribute <| Mouse.onClick (\event -> AddCharge event.offsetPos)
+            , E.htmlAttribute <| Mouse.onClick (\event -> CursorClicked event.offsetPos)
             , E.htmlAttribute <| Mouse.onDown (\_ -> MouseDown)
             , E.htmlAttribute <| Mouse.onUp (\_ -> MouseUp)
             ]
@@ -360,8 +362,8 @@ update message model =
         DrawCharges position ->
             ( drawCharges position model, Cmd.none )
 
-        AddCharge position ->
-            ( addCharge position model, Cmd.none )
+        CursorClicked position ->
+            ( cursorClicked position model, Cmd.none )
 
         MouseDown ->
             ( mouseDown model, Cmd.none )
@@ -604,10 +606,13 @@ viewCursorButton model =
 
                                     Simulation.Negative ->
                                         Icons.minusCircle
+
+                            Deleter ->
+                                Icons.xSquare
                 }
 
         unselectedOptions =
-            List.filter ((/=) model.cursor) [ Selector, Painter Simulation.Positive, Painter Simulation.Negative ]
+            List.filter ((/=) model.cursor) [ Selector, Deleter, Painter Simulation.Positive, Painter Simulation.Negative ]
     in
     E.el
         [ Element.Events.onMouseEnter ShowCursorOptions
@@ -1283,12 +1288,27 @@ updateActiveSimulationState model =
 
 updateCursor : Cursor -> Model -> Model
 updateCursor newCursor model =
-    { model
-        | cursor =
-            newCursor
-        , showCursorOptions =
-            model.cursor == newCursor
-    }
+    let
+        newModel =
+            { model
+                | cursor =
+                    newCursor
+                , showCursorOptions =
+                    model.cursor == newCursor
+            }
+
+        oldSimulation =
+            model.activeSimulation
+
+        newSimulation =
+            { oldSimulation
+                | isDeleteModeOn =
+                    newCursor == Deleter
+            }
+    in
+    updateActiveSimulation
+        newSimulation
+        newModel
 
 
 showCursorOptions : Model -> Model
@@ -1319,19 +1339,50 @@ drawCharges position model =
             else
                 model
 
-        Selector ->
+        _ ->
             model
 
 
-addCharge : Simulation.Position -> Model -> Model
-addCharge position model =
+cursorClicked : Simulation.Position -> Model -> Model
+cursorClicked position model =
     case model.cursor of
         Painter sign ->
             updateActiveSimulation
                 (Simulation.addCharge sign position model.activeSimulation)
                 model
 
-        Selector ->
+        Deleter ->
+            let
+                clickedChargedId =
+                    List.Extra.findMap
+                        (\field ->
+                            if
+                                Vector2.distance
+                                    (Vector2.vec2 (Tuple.first position) (Tuple.second position))
+                                    field.source.position
+                                    <= field.source.r
+                            then
+                                Just field.source.id
+
+                            else
+                                Nothing
+                        )
+                        model.activeSimulation.fields
+            in
+            case clickedChargedId of
+                Just id ->
+                    let
+                        _ =
+                            Debug.log "clickedChargedId" id
+                    in
+                    updateActiveSimulation
+                        (Simulation.deleteCharge id model.activeSimulation)
+                        model
+
+                Nothing ->
+                    model
+
+        _ ->
             model
 
 

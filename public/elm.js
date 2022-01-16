@@ -7577,6 +7577,7 @@ var $author$project$Simulation$decodeModel = function () {
 																	drag: $zaboco$elm_draggable$Draggable$init,
 																	fields: A3($author$project$Simulation$calculateFields, width, height, fields),
 																	height: height,
+																	isDeleteModeOn: false,
 																	isWheeling: false,
 																	isWheelingTimeOutCleared: false,
 																	name: name,
@@ -7707,6 +7708,7 @@ var $author$project$Simulation$init = F2(
 			drag: $zaboco$elm_draggable$Draggable$init,
 			fields: A3($author$project$Simulation$calculateFields, width, height, defaultFields),
 			height: height,
+			isDeleteModeOn: false,
 			isWheeling: false,
 			isWheelingTimeOutCleared: false,
 			name: $author$project$Simulation$defaultName,
@@ -8255,54 +8257,6 @@ var $author$project$Main$JsonLoaded = function (a) {
 var $author$project$Main$JsonSelected = function (a) {
 	return {$: 'JsonSelected', a: a};
 };
-var $author$project$Simulation$addCharge = F3(
-	function (sign, _v0, model) {
-		var x = _v0.a;
-		var y = _v0.b;
-		var newCharge = {
-			id: model.nextId,
-			magnitude: model.settings.magnitude,
-			position: A2($elm_explorations$linear_algebra$Math$Vector2$vec2, x, y),
-			r: model.settings.r,
-			sign: sign,
-			velocity: A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 0, 0)
-		};
-		var newField = {delta: model.settings.delta, density: model.settings.density, lines: _List_Nil, source: newCharge, steps: model.settings.steps};
-		var newFields = A2($elm$core$List$cons, newField, model.fields);
-		return _Utils_update(
-			model,
-			{
-				fields: A3($author$project$Simulation$calculateFields, model.width, model.height, newFields),
-				nextId: model.nextId + 1
-			});
-	});
-var $author$project$Main$updateActiveSimulation = F2(
-	function (newActiveSimulation, model) {
-		return _Utils_update(
-			model,
-			{
-				activeSimulation: newActiveSimulation,
-				simulations: A2(
-					$elm$core$List$map,
-					function (simulation) {
-						return _Utils_eq(simulation, model.activeSimulation) ? newActiveSimulation : simulation;
-					},
-					model.simulations)
-			});
-	});
-var $author$project$Main$addCharge = F2(
-	function (position, model) {
-		var _v0 = model.cursor;
-		if (_v0.$ === 'Painter') {
-			var sign = _v0.a;
-			return A2(
-				$author$project$Main$updateActiveSimulation,
-				A3($author$project$Simulation$addCharge, sign, position, model.activeSimulation),
-				model);
-		} else {
-			return model;
-		}
-	});
 var $author$project$Main$addSimulation = function (model) {
 	var newDefaultSimulationIndex = model.defaultSimulationIndex + 1;
 	var defaultSimulationName = $author$project$Main$getDefaultSimulationName(newDefaultSimulationIndex);
@@ -8416,6 +8370,100 @@ var $author$project$Main$closeUploadPopUp = function (model) {
 		model,
 		{popUp: $author$project$Main$NoPopUp, uploadResult: $author$project$Main$UploadPending});
 };
+var $author$project$Simulation$addCharge = F3(
+	function (sign, _v0, model) {
+		var x = _v0.a;
+		var y = _v0.b;
+		var newCharge = {
+			id: model.nextId,
+			magnitude: model.settings.magnitude,
+			position: A2($elm_explorations$linear_algebra$Math$Vector2$vec2, x, y),
+			r: model.settings.r,
+			sign: sign,
+			velocity: A2($elm_explorations$linear_algebra$Math$Vector2$vec2, 0, 0)
+		};
+		var newField = {delta: model.settings.delta, density: model.settings.density, lines: _List_Nil, source: newCharge, steps: model.settings.steps};
+		var newFields = A2($elm$core$List$cons, newField, model.fields);
+		return _Utils_update(
+			model,
+			{
+				fields: A3($author$project$Simulation$calculateFields, model.width, model.height, newFields),
+				nextId: model.nextId + 1
+			});
+	});
+var $author$project$Simulation$deleteCharge = F2(
+	function (id, model) {
+		var newFields = A2(
+			$elm$core$List$filter,
+			function (field) {
+				return !_Utils_eq(field.source.id, id);
+			},
+			model.fields);
+		return _Utils_update(
+			model,
+			{
+				activeSourceId: _Utils_eq(
+					$elm$core$Maybe$Just(id),
+					model.activeSourceId) ? $elm$core$Maybe$Nothing : model.activeSourceId,
+				contextMenu: $author$project$Simulation$NoContextMenu,
+				fields: A3($author$project$Simulation$calculateFields, model.width, model.height, newFields)
+			});
+	});
+var $elm$core$Debug$log = _Debug_log;
+var $elm$core$Tuple$second = function (_v0) {
+	var y = _v0.b;
+	return y;
+};
+var $author$project$Main$updateActiveSimulation = F2(
+	function (newActiveSimulation, model) {
+		return _Utils_update(
+			model,
+			{
+				activeSimulation: newActiveSimulation,
+				simulations: A2(
+					$elm$core$List$map,
+					function (simulation) {
+						return _Utils_eq(simulation, model.activeSimulation) ? newActiveSimulation : simulation;
+					},
+					model.simulations)
+			});
+	});
+var $author$project$Main$cursorClicked = F2(
+	function (position, model) {
+		var _v0 = model.cursor;
+		switch (_v0.$) {
+			case 'Painter':
+				var sign = _v0.a;
+				return A2(
+					$author$project$Main$updateActiveSimulation,
+					A3($author$project$Simulation$addCharge, sign, position, model.activeSimulation),
+					model);
+			case 'Deleter':
+				var clickedChargedId = A2(
+					$elm_community$list_extra$List$Extra$findMap,
+					function (field) {
+						return (_Utils_cmp(
+							A2(
+								$elm_explorations$linear_algebra$Math$Vector2$distance,
+								A2($elm_explorations$linear_algebra$Math$Vector2$vec2, position.a, position.b),
+								field.source.position),
+							field.source.r) < 1) ? $elm$core$Maybe$Just(field.source.id) : $elm$core$Maybe$Nothing;
+					},
+					model.activeSimulation.fields);
+				if (clickedChargedId.$ === 'Just') {
+					var id = clickedChargedId.a;
+					var _v2 = A2($elm$core$Debug$log, 'clickedChargedId', id);
+					return A2(
+						$author$project$Main$updateActiveSimulation,
+						A2($author$project$Simulation$deleteCharge, id, model.activeSimulation),
+						model);
+				} else {
+					return model;
+				}
+			default:
+				return model;
+		}
+	});
 var $elm$json$Json$Encode$string = _Json_wrap;
 var $author$project$Main$downloadModelAsSvg = _Platform_outgoingPort('downloadModelAsSvg', $elm$json$Json$Encode$string);
 var $author$project$Main$drawCharges = F2(
@@ -9677,7 +9725,7 @@ var $author$project$Simulation$scaleSourceMagnitude = F2(
 	});
 var $author$project$Simulation$setActiveSourceId = F2(
 	function (id, model) {
-		return _Utils_update(
+		return model.isDeleteModeOn ? model : _Utils_update(
 			model,
 			{
 				activeSourceId: $elm$core$Maybe$Just(id)
@@ -10101,14 +10149,22 @@ var $author$project$Main$updateActiveSimulationWithMsg = F2(
 			A2($author$project$Main$updateActiveSimulation, newSimulation, model),
 			A2($elm$core$Platform$Cmd$map, $author$project$Main$SimulationMsg, cmd));
 	});
+var $author$project$Main$Deleter = {$: 'Deleter'};
 var $author$project$Main$updateCursor = F2(
 	function (newCursor, model) {
-		return _Utils_update(
+		var oldSimulation = model.activeSimulation;
+		var newSimulation = _Utils_update(
+			oldSimulation,
+			{
+				isDeleteModeOn: _Utils_eq(newCursor, $author$project$Main$Deleter)
+			});
+		var newModel = _Utils_update(
 			model,
 			{
 				cursor: newCursor,
 				showCursorOptions: _Utils_eq(model.cursor, newCursor)
 			});
+		return A2($author$project$Main$updateActiveSimulation, newSimulation, newModel);
 	});
 var $elm$core$String$toFloat = _String_toFloat;
 var $author$project$Main$updatePendingSetting = F3(
@@ -10337,10 +10393,10 @@ var $author$project$Main$update = F2(
 				return _Utils_Tuple2(
 					A2($author$project$Main$drawCharges, position, model),
 					$elm$core$Platform$Cmd$none);
-			case 'AddCharge':
+			case 'CursorClicked':
 				var position = message.a;
 				return _Utils_Tuple2(
-					A2($author$project$Main$addCharge, position, model),
+					A2($author$project$Main$cursorClicked, position, model),
 					$elm$core$Platform$Cmd$none);
 			case 'MouseDown':
 				return _Utils_Tuple2(
@@ -10354,8 +10410,8 @@ var $author$project$Main$update = F2(
 				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 		}
 	});
-var $author$project$Main$AddCharge = function (a) {
-	return {$: 'AddCharge', a: a};
+var $author$project$Main$CursorClicked = function (a) {
+	return {$: 'CursorClicked', a: a};
 };
 var $author$project$Main$DrawCharges = function (a) {
 	return {$: 'DrawCharges', a: a};
@@ -10573,10 +10629,6 @@ var $mdgriffith$elm_ui$Internal$Model$lengthClassName = function (x) {
 			var len = x.b;
 			return 'max' + ($elm$core$String$fromInt(max) + $mdgriffith$elm_ui$Internal$Model$lengthClassName(len));
 	}
-};
-var $elm$core$Tuple$second = function (_v0) {
-	var y = _v0.b;
-	return y;
 };
 var $mdgriffith$elm_ui$Internal$Model$transformClass = function (transform) {
 	switch (transform.$) {
@@ -18171,6 +18223,49 @@ var $author$project$Icons$plusCircle = A2(
 				]),
 			_List_Nil)
 		]));
+var $elm$svg$Svg$rect = $elm$svg$Svg$trustedNode('rect');
+var $elm$svg$Svg$Attributes$rx = _VirtualDom_attribute('rx');
+var $elm$svg$Svg$Attributes$ry = _VirtualDom_attribute('ry');
+var $elm$svg$Svg$Attributes$x = _VirtualDom_attribute('x');
+var $elm$svg$Svg$Attributes$y = _VirtualDom_attribute('y');
+var $author$project$Icons$xSquare = A2(
+	$author$project$Icons$svgFeatherIcon,
+	'x-square',
+	_List_fromArray(
+		[
+			A2(
+			$elm$svg$Svg$rect,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$x('3'),
+					$elm$svg$Svg$Attributes$y('3'),
+					$elm$svg$Svg$Attributes$width('18'),
+					$elm$svg$Svg$Attributes$height('18'),
+					$elm$svg$Svg$Attributes$rx('2'),
+					$elm$svg$Svg$Attributes$ry('2')
+				]),
+			_List_Nil),
+			A2(
+			$elm$svg$Svg$line,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$x1('9'),
+					$elm$svg$Svg$Attributes$y1('9'),
+					$elm$svg$Svg$Attributes$x2('15'),
+					$elm$svg$Svg$Attributes$y2('15')
+				]),
+			_List_Nil),
+			A2(
+			$elm$svg$Svg$line,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$x1('15'),
+					$elm$svg$Svg$Attributes$y1('9'),
+					$elm$svg$Svg$Attributes$x2('9'),
+					$elm$svg$Svg$Attributes$y2('15')
+				]),
+			_List_Nil)
+		]));
 var $author$project$Main$viewCursorButton = function (model) {
 	var viewButton = function (cursor) {
 		return A2(
@@ -18186,15 +18281,18 @@ var $author$project$Main$viewCursorButton = function (model) {
 			{
 				label: $mdgriffith$elm_ui$Element$html(
 					function () {
-						if (cursor.$ === 'Selector') {
-							return $author$project$Icons$mousePointer;
-						} else {
-							var sign = cursor.a;
-							if (sign.$ === 'Positive') {
-								return $author$project$Icons$plusCircle;
-							} else {
-								return $author$project$Icons$minusCircle;
-							}
+						switch (cursor.$) {
+							case 'Selector':
+								return $author$project$Icons$mousePointer;
+							case 'Painter':
+								var sign = cursor.a;
+								if (sign.$ === 'Positive') {
+									return $author$project$Icons$plusCircle;
+								} else {
+									return $author$project$Icons$minusCircle;
+								}
+							default:
+								return $author$project$Icons$xSquare;
 						}
 					}()),
 				onPress: $elm$core$Maybe$Nothing
@@ -18206,6 +18304,7 @@ var $author$project$Main$viewCursorButton = function (model) {
 		_List_fromArray(
 			[
 				$author$project$Main$Selector,
+				$author$project$Main$Deleter,
 				$author$project$Main$Painter($author$project$Simulation$Positive),
 				$author$project$Main$Painter($author$project$Simulation$Negative)
 			]));
@@ -18224,9 +18323,6 @@ var $author$project$Main$viewCursorButton = function (model) {
 		viewButton(model.cursor));
 };
 var $author$project$Main$UpdateActiveSimulationState = {$: 'UpdateActiveSimulationState'};
-var $elm$svg$Svg$rect = $elm$svg$Svg$trustedNode('rect');
-var $elm$svg$Svg$Attributes$x = _VirtualDom_attribute('x');
-var $elm$svg$Svg$Attributes$y = _VirtualDom_attribute('y');
 var $author$project$Icons$pause = A2(
 	$author$project$Icons$svgFeatherIcon,
 	'pause',
@@ -20452,7 +20548,7 @@ var $author$project$Main$view = function (model) {
 					$mdgriffith$elm_ui$Element$htmlAttribute(
 					$mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onClick(
 						function (event) {
-							return $author$project$Main$AddCharge(event.offsetPos);
+							return $author$project$Main$CursorClicked(event.offsetPos);
 						})),
 					$mdgriffith$elm_ui$Element$htmlAttribute(
 					$mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onDown(

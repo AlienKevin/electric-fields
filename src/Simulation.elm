@@ -1,4 +1,4 @@
-module Simulation exposing (Model, Msg, Position, Settings, Sign(..), State(..), addCharge, calculateFields, decodeModel, defaultName, defaultSettings, encodeModel, init, subscriptions, update, view)
+module Simulation exposing (Model, Msg, Position, Settings, Sign(..), State(..), addCharge, calculateFields, decodeModel, defaultName, defaultSettings, deleteCharge, encodeModel, init, subscriptions, update, view)
 
 import Browser.Events
 import Color exposing (Color)
@@ -45,6 +45,7 @@ type alias Model =
     , state : State
     , width : Float
     , height : Float
+    , isDeleteModeOn : Bool
     }
 
 
@@ -212,6 +213,7 @@ init width height =
             , width = width
             , height = height
             , state = Resting
+            , isDeleteModeOn = False
             }
     in
     defaultModel
@@ -828,14 +830,19 @@ decodeModel =
                                                                 , isWheeling = False
                                                                 , isWheelingTimeOutCleared = False
                                                                 , state = Resting
+                                                                , isDeleteModeOn = False
                                                                 }
 
 
 setActiveSourceId : Id -> Model -> Model
 setActiveSourceId id model =
-    { model
-        | activeSourceId = Just id
-    }
+    if model.isDeleteModeOn then
+        model
+
+    else
+        { model
+            | activeSourceId = Just id
+        }
 
 
 toggleSourceSign : Model -> Model
@@ -1021,6 +1028,30 @@ deleteActiveField model =
             NoContextMenu
         , activeSourceId =
             Nothing
+    }
+
+
+deleteCharge : Id -> Model -> Model
+deleteCharge id model =
+    let
+        newFields =
+            List.filter
+                (\field ->
+                    field.source.id /= id
+                )
+                model.fields
+    in
+    { model
+        | fields =
+            calculateFields model.width model.height newFields
+        , contextMenu =
+            NoContextMenu
+        , activeSourceId =
+            if Just id == model.activeSourceId then
+                Nothing
+
+            else
+                model.activeSourceId
     }
 
 
