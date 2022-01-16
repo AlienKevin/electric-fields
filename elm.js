@@ -18485,19 +18485,17 @@ var $author$project$Main$viewPopUpOf = F3(
 						$author$project$Main$onClickNoProp($author$project$Main$DoNothing))
 					]),
 				attributes),
-			_Utils_ap(
-				_List_fromArray(
-					[
-						A2(
-						$mdgriffith$elm_ui$Element$el,
-						_List_fromArray(
-							[
-								$mdgriffith$elm_ui$Element$Font$size(18),
-								$mdgriffith$elm_ui$Element$paddingEach(
-								{bottom: 10, left: 0, right: 0, top: 0})
-							]),
-						$mdgriffith$elm_ui$Element$text(title))
-					]),
+			A2(
+				$elm$core$List$cons,
+				A2(
+					$mdgriffith$elm_ui$Element$el,
+					_List_fromArray(
+						[
+							$mdgriffith$elm_ui$Element$Font$size(18),
+							$mdgriffith$elm_ui$Element$paddingEach(
+							{bottom: 10, left: 0, right: 0, top: 0})
+						]),
+					$mdgriffith$elm_ui$Element$text(title)),
 				content));
 	});
 var $author$project$Main$viewApplyOptions = function (model) {
