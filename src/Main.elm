@@ -15,6 +15,7 @@ import File exposing (File)
 import File.Download
 import File.Select
 import Html exposing (Html)
+import Html.Attributes
 import Html.Events
 import Html.Events.Extra.Mouse as Mouse
 import Icons
@@ -187,6 +188,7 @@ view model =
             [ Font.monospace
             ]
         , Background.color <| toElmUiColor model.activeSimulation.settings.colors.background
+        , E.htmlAttribute <| Html.Attributes.style "touch-action" "none"
         ]
     <|
         E.el
