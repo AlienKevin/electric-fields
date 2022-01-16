@@ -1284,6 +1284,8 @@ updateCursor newCursor model =
     { model
         | cursor =
             newCursor
+        , showCursorOptions =
+            model.cursor == newCursor
     }
 
 

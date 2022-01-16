@@ -10105,7 +10105,10 @@ var $author$project$Main$updateCursor = F2(
 	function (newCursor, model) {
 		return _Utils_update(
 			model,
-			{cursor: newCursor});
+			{
+				cursor: newCursor,
+				showCursorOptions: _Utils_eq(model.cursor, newCursor)
+			});
 	});
 var $elm$core$String$toFloat = _String_toFloat;
 var $author$project$Main$updatePendingSetting = F3(
