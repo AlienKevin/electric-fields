@@ -911,7 +911,7 @@ viewPopUpOf title attributes content =
             ++ attributes
         )
     <|
-        [ E.el
+        (E.el
             [ Font.size 18
             , E.paddingEach
                 { left = 0
@@ -920,10 +920,10 @@ viewPopUpOf title attributes content =
                 , bottom = 10
                 }
             ]
-          <|
+         <|
             E.text title
-        ]
-            ++ content
+        )
+            :: content
 
 
 textHeader : String -> E.Element Msg

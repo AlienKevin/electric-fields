@@ -448,11 +448,6 @@ calculateFieldLine { charges, steps, delta, sourceSign, startChargeId, start, xB
         (List.range 0 (steps - 1))
 
 
-distance : Point -> Point -> Float
-distance ( x1, y1 ) ( x2, y2 ) =
-    sqrt ((x2 - x1) ^ 2 + (y2 - y1) ^ 2)
-
-
 dragConfig : Bool -> Draggable.Config Id Msg
 dragConfig isDeleteModeOn =
     Draggable.customConfig
