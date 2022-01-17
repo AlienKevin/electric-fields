@@ -336,10 +336,10 @@ update message model =
             ( closeUploadPopUp model, Cmd.none )
 
         GotViewport viewport ->
-            ( updateSimulationSize (viewport.viewport.width - 50) (viewport.viewport.height - 150) model, Cmd.none )
+            ( updateSimulationSize (viewport.viewport.width) (viewport.viewport.height - 150) model, Cmd.none )
 
         WindowResized newWidth newHeight ->
-            ( updateSimulationSize (toFloat newWidth - 50) (toFloat newHeight - 150) model, Cmd.none )
+            ( updateSimulationSize (toFloat newWidth) (toFloat newHeight - 150) model, Cmd.none )
 
         ToggleShowSourceValue newChecked ->
             ( toggleShowSourceValue newChecked model, Cmd.none )
