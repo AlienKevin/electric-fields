@@ -10329,13 +10329,13 @@ var $author$project$Main$update = F2(
 			case 'GotViewport':
 				var viewport = message.a;
 				return _Utils_Tuple2(
-					A3($author$project$Main$updateSimulationSize, viewport.viewport.width - 50, viewport.viewport.height - 150, model),
+					A3($author$project$Main$updateSimulationSize, viewport.viewport.width, viewport.viewport.height - 150, model),
 					$elm$core$Platform$Cmd$none);
 			case 'WindowResized':
 				var newWidth = message.a;
 				var newHeight = message.b;
 				return _Utils_Tuple2(
-					A3($author$project$Main$updateSimulationSize, newWidth - 50, newHeight - 150, model),
+					A3($author$project$Main$updateSimulationSize, newWidth, newHeight - 150, model),
 					$elm$core$Platform$Cmd$none);
 			case 'ToggleShowSourceValue':
 				var newChecked = message.a;
