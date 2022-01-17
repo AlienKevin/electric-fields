@@ -216,23 +216,34 @@ viewTabs model =
         List.map
             (\simulation ->
                 if simulation == model.activeSimulation then
-                    Input.text
+                    E.row
                         (styles.tab
                             ++ [ Background.color colors.white
-                               , E.padding 15
-                               , E.inFront <| viewCloseTabButton simulation
+                               , E.padding 8
                                ]
                         )
-                        { label = Input.labelHidden "current simulation name"
-                        , onChange = UpdateActiveSimulationName
-                        , placeholder = Nothing
-                        , text = simulation.name
-                        }
+                        [ viewCloseTabButton simulation
+                        , Input.text
+                            [ E.width (E.px 160) ]
+                            { label = Input.labelHidden "current simulation name"
+                            , onChange = UpdateActiveSimulationName
+                            , placeholder = Nothing
+                            , text = simulation.name
+                            }
+                        ]
 
                 else
                     Input.button styles.tab
                         { onPress = Just <| ChangeActiveSimulation simulation
-                        , label = E.el [ E.padding 15, E.inFront <| viewCloseTabButton simulation, E.alignLeft ] <| E.text simulation.name
+                        , label =
+                            E.row
+                                [ E.padding 8
+                                , E.alignLeft
+                                , E.width (E.px 190)
+                                ]
+                                [ viewCloseTabButton simulation
+                                , E.text simulation.name
+                                ]
                         }
             )
             model.simulations
@@ -246,8 +257,8 @@ viewCloseTabButton target =
             [ Background.color colors.lightGrey ]
         , E.paddingXY 3 3
         , E.centerY
-        , E.alignRight
-        , Border.rounded 10
+        , E.alignLeft
+        , Font.size 26
         ]
         { onPress =
             Just <| RemoveSimulation target
