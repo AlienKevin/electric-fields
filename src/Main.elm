@@ -258,7 +258,13 @@ viewCloseTabButton target =
 
 viewAddTab : E.Element Msg
 viewAddTab =
-    Input.button (styles.button ++ [ E.width <| E.px 20, Border.rounded 20 ])
+    Input.button
+        (styles.button
+            ++ [ E.width <| E.px 40
+               , E.height <| E.px 40
+               , Font.size 26
+               ]
+        )
         { onPress =
             Just AddSimulation
         , label =
@@ -336,7 +342,7 @@ update message model =
             ( closeUploadPopUp model, Cmd.none )
 
         GotViewport viewport ->
-            ( updateSimulationSize (viewport.viewport.width) (viewport.viewport.height - 150) model, Cmd.none )
+            ( updateSimulationSize viewport.viewport.width (viewport.viewport.height - 150) model, Cmd.none )
 
         WindowResized newWidth newHeight ->
             ( updateSimulationSize (toFloat newWidth) (toFloat newHeight - 150) model, Cmd.none )

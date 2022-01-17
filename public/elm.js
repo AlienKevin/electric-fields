@@ -20413,8 +20413,10 @@ var $author$project$Main$viewAddTab = A2(
 		_List_fromArray(
 			[
 				$mdgriffith$elm_ui$Element$width(
-				$mdgriffith$elm_ui$Element$px(20)),
-				$mdgriffith$elm_ui$Element$Border$rounded(20)
+				$mdgriffith$elm_ui$Element$px(40)),
+				$mdgriffith$elm_ui$Element$height(
+				$mdgriffith$elm_ui$Element$px(40)),
+				$mdgriffith$elm_ui$Element$Font$size(26)
 			])),
 	{
 		label: $author$project$Utils$centeredText('+'),
