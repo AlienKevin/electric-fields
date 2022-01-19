@@ -7631,7 +7631,7 @@ var $author$project$Main$decodeProject = A3(
 					$elm$json$Json$Decode$int,
 					function (defaultSimulationIndex) {
 						return $elm$json$Json$Decode$succeed(
-							{activeSimulation: activeSimulation, backgroundColorPicker: $simonh1000$elm_colorpicker$ColorPicker$empty, cursor: $author$project$Main$Selector, defaultSimulationIndex: defaultSimulationIndex, isInteractionEnabled: true, isMouseDown: false, negativeChargeColorPicker: $simonh1000$elm_colorpicker$ColorPicker$empty, negativeLineColorPicker: $simonh1000$elm_colorpicker$ColorPicker$empty, pendingSettings: $author$project$Simulation$defaultSettings, popUp: $author$project$Main$NoPopUp, positiveChargeColorPicker: $simonh1000$elm_colorpicker$ColorPicker$empty, positiveLineColorPicker: $simonh1000$elm_colorpicker$ColorPicker$empty, showCursorOptions: false, simulationHeight: $author$project$Main$defaultSimulationHeight, simulationWidth: $author$project$Main$defaultSimulationWidth, simulations: simulations, uploadResult: $author$project$Main$UploadPending});
+							{activeSimulation: activeSimulation, backgroundColorPicker: $simonh1000$elm_colorpicker$ColorPicker$empty, cursor: $author$project$Main$Selector, defaultSimulationIndex: defaultSimulationIndex, isInteractionEnabled: true, isMobile: false, isMouseDown: false, negativeChargeColorPicker: $simonh1000$elm_colorpicker$ColorPicker$empty, negativeLineColorPicker: $simonh1000$elm_colorpicker$ColorPicker$empty, pendingSettings: $author$project$Simulation$defaultSettings, popUp: $author$project$Main$NoPopUp, positiveChargeColorPicker: $simonh1000$elm_colorpicker$ColorPicker$empty, positiveLineColorPicker: $simonh1000$elm_colorpicker$ColorPicker$empty, showCursorOptions: false, simulationHeight: $author$project$Main$defaultSimulationHeight, simulationWidth: $author$project$Main$defaultSimulationWidth, simulations: simulations, uploadResult: $author$project$Main$UploadPending});
 					});
 			});
 	});
@@ -7712,7 +7712,7 @@ var $author$project$Main$init = function (savedProject) {
 	}();
 	var defaultSimulations = _List_fromArray(
 		[defaultActiveSimulation]);
-	var defaultProject = {activeSimulation: defaultActiveSimulation, backgroundColorPicker: $simonh1000$elm_colorpicker$ColorPicker$empty, cursor: $author$project$Main$Selector, defaultSimulationIndex: 1, isInteractionEnabled: true, isMouseDown: false, negativeChargeColorPicker: $simonh1000$elm_colorpicker$ColorPicker$empty, negativeLineColorPicker: $simonh1000$elm_colorpicker$ColorPicker$empty, pendingSettings: $author$project$Simulation$defaultSettings, popUp: $author$project$Main$NoPopUp, positiveChargeColorPicker: $simonh1000$elm_colorpicker$ColorPicker$empty, positiveLineColorPicker: $simonh1000$elm_colorpicker$ColorPicker$empty, showCursorOptions: false, simulationHeight: $author$project$Main$defaultSimulationHeight, simulationWidth: $author$project$Main$defaultSimulationWidth, simulations: defaultSimulations, uploadResult: $author$project$Main$UploadPending};
+	var defaultProject = {activeSimulation: defaultActiveSimulation, backgroundColorPicker: $simonh1000$elm_colorpicker$ColorPicker$empty, cursor: $author$project$Main$Selector, defaultSimulationIndex: 1, isInteractionEnabled: true, isMobile: false, isMouseDown: false, negativeChargeColorPicker: $simonh1000$elm_colorpicker$ColorPicker$empty, negativeLineColorPicker: $simonh1000$elm_colorpicker$ColorPicker$empty, pendingSettings: $author$project$Simulation$defaultSettings, popUp: $author$project$Main$NoPopUp, positiveChargeColorPicker: $simonh1000$elm_colorpicker$ColorPicker$empty, positiveLineColorPicker: $simonh1000$elm_colorpicker$ColorPicker$empty, showCursorOptions: false, simulationHeight: $author$project$Main$defaultSimulationHeight, simulationWidth: $author$project$Main$defaultSimulationWidth, simulations: defaultSimulations, uploadResult: $author$project$Main$UploadPending};
 	var project = function () {
 		if (savedProject.$ === 'Just') {
 			var projectJson = savedProject.a;
@@ -10226,14 +10226,17 @@ var $author$project$Main$updatePendingSetting = F3(
 	});
 var $author$project$Main$updateSimulationSize = F3(
 	function (newWidth, newHeight, model) {
+		var isMobile = A2($elm$core$Basics$min, newWidth, newHeight) < 500;
+		var newHeightAdapted = isMobile ? (newHeight - 60) : (newHeight - 150);
 		var updateSize = function (simulation) {
-			return ((!_Utils_eq(simulation.width, newWidth)) || (!_Utils_eq(simulation.height, newHeight))) ? A2($author$project$Simulation$init, newWidth, newHeight) : simulation;
+			return ((!_Utils_eq(simulation.width, newWidth)) || (!_Utils_eq(simulation.height, newHeightAdapted))) ? A2($author$project$Simulation$init, newWidth, newHeightAdapted) : simulation;
 		};
 		return _Utils_update(
 			model,
 			{
 				activeSimulation: updateSize(model.activeSimulation),
-				simulationHeight: newHeight,
+				isMobile: isMobile,
+				simulationHeight: newHeightAdapted,
 				simulationWidth: newWidth,
 				simulations: A2($elm$core$List$map, updateSize, model.simulations)
 			});
@@ -10346,13 +10349,13 @@ var $author$project$Main$update = F2(
 			case 'GotViewport':
 				var viewport = message.a;
 				return _Utils_Tuple2(
-					A3($author$project$Main$updateSimulationSize, viewport.viewport.width, viewport.viewport.height - 150, model),
+					A3($author$project$Main$updateSimulationSize, viewport.viewport.width, viewport.viewport.height, model),
 					$elm$core$Platform$Cmd$none);
 			case 'WindowResized':
 				var newWidth = message.a;
 				var newHeight = message.b;
 				return _Utils_Tuple2(
-					A3($author$project$Main$updateSimulationSize, newWidth, newHeight - 150, model),
+					A3($author$project$Main$updateSimulationSize, newWidth, newHeight, model),
 					$elm$core$Platform$Cmd$none);
 			case 'ToggleShowSourceValue':
 				var newChecked = message.a;
@@ -16343,40 +16346,6 @@ var $elm$html$Html$Events$onClick = function (msg) {
 };
 var $mdgriffith$elm_ui$Element$Events$onClick = A2($elm$core$Basics$composeL, $mdgriffith$elm_ui$Internal$Model$Attr, $elm$html$Html$Events$onClick);
 var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onContextMenu = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onWithOptions, 'contextmenu', $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$defaultOptions);
-var $mdgriffith$elm_ui$Internal$Model$PaddingStyle = F5(
-	function (a, b, c, d, e) {
-		return {$: 'PaddingStyle', a: a, b: b, c: c, d: d, e: e};
-	});
-var $mdgriffith$elm_ui$Internal$Flag$padding = $mdgriffith$elm_ui$Internal$Flag$flag(2);
-var $mdgriffith$elm_ui$Element$paddingXY = F2(
-	function (x, y) {
-		if (_Utils_eq(x, y)) {
-			var f = x;
-			return A2(
-				$mdgriffith$elm_ui$Internal$Model$StyleClass,
-				$mdgriffith$elm_ui$Internal$Flag$padding,
-				A5(
-					$mdgriffith$elm_ui$Internal$Model$PaddingStyle,
-					'p-' + $elm$core$String$fromInt(x),
-					f,
-					f,
-					f,
-					f));
-		} else {
-			var yFloat = y;
-			var xFloat = x;
-			return A2(
-				$mdgriffith$elm_ui$Internal$Model$StyleClass,
-				$mdgriffith$elm_ui$Internal$Flag$padding,
-				A5(
-					$mdgriffith$elm_ui$Internal$Model$PaddingStyle,
-					'p-' + ($elm$core$String$fromInt(x) + ('-' + $elm$core$String$fromInt(y))),
-					yFloat,
-					xFloat,
-					yFloat,
-					xFloat));
-		}
-	});
 var $elm_community$typed_svg$TypedSvg$Types$Px = function (a) {
 	return {$: 'Px', a: a};
 };
@@ -16642,6 +16611,40 @@ var $mdgriffith$elm_ui$Element$mouseOver = function (decs) {
 			$mdgriffith$elm_ui$Internal$Model$Hover,
 			$mdgriffith$elm_ui$Internal$Model$unwrapDecorations(decs)));
 };
+var $mdgriffith$elm_ui$Internal$Model$PaddingStyle = F5(
+	function (a, b, c, d, e) {
+		return {$: 'PaddingStyle', a: a, b: b, c: c, d: d, e: e};
+	});
+var $mdgriffith$elm_ui$Internal$Flag$padding = $mdgriffith$elm_ui$Internal$Flag$flag(2);
+var $mdgriffith$elm_ui$Element$paddingXY = F2(
+	function (x, y) {
+		if (_Utils_eq(x, y)) {
+			var f = x;
+			return A2(
+				$mdgriffith$elm_ui$Internal$Model$StyleClass,
+				$mdgriffith$elm_ui$Internal$Flag$padding,
+				A5(
+					$mdgriffith$elm_ui$Internal$Model$PaddingStyle,
+					'p-' + $elm$core$String$fromInt(x),
+					f,
+					f,
+					f,
+					f));
+		} else {
+			var yFloat = y;
+			var xFloat = x;
+			return A2(
+				$mdgriffith$elm_ui$Internal$Model$StyleClass,
+				$mdgriffith$elm_ui$Internal$Flag$padding,
+				A5(
+					$mdgriffith$elm_ui$Internal$Model$PaddingStyle,
+					'p-' + ($elm$core$String$fromInt(x) + ('-' + $elm$core$String$fromInt(y))),
+					yFloat,
+					xFloat,
+					yFloat,
+					xFloat));
+		}
+	});
 var $mdgriffith$elm_ui$Internal$Model$Px = function (a) {
 	return {$: 'Px', a: a};
 };
@@ -16721,6 +16724,8 @@ var $author$project$Utils$styles = {
 			A2($mdgriffith$elm_ui$Element$Border$widthXY, 2, 1),
 			$mdgriffith$elm_ui$Element$Border$color($author$project$Utils$colors.darkGrey)
 		]),
+	padBottom10: $mdgriffith$elm_ui$Element$htmlAttribute(
+		A2($elm$html$Html$Attributes$style, 'margin-bottom', '10px')),
 	padBottom20: $mdgriffith$elm_ui$Element$htmlAttribute(
 		A2($elm$html$Html$Attributes$style, 'margin-bottom', '20px')),
 	padTop10: $mdgriffith$elm_ui$Element$htmlAttribute(
@@ -18066,8 +18071,7 @@ var $author$project$Simulation$view = function (model) {
 					$mdgriffith$elm_ui$Element$inFront(
 					$author$project$Simulation$viewContextMenu(model)),
 					$mdgriffith$elm_ui$Element$centerX,
-					$mdgriffith$elm_ui$Element$centerY,
-					A2($mdgriffith$elm_ui$Element$paddingXY, 0, 5)
+					$mdgriffith$elm_ui$Element$centerY
 				]),
 			$mdgriffith$elm_ui$Element$html(
 				A2(
@@ -18475,30 +18479,38 @@ var $author$project$Main$viewControlPanel = function (model) {
 			[
 				$mdgriffith$elm_ui$Element$centerX,
 				$mdgriffith$elm_ui$Element$spacing(10),
-				$author$project$Utils$styles.padTop20,
-				$author$project$Utils$styles.padBottom20
+				model.isMobile ? $author$project$Utils$styles.padTop10 : $author$project$Utils$styles.padTop20,
+				model.isMobile ? $author$project$Utils$styles.padBottom10 : $author$project$Utils$styles.padBottom20
 			]),
-		_List_fromArray(
-			[
-				A2(
-				$author$project$Main$viewButtonNoProp,
-				'Help',
-				$author$project$Main$ShowPopUp($author$project$Main$HelpPopUp)),
-				A2(
-				$author$project$Main$viewButtonNoProp,
-				'Settings',
-				$author$project$Main$ShowPopUp($author$project$Main$SettingsPopUp)),
-				$author$project$Main$viewUpdateStateButton(model),
-				$author$project$Main$viewCursorButton(model),
-				A2(
-				$author$project$Main$viewButtonNoProp,
-				'Download',
-				$author$project$Main$ShowPopUp($author$project$Main$DownloadPopUp)),
-				A2(
-				$author$project$Main$viewButtonNoProp,
-				'Upload',
-				$author$project$Main$ShowPopUp($author$project$Main$UploadPopUp))
-			]));
+		_Utils_ap(
+			model.isMobile ? _List_Nil : _List_fromArray(
+				[
+					A2(
+					$author$project$Main$viewButtonNoProp,
+					'Help',
+					$author$project$Main$ShowPopUp($author$project$Main$HelpPopUp)),
+					A2(
+					$author$project$Main$viewButtonNoProp,
+					'Settings',
+					$author$project$Main$ShowPopUp($author$project$Main$SettingsPopUp))
+				]),
+			_Utils_ap(
+				_List_fromArray(
+					[
+						$author$project$Main$viewUpdateStateButton(model),
+						$author$project$Main$viewCursorButton(model)
+					]),
+				model.isMobile ? _List_Nil : _List_fromArray(
+					[
+						A2(
+						$author$project$Main$viewButtonNoProp,
+						'Download',
+						$author$project$Main$ShowPopUp($author$project$Main$DownloadPopUp)),
+						A2(
+						$author$project$Main$viewButtonNoProp,
+						'Upload',
+						$author$project$Main$ShowPopUp($author$project$Main$UploadPopUp))
+					]))));
 };
 var $author$project$Main$ApplySettingsToCurrentAndFutureFields = {$: 'ApplySettingsToCurrentAndFutureFields'};
 var $author$project$Main$ApplySettingsToFutureFields = {$: 'ApplySettingsToFutureFields'};
@@ -20657,17 +20669,21 @@ var $author$project$Main$view = function (model) {
 			]),
 		A2(
 			$mdgriffith$elm_ui$Element$el,
-			_List_fromArray(
-				[
-					$mdgriffith$elm_ui$Element$above(
-					$author$project$Main$viewTabs(model)),
-					$mdgriffith$elm_ui$Element$inFront(
-					$author$project$Main$viewPopUp(model)),
-					$mdgriffith$elm_ui$Element$below(
-					$author$project$Main$viewControlPanel(model)),
-					$mdgriffith$elm_ui$Element$centerX,
-					$mdgriffith$elm_ui$Element$centerY
-				]),
+			_Utils_ap(
+				_List_fromArray(
+					[
+						$mdgriffith$elm_ui$Element$inFront(
+						$author$project$Main$viewPopUp(model)),
+						$mdgriffith$elm_ui$Element$below(
+						$author$project$Main$viewControlPanel(model)),
+						$mdgriffith$elm_ui$Element$centerX
+					]),
+				model.isMobile ? _List_Nil : _List_fromArray(
+					[
+						$mdgriffith$elm_ui$Element$above(
+						$author$project$Main$viewTabs(model)),
+						$mdgriffith$elm_ui$Element$centerY
+					])),
 			A2(
 				$mdgriffith$elm_ui$Element$el,
 				model.isInteractionEnabled ? _List_fromArray(
