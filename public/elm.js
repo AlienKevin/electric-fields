@@ -10400,10 +10400,15 @@ var $author$project$Main$update = F2(
 				return _Utils_Tuple2(
 					$author$project$Main$mouseUp(model),
 					$elm$core$Platform$Cmd$none);
-			default:
+			case 'DoNothing':
 				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+			default:
+				return _Utils_Tuple2(
+					$author$project$Main$closePopUp(model),
+					$elm$core$Platform$Cmd$none);
 		}
 	});
+var $author$project$Main$ClickedOutsidePopUp = {$: 'ClickedOutsidePopUp'};
 var $author$project$Main$CursorClicked = function (a) {
 	return {$: 'CursorClicked', a: a};
 };
@@ -20652,18 +20657,19 @@ var $author$project$Main$view = function (model) {
 			]),
 		A2(
 			$mdgriffith$elm_ui$Element$el,
-			_Utils_ap(
-				_List_fromArray(
-					[
-						$mdgriffith$elm_ui$Element$above(
-						$author$project$Main$viewTabs(model)),
-						$mdgriffith$elm_ui$Element$inFront(
-						$author$project$Main$viewPopUp(model)),
-						$mdgriffith$elm_ui$Element$below(
-						$author$project$Main$viewControlPanel(model)),
-						$mdgriffith$elm_ui$Element$centerX,
-						$mdgriffith$elm_ui$Element$centerY
-					]),
+			_List_fromArray(
+				[
+					$mdgriffith$elm_ui$Element$above(
+					$author$project$Main$viewTabs(model)),
+					$mdgriffith$elm_ui$Element$inFront(
+					$author$project$Main$viewPopUp(model)),
+					$mdgriffith$elm_ui$Element$below(
+					$author$project$Main$viewControlPanel(model)),
+					$mdgriffith$elm_ui$Element$centerX,
+					$mdgriffith$elm_ui$Element$centerY
+				]),
+			A2(
+				$mdgriffith$elm_ui$Element$el,
 				model.isInteractionEnabled ? _List_fromArray(
 					[
 						$mdgriffith$elm_ui$Element$htmlAttribute(
@@ -20686,12 +20692,19 @@ var $author$project$Main$view = function (model) {
 							function (_v1) {
 								return $author$project$Main$MouseUp;
 							}))
-					]) : _List_Nil),
-			$mdgriffith$elm_ui$Element$html(
-				A2(
-					$elm$html$Html$map,
-					$author$project$Main$SimulationMsg,
-					$author$project$Simulation$view(model.activeSimulation)))));
+					]) : _List_fromArray(
+					[
+						$mdgriffith$elm_ui$Element$htmlAttribute(
+						$mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onClick(
+							function (_v2) {
+								return $author$project$Main$ClickedOutsidePopUp;
+							}))
+					]),
+				$mdgriffith$elm_ui$Element$html(
+					A2(
+						$elm$html$Html$map,
+						$author$project$Main$SimulationMsg,
+						$author$project$Simulation$view(model.activeSimulation))))));
 };
 var $author$project$Main$main = $elm$browser$Browser$element(
 	{init: $author$project$Main$init, subscriptions: $author$project$Main$subscriptions, update: $author$project$Main$update, view: $author$project$Main$view});

@@ -114,6 +114,7 @@ type Msg
     | MouseDown
     | MouseUp
     | DoNothing
+    | ClickedOutsidePopUp
 
 
 defaultSimulationWidth : Float
@@ -196,24 +197,25 @@ view model =
         ]
     <|
         E.el
-            ([ E.above <| viewTabs model
-             , E.inFront <| viewPopUp model
-             , E.below <| viewControlPanel model
-             , E.centerX
-             , E.centerY
-             ]
-                ++ (if model.isInteractionEnabled then
-                        [ E.htmlAttribute <| Mouse.onMove (\event -> DrawCharges event.offsetPos)
-                        , E.htmlAttribute <| Mouse.onClick (\event -> CursorClicked event.offsetPos)
-                        , E.htmlAttribute <| Mouse.onDown (\_ -> MouseDown)
-                        , E.htmlAttribute <| Mouse.onUp (\_ -> MouseUp)
-                        ]
+            [ E.above <| viewTabs model
+            , E.inFront <| viewPopUp model
+            , E.below <| viewControlPanel model
+            , E.centerX
+            , E.centerY
+            ]
+            (E.el
+                (if model.isInteractionEnabled then
+                    [ E.htmlAttribute <| Mouse.onMove (\event -> DrawCharges event.offsetPos)
+                    , E.htmlAttribute <| Mouse.onClick (\event -> CursorClicked event.offsetPos)
+                    , E.htmlAttribute <| Mouse.onDown (\_ -> MouseDown)
+                    , E.htmlAttribute <| Mouse.onUp (\_ -> MouseUp)
+                    ]
 
-                    else
-                        []
-                   )
+                 else
+                    [ E.htmlAttribute <| Mouse.onClick (\_ -> ClickedOutsidePopUp) ]
+                )
+                (E.html (Html.map SimulationMsg <| Simulation.view model.activeSimulation))
             )
-            (E.html (Html.map SimulationMsg <| Simulation.view model.activeSimulation))
 
 
 viewTabs : Model -> E.Element Msg
@@ -399,6 +401,9 @@ update message model =
 
         DoNothing ->
             ( model, Cmd.none )
+
+        ClickedOutsidePopUp ->
+            ( closePopUp model, Cmd.none )
 
 
 updateActiveSimulationName : String -> Model -> Model
