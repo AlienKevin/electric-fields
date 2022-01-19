@@ -1136,9 +1136,6 @@ applySettingsToCurrentAndFutureFields model =
 updatePendingSetting : String -> String -> Model -> Model
 updatePendingSetting field value model =
     let
-        _ =
-            Debug.log "value" value
-
         settings =
             model.pendingSettings
 
