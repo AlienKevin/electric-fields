@@ -56,6 +56,7 @@ type alias Model =
     , showCursorOptions : Bool
     , isMouseDown : Bool
     , isInteractionEnabled : Bool
+    , isMobile : Bool
     }
 
 
@@ -176,6 +177,7 @@ init savedProject =
             , showCursorOptions = False
             , isMouseDown = False
             , isInteractionEnabled = True
+            , isMobile = False
             }
     in
     ( project
@@ -197,12 +199,19 @@ view model =
         ]
     <|
         E.el
-            [ E.above <| viewTabs model
-            , E.inFront <| viewPopUp model
-            , E.below <| viewControlPanel model
-            , E.centerX
-            , E.centerY
-            ]
+            ([ E.inFront <| viewPopUp model
+             , E.below <| viewControlPanel model
+             , E.centerX
+             ]
+                ++ (if model.isMobile then
+                        []
+
+                    else
+                        [ E.above <| viewTabs model
+                        , E.centerY
+                        ]
+                   )
+            )
             (E.el
                 (if model.isInteractionEnabled then
                     [ E.htmlAttribute <| Mouse.onMove (\event -> DrawCharges event.offsetPos)
@@ -364,10 +373,10 @@ update message model =
             ( closeUploadPopUp model, Cmd.none )
 
         GotViewport viewport ->
-            ( updateSimulationSize viewport.viewport.width (viewport.viewport.height - 150) model, Cmd.none )
+            ( updateSimulationSize viewport.viewport.width viewport.viewport.height model, Cmd.none )
 
         WindowResized newWidth newHeight ->
-            ( updateSimulationSize (toFloat newWidth) (toFloat newHeight - 150) model, Cmd.none )
+            ( updateSimulationSize (toFloat newWidth) (toFloat newHeight) model, Cmd.none )
 
         ToggleShowSourceValue newChecked ->
             ( toggleShowSourceValue newChecked model, Cmd.none )
@@ -585,16 +594,37 @@ viewControlPanel model =
     E.row
         [ E.centerX
         , E.spacing 10
-        , styles.padTop20
-        , styles.padBottom20
+        , if model.isMobile then
+            styles.padTop10
+
+          else
+            styles.padTop20
+        , if model.isMobile then
+            styles.padBottom10
+
+          else
+            styles.padBottom20
         ]
-        [ viewButtonNoProp "Help" <| ShowPopUp HelpPopUp
-        , viewButtonNoProp "Settings" <| ShowPopUp SettingsPopUp
-        , viewUpdateStateButton model
-        , viewCursorButton model
-        , viewButtonNoProp "Download" <| ShowPopUp DownloadPopUp
-        , viewButtonNoProp "Upload" <| ShowPopUp UploadPopUp
-        ]
+    <|
+        (if model.isMobile then
+            []
+
+         else
+            [ viewButtonNoProp "Help" <| ShowPopUp HelpPopUp
+            , viewButtonNoProp "Settings" <| ShowPopUp SettingsPopUp
+            ]
+        )
+            ++ [ viewUpdateStateButton model
+               , viewCursorButton model
+               ]
+            ++ (if model.isMobile then
+                    []
+
+                else
+                    [ viewButtonNoProp "Download" <| ShowPopUp DownloadPopUp
+                    , viewButtonNoProp "Upload" <| ShowPopUp UploadPopUp
+                    ]
+               )
 
 
 viewUpdateStateButton : Model -> E.Element Msg
@@ -1195,10 +1225,20 @@ showPopUp popUp model =
 updateSimulationSize : Float -> Float -> Model -> Model
 updateSimulationSize newWidth newHeight model =
     let
+        isMobile =
+            min newWidth newHeight < 500
+
+        newHeightAdapted =
+            if isMobile then
+                newHeight - 60
+
+            else
+                newHeight - 150
+
         updateSize =
             \simulation ->
-                if simulation.width /= newWidth || simulation.height /= newHeight then
-                    Simulation.init newWidth newHeight
+                if simulation.width /= newWidth || simulation.height /= newHeightAdapted then
+                    Simulation.init newWidth newHeightAdapted
 
                 else
                     simulation
@@ -1207,13 +1247,15 @@ updateSimulationSize newWidth newHeight model =
         | simulationWidth =
             newWidth
         , simulationHeight =
-            newHeight
+            newHeightAdapted
         , simulations =
             List.map
                 updateSize
                 model.simulations
         , activeSimulation =
             updateSize model.activeSimulation
+        , isMobile =
+            isMobile
     }
 
 
@@ -1503,6 +1545,7 @@ decodeProject =
                                 , showCursorOptions = False
                                 , isMouseDown = False
                                 , isInteractionEnabled = True
+                                , isMobile = False
                                 }
 
 

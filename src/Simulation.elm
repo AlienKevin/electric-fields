@@ -448,7 +448,8 @@ dragConfig isInteractionEnabled =
             , Draggable.Events.onDragEnd EndDragging
             , Draggable.Events.onClick ActivateSource
             ]
-        else
+
+         else
             []
         )
 
@@ -1317,7 +1318,6 @@ view model =
             [ E.inFront <| viewContextMenu model
             , E.centerX
             , E.centerY
-            , E.paddingXY 0 5
             ]
             (E.html <|
                 Svg.svg
@@ -1491,7 +1491,6 @@ viewFieldSource isInteractionEnabled activeSourceId settings field =
 
                     else
                         []
-                        
                    )
              )
                 ++ (case activeSourceId of
