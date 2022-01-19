@@ -45,7 +45,7 @@ type alias Model =
     , state : State
     , width : Float
     , height : Float
-    , isDeleteModeOn : Bool
+    , isInteractionEnabled : Bool
     }
 
 
@@ -204,7 +204,7 @@ init width height =
             , width = width
             , height = height
             , state = Resting
-            , isDeleteModeOn = False
+            , isInteractionEnabled = True
             }
     in
     defaultModel
@@ -440,17 +440,16 @@ calculateFieldLine { charges, steps, delta, sourceSign, startChargeId, start, xB
 
 
 dragConfig : Bool -> Draggable.Config Id Msg
-dragConfig isDeleteModeOn =
+dragConfig isInteractionEnabled =
     Draggable.customConfig
-        (if isDeleteModeOn then
-            []
-
-         else
+        (if isInteractionEnabled then
             [ Draggable.Events.onDragBy OnDragBy
             , Draggable.Events.onDragStart StartDragging
             , Draggable.Events.onDragEnd EndDragging
             , Draggable.Events.onClick ActivateSource
             ]
+        else
+            []
         )
 
 
@@ -482,7 +481,7 @@ update msg model =
             ( stopWheelingTimeOut model, Cmd.none )
 
         DragMsg dragMsg ->
-            Draggable.update (dragConfig model.isDeleteModeOn) dragMsg model
+            Draggable.update (dragConfig model.isInteractionEnabled) dragMsg model
 
         ShowFieldContextMenu ->
             ( showFieldContextMenu model, Cmd.none )
@@ -821,7 +820,7 @@ decodeModel =
                                                                 , isWheeling = False
                                                                 , isWheelingTimeOutCleared = False
                                                                 , state = Resting
-                                                                , isDeleteModeOn = False
+                                                                , isInteractionEnabled = True
                                                                 }
 
 
@@ -1306,11 +1305,11 @@ view model =
             [ Font.monospace
             ]
          ]
-            ++ (if model.isDeleteModeOn then
-                    []
+            ++ (if model.isInteractionEnabled then
+                    [ Element.Events.onClick ClickedBackground ]
 
                 else
-                    [ Element.Events.onClick ClickedBackground ]
+                    []
                )
         )
     <|
@@ -1331,7 +1330,7 @@ view model =
                 <|
                     viewBackground model.width model.height model.settings.colors.background
                         :: List.map (viewFieldLines model.settings) model.fields
-                        ++ List.map (viewFieldSource model.isDeleteModeOn model.activeSourceId model.settings) model.fields
+                        ++ List.map (viewFieldSource model.isInteractionEnabled model.activeSourceId model.settings) model.fields
             )
 
 
@@ -1429,7 +1428,7 @@ viewGeneralContextMenu menuItemstyless ( x, y ) =
 
 
 viewFieldSource : Bool -> Maybe Id -> Settings -> Field -> Svg Msg
-viewFieldSource isDeleteModeOn activeSourceId settings field =
+viewFieldSource isInteractionEnabled activeSourceId settings field =
     let
         fill =
             case field.source.sign of
@@ -1486,12 +1485,13 @@ viewFieldSource isDeleteModeOn activeSourceId settings field =
                     else
                         []
                    )
-                ++ (if isDeleteModeOn then
-                        []
-
-                    else
+                ++ (if isInteractionEnabled then
                         Draggable.mouseTrigger field.source.id DragMsg
                             :: Draggable.touchTriggers field.source.id DragMsg
+
+                    else
+                        []
+                        
                    )
              )
                 ++ (case activeSourceId of

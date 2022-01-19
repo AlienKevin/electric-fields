@@ -55,6 +55,7 @@ type alias Model =
     , cursor : Cursor
     , showCursorOptions : Bool
     , isMouseDown : Bool
+    , isInteractionEnabled : Bool
     }
 
 
@@ -173,6 +174,7 @@ init savedProject =
             , cursor = Selector
             , showCursorOptions = False
             , isMouseDown = False
+            , isInteractionEnabled = True
             }
     in
     ( project
@@ -194,16 +196,23 @@ view model =
         ]
     <|
         E.el
-            [ E.above <| viewTabs model
-            , E.inFront <| viewPopUp model
-            , E.below <| viewControlPanel model
-            , E.centerX
-            , E.centerY
-            , E.htmlAttribute <| Mouse.onMove (\event -> DrawCharges event.offsetPos)
-            , E.htmlAttribute <| Mouse.onClick (\event -> CursorClicked event.offsetPos)
-            , E.htmlAttribute <| Mouse.onDown (\_ -> MouseDown)
-            , E.htmlAttribute <| Mouse.onUp (\_ -> MouseUp)
-            ]
+            ([ E.above <| viewTabs model
+             , E.inFront <| viewPopUp model
+             , E.below <| viewControlPanel model
+             , E.centerX
+             , E.centerY
+             ]
+                ++ (if model.isInteractionEnabled then
+                        [ E.htmlAttribute <| Mouse.onMove (\event -> DrawCharges event.offsetPos)
+                        , E.htmlAttribute <| Mouse.onClick (\event -> CursorClicked event.offsetPos)
+                        , E.htmlAttribute <| Mouse.onDown (\_ -> MouseDown)
+                        , E.htmlAttribute <| Mouse.onUp (\_ -> MouseUp)
+                        ]
+
+                    else
+                        []
+                   )
+            )
             (E.html (Html.map SimulationMsg <| Simulation.view model.activeSimulation))
 
 
@@ -965,11 +974,8 @@ onClickNoProp msg =
 
 
 closeDownloadPopUp : Model -> Model
-closeDownloadPopUp model =
-    { model
-        | popUp =
-            NoPopUp
-    }
+closeDownloadPopUp =
+    closePopUp
 
 
 loadSimulation : String -> Model -> Model
@@ -992,32 +998,36 @@ loadSimulation jsonString model =
             }
 
 
+closePopUp : Model -> Model
+closePopUp model =
+    updateIsInteractionEnabled True
+        { model
+            | popUp =
+                NoPopUp
+        }
+
+
 closeUploadPopUp : Model -> Model
 closeUploadPopUp model =
-    { model
-        | popUp =
-            NoPopUp
-        , uploadResult =
-            UploadPending
-    }
+    closePopUp
+        { model
+            | uploadResult =
+                UploadPending
+        }
 
 
 closeHelpPopUp : Model -> Model
-closeHelpPopUp model =
-    { model
-        | popUp =
-            NoPopUp
-    }
+closeHelpPopUp =
+    closePopUp
 
 
 closeSettingsPopUp : Model -> Model
 closeSettingsPopUp model =
-    { model
-        | popUp =
-            NoPopUp
-        , pendingSettings =
-            model.activeSimulation.settings
-    }
+    closePopUp
+        { model
+            | pendingSettings =
+                model.activeSimulation.settings
+        }
 
 
 applyPendingSettings : Model -> Model
@@ -1041,10 +1051,7 @@ applySettingsToFutureFields model =
                 )
                 model
     in
-    { updatedModel
-        | popUp =
-            NoPopUp
-    }
+    closePopUp updatedModel
 
 
 applySettingsToCurrentAndFutureFields : Model -> Model
@@ -1088,15 +1095,15 @@ applySettingsToCurrentAndFutureFields model =
                 )
                 model
     in
-    { updatedModel
-        | popUp =
-            NoPopUp
-    }
+    closePopUp updatedModel
 
 
 updatePendingSetting : String -> String -> Model -> Model
 updatePendingSetting field value model =
     let
+        _ =
+            Debug.log "value" value
+
         settings =
             model.pendingSettings
 
@@ -1151,12 +1158,33 @@ updatePendingSetting field value model =
     }
 
 
+updateIsInteractionEnabled : Bool -> Model -> Model
+updateIsInteractionEnabled isInteractionEnabled model =
+    let
+        oldSimulation =
+            model.activeSimulation
+
+        newSimulation =
+            { oldSimulation
+                | isInteractionEnabled =
+                    isInteractionEnabled
+            }
+    in
+    updateActiveSimulation
+        newSimulation
+        { model | isInteractionEnabled = isInteractionEnabled }
+
+
 showPopUp : PopUp -> Model -> Model
 showPopUp popUp model =
-    { model
-        | popUp =
-            popUp
-    }
+    let
+        newModel =
+            { model
+                | popUp =
+                    popUp
+            }
+    in
+    updateIsInteractionEnabled (popUp == NoPopUp) newModel
 
 
 updateSimulationSize : Float -> Float -> Model -> Model
@@ -1306,26 +1334,24 @@ updateActiveSimulationState model =
 updateCursor : Cursor -> Model -> Model
 updateCursor newCursor model =
     let
+        oldIsInteractionEnabled =
+            model.isInteractionEnabled
+
         newModel =
-            { model
-                | cursor =
-                    newCursor
-                , showCursorOptions =
-                    model.cursor == newCursor
-            }
-
-        oldSimulation =
-            model.activeSimulation
-
-        newSimulation =
-            { oldSimulation
-                | isDeleteModeOn =
-                    newCursor == Deleter
-            }
+            updateIsInteractionEnabled (newCursor /= Deleter)
+                { model
+                    | cursor =
+                        newCursor
+                    , showCursorOptions =
+                        model.cursor == newCursor
+                }
     in
-    updateActiveSimulation
-        newSimulation
-        newModel
+    -- only update the simulation's isInteractionEnabled
+    -- keep Main's isInteractionEnabled the same
+    { newModel
+        | isInteractionEnabled =
+            oldIsInteractionEnabled
+    }
 
 
 showCursorOptions : Model -> Model
@@ -1471,6 +1497,7 @@ decodeProject =
                                 , cursor = Selector
                                 , showCursorOptions = False
                                 , isMouseDown = False
+                                , isInteractionEnabled = True
                                 }
 
 
