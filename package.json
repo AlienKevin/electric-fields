@@ -17,6 +17,6 @@
   },
   "homepage": "https://github.com/AlienKevin/electric-fields#readme",
   "devDependencies": {
-    "terser": "^4.6.10"
+    "terser": "^4.8.1"
   }
 }
